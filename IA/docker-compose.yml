@@ -1,0 +1,129 @@
+version: '3.9'
+
+services:
+  # ==========================================
+  #  SERVIÇOS ORIGINAIS (n8n, Redis Antigo)
+  # ==========================================
+
+  # O Cérebro (n8n)
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n
+    restart: always
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:5678/
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+    depends_on:
+      - redis_memory
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - app_network
+
+  # A Memória Antiga (Mantida para o n8n)
+  redis_memory:
+    image: redis:alpine
+    container_name: redis_memory
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - app_network
+
+  # ==========================================
+  #  NOVOS SERVIÇOS (MongoDB e Neo4j - Manuario)
+  # ==========================================
+
+  # Banco de Dados de Documentos (MongoDB)
+  mongo_db:
+    image: mongo:latest
+    container_name: mongo_manuario
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: manuario_admin
+      MONGO_INITDB_ROOT_PASSWORD: 123456789
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app_network
+
+  # Banco de Dados de Grafos (Neo4j)
+  neo4j_db:
+    image: neo4j:5
+    container_name: neo4j_manuario
+    restart: always
+    ports:
+      - "7474:7474" # Interface Web
+      - "7687:7687" # Conexão (Bolt)
+    environment:
+      # Define o usuário/senha padrão
+      NEO4J_AUTH: neo4j/123456789
+    volumes:
+      - neo4j-data:/data
+    networks:
+      - app_network
+
+  # ==========================================
+  #  RAG SERVICES (Postgres Vector + pgAdmin)
+  # ==========================================
+
+  # Postgres com PGVector já instalado
+  rag-postgres:
+    image: pgvector/pgvector:pg16
+    container_name: rag_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123  # Senha do banco de vetores
+      POSTGRES_DB: vector_db
+    ports:
+      - "5434:5432" 
+    volumes:
+      - rag_postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  # Interface de Administração para o Banco Vetorial
+  rag-pgadmin:
+    image: dpage/pgadmin4
+    container_name: rag_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin # Senha de login no site do pgAdmin
+    ports:
+      - "5050:80" 
+    depends_on:
+      - rag-postgres
+    volumes:
+      - rag_pgadmin_data:/var/lib/pgadmin
+    networks:
+      - app_network
+
+# ==========================================
+#  VOLUMES E REDES
+# ==========================================
+volumes:
+  # Volumes do n8n / Redis
+  n8n_data:
+  redis_data:
+  # Volumes RAG
+  rag_postgres_data:
+  rag_pgadmin_data:
+  # Volumes Novos (Mongo e Neo4j - Manuario)
+  mongo-data:
+  neo4j-data:
+
+networks:
+  app_network:
+    driver: bridge
