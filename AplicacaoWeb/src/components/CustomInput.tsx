@@ -3,17 +3,24 @@ import React from 'react';
 interface CustomInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label: string;
     id: string;
+    error?: boolean;
 }
 
-export function CustomInput({ label, id, ...props }: CustomInputProps) {
+export function CustomInput({ label, id, error, ...props }: CustomInputProps) {
     return (
-        <div className="space-y-1 text-left">
-            <label htmlFor={id} className="text-sm font-medium text-zinc-300 ml-1">
+        <div className="text-left">
+            <label
+                className={`mb-2 block text-sm font-medium ml-1 ${error ? 'text-red-500' : 'text-text-muted'}`}
+            >
                 {label}
             </label>
             <input
                 id={id}
-                className="w-full bg-transparent border border-[#3b2d59] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#8b5cf6] focus:ring-1 focus:ring-[#8b5cf6] transition-colors"
+                className={`w-full bg-transparent border rounded-xl px-4 py-3 text-text focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                    error
+                        ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
+                        : 'border-surface-border focus:border-primary focus:ring-1 focus:ring-primary'
+                }`}
                 {...props}
             />
         </div>

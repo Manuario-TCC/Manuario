@@ -1,5 +1,5 @@
-import { AuthForm } from "../AuthForm";
+import { AuthForm } from '../AuthForm';
 
 export default function LoginPage() {
-  return <AuthForm />;
+    return <AuthForm />;
 }

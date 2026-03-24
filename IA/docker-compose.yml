@@ -49,13 +49,11 @@ services:
     restart: always
     ports:
       - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: manuario_admin
-      MONGO_INITDB_ROOT_PASSWORD: 123456789
     volumes:
       - mongo-data:/data/db
     networks:
       - app_network
+    command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
 
   # Banco de Dados de Grafos (Neo4j)
   neo4j_db:
