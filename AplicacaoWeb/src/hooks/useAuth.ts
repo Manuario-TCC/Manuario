@@ -51,7 +51,7 @@ export function useAuth() {
                 timer: 1500,
                 showConfirmButton: false,
             }).then(() => {
-                router.push('/dashboard');
+                router.push('/chat');
             });
         } catch (error: any) {
             Swal.fire({
