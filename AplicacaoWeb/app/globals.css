@@ -1,18 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 @import 'tailwindcss';
 
 @theme {
     --color-background: #0d0b14;
     --color-surface: #13111c;
     --color-surface-border: #3b2d59;
-
     --color-primary: #8b5cf6;
     --color-primary-hover: #7c4deb;
     --color-primary-light: #a78bfa;
-
     --color-text: #ffffff;
     --color-text-muted: #a1a1aa;
 
     --background-image-img-fundo: url('/img/background.jpg');
+    --font-sans: 'Roboto', sans-serif;
 }
 
 @layer base {

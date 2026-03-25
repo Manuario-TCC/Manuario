@@ -23,9 +23,8 @@ export async function POST(request: Request) {
 
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET!, { expiresIn: '7d' });
 
-        return NextResponse.json(
+        const response = NextResponse.json(
             {
-                token,
                 user: {
                     id: user.id,
                     name: user.name,
@@ -33,6 +32,17 @@ export async function POST(request: Request) {
             },
             { status: 200 },
         );
+
+        // Salva o token
+        response.cookies.set('manuario_token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 24 * 7, // 7 dias
+            path: '/',
+        });
+
+        return response;
     } catch (error) {
         console.error('Erro no login:', error);
         return NextResponse.json({ message: 'Erro no servidor' }, { status: 500 });
