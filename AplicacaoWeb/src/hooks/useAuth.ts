@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
@@ -51,7 +53,7 @@ export function useAuth() {
                 timer: 1500,
                 showConfirmButton: false,
             }).then(() => {
-                router.push('/chat');
+                window.location.href = '/chat';
             });
         } catch (error: any) {
             Swal.fire({
@@ -64,6 +66,17 @@ export function useAuth() {
             });
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const logout = async () => {
+        try {
+            await authService.logout();
+
+            router.push('/login');
+            router.refresh();
+        } catch (error) {
+            console.error('Erro durante o processo de logout:', error);
         }
     };
 
@@ -80,5 +93,6 @@ export function useAuth() {
         emailError,
         passwordError,
         canSubmit,
+        logout,
     };
 }

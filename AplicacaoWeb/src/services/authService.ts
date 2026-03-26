@@ -27,4 +27,16 @@ export const authService = {
 
         return result;
     },
+
+    logout: async () => {
+        const response = await fetch('/api/auth/logout', {
+            method: 'POST',
+        });
+
+        if (!response.ok) {
+            throw new Error('Falha ao comunicar com o servidor para logout');
+        }
+
+        return response.json();
+    },
 };

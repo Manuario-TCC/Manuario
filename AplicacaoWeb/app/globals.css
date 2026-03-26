@@ -2,12 +2,16 @@
 @import 'tailwindcss';
 
 @theme {
-    --color-background: #0d0b14;
-    --color-surface: #13111c;
-    --color-surface-border: #3b2d59;
-    --color-primary: #8b5cf6;
-    --color-primary-hover: #7c4deb;
-    --color-primary-light: #a78bfa;
+    --color-background: #17141b;
+    --color-surface: #0f0d12;
+    --color-surface-border: #2a2438;
+
+    --color-primary: #470279;
+    --color-primary-hover: #5d03a1;
+
+    --color-accent: #816cfb;
+    --color-accent-hover: #9b8afc;
+
     --color-text: #ffffff;
     --color-text-muted: #a1a1aa;
 
@@ -16,23 +20,32 @@
 }
 
 @layer base {
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover,
-    input:-webkit-autofill:focus,
-    input:-webkit-autofill:active {
-        -webkit-box-shadow: 0 0 0 30px var(--color-surface) inset !important;
-        -webkit-text-fill-color: var(--color-text) !important;
+    body {
+        background-color: var(--color-background);
+        color: var(--color-text);
     }
 }
 
-@media (min-width: 2500px) {
+@media screen and (max-width: 320px) {
     html {
-        font-size: 110%;
+        font-size: 14px;
     }
 }
 
-@media (min-width: 3000px) {
+@media screen and (min-width: 1600px) {
     html {
-        font-size: 130%;
+        font-size: 18px;
+    }
+}
+
+@media screen and (min-width: 2000px) {
+    html {
+        font-size: 36px;
+    }
+}
+
+@media screen and (min-width: 3000px) {
+    html {
+        font-size: 52px;
     }
 }

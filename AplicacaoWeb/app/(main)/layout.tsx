@@ -1,18 +1,13 @@
-import type { Metadata } from 'next';
+import Menu from '@/src/features/menu/page';
 
-export const metadata: Metadata = {
-    title: 'Manuario - Principal',
-    description: 'Sistema',
-};
-
-export default function MainLayout({
-    children,
-}: Readonly<{
-    children: React.ReactNode;
-}>) {
+export default function MainLayout({ children }: { children: React.ReactNode }) {
     return (
-        <div className="w-full min-h-screen bg-background text-text antialiased">
-            <main className="relative z-10 flex flex-col min-h-screen">{children}</main>
+        <div className="flex h-screen w-full bg-background text-text overflow-hidden">
+            <Menu />
+
+            <main className="flex-1 h-full overflow-y-auto relative pl-0 pt-14 sm:pt-0 sm:pl-24 lg:pl-0">
+                <div className="w-full h-full">{children}</div>
+            </main>
         </div>
     );
 }
