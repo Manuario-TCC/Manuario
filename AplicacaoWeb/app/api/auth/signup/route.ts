@@ -1,17 +1,14 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/src/database/prisma';
+import { randomUUID } from 'crypto'; // Importe a biblioteca nativa do Node
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
     try {
-        const body = await request.json();
-        const { name, email, password } = body;
+        const { name, email, password } = await req.json();
 
         if (!name || !email || !password) {
-            return NextResponse.json(
-                { message: 'Nome, e-mail e senha são obrigatórios.' },
-                { status: 400 },
-            );
+            return NextResponse.json({ error: 'Preencha todos os campos.' }, { status: 400 });
         }
 
         const existingUser = await prisma.user.findUnique({
@@ -19,33 +16,28 @@ export async function POST(request: Request) {
         });
 
         if (existingUser) {
-            return NextResponse.json({ message: 'Este e-mail já está em uso.' }, { status: 409 });
+            return NextResponse.json({ error: 'E-mail já está em uso.' }, { status: 409 });
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newUser = await prisma.user.create({
+        // Id pulbico
+        const shortIdPublico = randomUUID().split('-')[0];
+
+        const user = await prisma.user.create({
             data: {
                 name,
                 email,
                 password: hashedPassword,
+                idPublico: shortIdPublico,
             },
         });
 
-        return NextResponse.json(
-            {
-                message: 'Conta criada com sucesso!',
-                user: { id: newUser.id, name: newUser.name, email: newUser.email },
-            },
-            { status: 201 },
-        );
-    } catch (error: any) {
-        console.error('Erro no cadastro:', error);
+        const { password: _, ...userWithoutPassword } = user;
 
-        return NextResponse.json(
-            { message: 'Erro interno do servidor ao criar a conta.' },
-            { status: 500 },
-        );
+        return NextResponse.json(userWithoutPassword, { status: 201 });
+    } catch (error) {
+        console.error('Erro no signup:', error);
+        return NextResponse.json({ error: 'Erro interno no servidor.' }, { status: 500 });
     }
 }
