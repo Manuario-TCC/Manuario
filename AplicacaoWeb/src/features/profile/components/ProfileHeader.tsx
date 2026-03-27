@@ -36,18 +36,32 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ initialData, isOwnProfile
             />
 
             <div className="px-4 md:px-8 max-w-5xl w-full mx-auto relative pb-4">
-                <div className="flex items-start gap-4 md:gap-6">
-                    <div className="-mt-16 md:-mt-20">
-                        <ProfileAvatar
-                            avatarUrl={avatar.avatarUrl}
-                            isOwnProfile={isOwnProfile}
-                            inputRef={avatar.avatarInputRef}
-                            onClick={avatar.handleAvatarClick}
-                            onChange={avatar.handleAvatarChange}
-                        />
+                <div className="flex flex-col min-[900px]:flex-row min-[900px]:items-start gap-4 min-[900px]:gap-6">
+                    <div className="flex justify-between items-end min-[900px]:items-start w-full min-[900px]:w-auto">
+                        <div className="-mt-16">
+                            <ProfileAvatar
+                                avatarUrl={avatar.avatarUrl}
+                                isOwnProfile={isOwnProfile}
+                                inputRef={avatar.avatarInputRef}
+                                onClick={avatar.handleAvatarClick}
+                                onChange={avatar.handleAvatarChange}
+                            />
+                        </div>
+
+                        <div className="min-[900px]:hidden pb-2 flex-shrink-0">
+                            {isOwnProfile ? (
+                                <button className="px-4 py-1.5 rounded-full border border-card-border text-text font-semibold hover:bg-card-border transition text-sm cursor-pointer">
+                                    Compartilhar
+                                </button>
+                            ) : (
+                                <button className="px-6 py-1.5 rounded-full bg-text text-text-inverted font-semibold hover:bg-sub-text transition text-sm cursor-pointer">
+                                    Seguir
+                                </button>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="flex-1 pt-2 md:pt-4">
+                    <div className="flex-1 min-[900px]:pt-4">
                         <ProfileUserInfo
                             name={user.name}
                             tempName={user.tempName}
@@ -60,13 +74,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ initialData, isOwnProfile
                         />
                     </div>
 
-                    <div className="pt-2 md:pt-4 flex-shrink-0">
+                    <div className="hidden min-[900px]:block pt-4 flex-shrink-0">
                         {isOwnProfile ? (
-                            <button className="px-6 py-2 rounded-full border border-card-border text-text font-semibold hover:bg-card-border transition text-sm">
+                            <button className="px-6 py-2 rounded-full border border-card-border text-text font-semibold hover:bg-card-border transition text-sm cursor-pointer">
                                 Compartilhar Perfil
                             </button>
                         ) : (
-                            <button className="px-6 py-2 rounded-full bg-text text-text-inverted font-semibold hover:bg-sub-text transition text-sm">
+                            <button className="px-6 py-2 rounded-full bg-text text-text-inverted font-semibold hover:bg-sub-text transition text-sm cursor-pointer">
                                 Seguir
                             </button>
                         )}
