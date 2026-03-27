@@ -1,21 +1,17 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/src/database/prisma';
-import { cookies } from 'next/headers';
-import * as jwt from 'jsonwebtoken';
+import { getAuthUserId } from '@/src/utils/auth';
 
 export async function GET() {
     try {
-        const cookieStore = await cookies();
-        const token = cookieStore.get('manuario_token')?.value;
+        const userId = await getAuthUserId();
 
-        if (!token) {
+        if (!userId) {
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as { userId: string };
-
         const dbUser = await prisma.user.findUnique({
-            where: { id: decoded.userId },
+            where: { id: userId },
             select: {
                 idPublico: true,
                 name: true,

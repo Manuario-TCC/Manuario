@@ -24,12 +24,12 @@ export function AuthForm() {
 
     return (
         <div className="flex min-h-screen items-center justify-center p-4">
-            <div className="w-full max-w-md p-10 bg-surface/90 backdrop-blur-sm border border-surface-border rounded-[32px] shadow-2xl">
+            <div className="w-full max-w-md p-10 bg-card backdrop-blur-sm border border-card-border rounded-[32px] shadow-2xl">
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-extrabold text-text tracking-tight mb-2">
                         {isLogin ? 'Bem-vindo de volta' : 'Crie sua conta'}
                     </h1>
-                    <p className="text-text-muted text-sm">
+                    <p className="text-sub-text text-sm">
                         Comece sua jornada nos jogos de tabuleiro
                     </p>
                 </div>
@@ -78,7 +78,7 @@ export function AuthForm() {
                     </button>
                 </form>
 
-                <div className="mt-8 text-center text-sm text-text-muted">
+                <div className="mt-8 text-center text-sm text-sub-text">
                     {isLogin ? 'Ainda não tem uma conta? ' : 'Já tem uma conta? '}
                     <button
                         type="button"

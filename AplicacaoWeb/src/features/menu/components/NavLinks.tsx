@@ -54,7 +54,7 @@ export function NavLinks({ isOpen, closeMenu }: NavLinksProps) {
     };
 
     return (
-        <nav className="flex-1 flex flex-col gap-2 p-3 mt-2 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-surface-border">
+        <nav className="flex-1 flex flex-col gap-2 p-3 mt-2 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-card-border">
             {navItems.map((item) => {
                 const isActive = item.href ? pathname.startsWith(item.href) : false;
 
@@ -62,8 +62,8 @@ export function NavLinks({ isOpen, closeMenu }: NavLinksProps) {
                     isOpen ? 'px-4 justify-start' : 'justify-center px-0 lg:px-4 lg:justify-start'
                 } ${
                     isActive
-                        ? 'bg-primary text-white font-medium'
-                        : 'text-text-muted hover:bg-zinc-800 hover:text-text'
+                        ? 'bg-primary text-text font-medium'
+                        : 'text-sub-text hover:bg-zinc-800 hover:text-text'
                 }`;
 
                 const textClasses = `whitespace-nowrap text-base transition-opacity duration-300 ${

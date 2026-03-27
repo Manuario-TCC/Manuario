@@ -32,6 +32,6 @@ Cada feature deve seguir estritamente a estrutura abaixo:
 
 ### 🎨 Padrão de Estilização (Tailwind CSS)
 
-- **Uso Obrigatório de Variáveis:** SEMPRE utilize as variáveis semânticas de cor definidas no `@theme` do `app/globals.css` (exemplo: `bg-primary`, `text-text`, `border-surface-border`).
+- **Uso Obrigatório de Variáveis:** SEMPRE utilize as variáveis semânticas de cor definidas no `@theme` do `app/globals.css` (exemplo: `bg-primary`, `text-text`, `border-card-border`).
 - **Proibido Hexadecimal Fixo:** É ESTRITAMENTE PROIBIDO o uso de valores hexadecimais _hardcoded_ nas classes do Tailwind (exemplo: NUNCA use `bg-[#8b5cf6]`, `text-[#13111c]`).
 - **Nova Cor:** Se o design exigir uma cor que não existe, ela DEVE ser criada primeiro como uma nova variável no `globals.css`.
