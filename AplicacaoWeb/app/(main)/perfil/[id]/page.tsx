@@ -41,7 +41,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
     }
 
     return (
-        <main className="w-full flex flex-col min-h-screen bg-zinc-950">
+        <main className="w-full flex flex-col min-h-screen">
             <ProfileHeader
                 initialData={{
                     name: profileData.name,

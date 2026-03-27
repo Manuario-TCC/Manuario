@@ -46,11 +46,11 @@ export const ProfileUserInfo: React.FC<Props> = ({
             </div>
         ) : (
             <div className="flex items-center gap-3 mb-1 group w-max">
-                <h1 className="text-2xl md:text-3xl font-bold text-white">{name}</h1>
+                <h1 className="text-2xl md:text-3xl font-bold text-text">{name}</h1>
                 {isOwnProfile && (
                     <button
                         onClick={onStartEdit}
-                        className="text-zinc-500 md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:text-white"
+                        className="text-zinc-500 md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:text-text"
                     >
                         <Pencil size={18} />
                     </button>
@@ -58,15 +58,15 @@ export const ProfileUserInfo: React.FC<Props> = ({
             </div>
         )}
 
-        <div className="flex gap-4 mt-2 text-xs md:text-base text-zinc-400">
+        <div className="flex gap-4 mt-2 text-xs md:text-base text-sub-text">
             <p>
-                <span className="font-bold text-white">142</span> Seguidores
+                <span className="font-bold text-text">142</span> Seguidores
             </p>
             <p>
-                <span className="font-bold text-white">89</span> Seguindo
+                <span className="font-bold text-text">89</span> Seguindo
             </p>
             <p>
-                <span className="font-bold text-white">12</span> Regras Postadas
+                <span className="font-bold text-text">12</span> Regras Postadas
             </p>
         </div>
     </div>

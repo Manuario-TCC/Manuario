@@ -3,17 +3,16 @@
 
 @theme {
     --color-background: #17141b;
-    --color-surface: #0f0d12;
-    --color-surface-border: #2a2438;
-
+    --color-card: #0f0d12;
+    --color-card-border: #2a2438;
     --color-primary: #470279;
     --color-primary-hover: #5d03a1;
-
     --color-accent: #816cfb;
     --color-accent-hover: #9b8afc;
-
     --color-text: #ffffff;
-    --color-text-muted: #a1a1aa;
+    --color-sub-text: #a1a1aa;
+    --color-text-inverted: #000000;
+    --color-black: #000000;
 
     --background-image-img-fundo: url('/img/background.jpg');
     --font-sans: 'Roboto', sans-serif;

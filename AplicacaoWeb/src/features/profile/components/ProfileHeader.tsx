@@ -26,7 +26,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ initialData, isOwnProfile
     const user = useProfileName(initialData.name);
 
     return (
-        <div className="w-full flex flex-col bg-zinc-950 min-h-screen">
+        <div className="w-full flex flex-col min-h-screen">
             <ProfileBanner
                 bannerUrl={banner.bannerUrl}
                 isOwnProfile={isOwnProfile}
@@ -62,11 +62,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ initialData, isOwnProfile
 
                     <div className="pt-2 md:pt-4 flex-shrink-0">
                         {isOwnProfile ? (
-                            <button className="px-6 py-2 rounded-full border border-zinc-700 text-white font-semibold hover:bg-zinc-800 transition text-sm">
+                            <button className="px-6 py-2 rounded-full border border-card-border text-text font-semibold hover:bg-card-border transition text-sm">
                                 Compartilhar Perfil
                             </button>
                         ) : (
-                            <button className="px-6 py-2 rounded-full bg-white text-black font-semibold hover:bg-zinc-200 transition text-sm">
+                            <button className="px-6 py-2 rounded-full bg-text text-text-inverted font-semibold hover:bg-sub-text transition text-sm">
                                 Seguir
                             </button>
                         )}

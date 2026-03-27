@@ -22,7 +22,7 @@ export default function Menu() {
             {!isOpen && (
                 <button
                     onClick={toggleMenu}
-                    className="fixed top-2 left-2 z-40 p-2 bg-surface border border-surface-border rounded-lg text-text-muted hover:text-text sm:hidden shadow-lg transition-colors"
+                    className="fixed top-2 left-2 z-40 p-2 bg-card border border-card-border rounded-lg text-sub-text hover:text-text sm:hidden shadow-lg transition-colors"
                     aria-label="Abrir Menu"
                 >
                     <svg className="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,7 +38,7 @@ export default function Menu() {
 
             <aside
                 className={`
-                    fixed top-0 left-0 h-screen bg-surface border-r border-surface-border z-50
+                    fixed top-0 left-0 h-screen bg-card border-r border-card-border z-50
                     transition-all duration-300 ease-in-out flex flex-col
 
                     ${isOpen ? 'translate-x-0 w-[80%] shadow-2xl' : '-translate-x-full w-[80%]'}
@@ -53,7 +53,7 @@ export default function Menu() {
                 >
                     <button
                         onClick={toggleMenu}
-                        className="text-text-muted hover:text-text p-1 focus:outline-none transition-colors cursor-pointer"
+                        className="text-sub-text hover:text-text p-1 focus:outline-none transition-colors cursor-pointer"
                         aria-label={isOpen ? 'Fechar Menu' : 'Abrir Menu'}
                     >
                         <svg
@@ -82,7 +82,7 @@ export default function Menu() {
                 </div>
 
                 <HeaderMenu user={user} loading={loading} isOpen={isOpen} />
-                <div className="border-t border-surface-border mx-4"></div>
+                <div className="border-t border-card-border mx-4"></div>
                 <NavLinks isOpen={isOpen} closeMenu={closeMenu} />
                 <FooterMenu isOpen={isOpen} />
             </aside>

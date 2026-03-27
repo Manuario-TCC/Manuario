@@ -22,7 +22,7 @@ export function HeaderMenu({ user, loading, isOpen }: HeaderMenuProps) {
         isOpen ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 lg:max-w-[200px] lg:opacity-100'
     }`;
 
-    const logoutBtnClasses = `absolute right-4 p-2 rounded-lg text-text-muted hover:text-white hover:bg-zinc-800 shrink-0 transition-all duration-300 ease-in-out z-20 cursor-pointer ${
+    const logoutBtnClasses = `absolute right-4 p-2 rounded-lg text-sub-text hover:text-text hover:bg-zinc-800 shrink-0 transition-all duration-300 ease-in-out z-20 cursor-pointer ${
         isOpen
             ? 'opacity-100 delay-150 pointer-events-auto'
             : 'opacity-0 pointer-events-none lg:opacity-100 lg:pointer-events-auto lg:delay-0'
@@ -31,10 +31,10 @@ export function HeaderMenu({ user, loading, isOpen }: HeaderMenuProps) {
     if (loading)
         return (
             <div className={containerClasses}>
-                <div className="size-10 bg-surface-border animate-pulse rounded-full shrink-0"></div>
+                <div className="size-10 bg-card-border animate-pulse rounded-full shrink-0"></div>
                 <div className={`space-y-2 ${textContainerClasses}`}>
-                    <div className="h-3 bg-surface-border animate-pulse rounded w-2/3"></div>
-                    <div className="h-2 bg-surface-border animate-pulse rounded w-1/2"></div>
+                    <div className="h-3 bg-card-border animate-pulse rounded w-2/3"></div>
+                    <div className="h-2 bg-card-border animate-pulse rounded w-1/2"></div>
                 </div>
             </div>
         );
@@ -53,7 +53,7 @@ export function HeaderMenu({ user, loading, isOpen }: HeaderMenuProps) {
                     isOpen ? 'gap-3' : 'gap-0 lg:gap-3'
                 }`}
             >
-                <div className="relative size-10 rounded-full overflow-hidden bg-surface shrink-0 border border-surface-border transition-colors group-hover:border-accent">
+                <div className="relative size-10 rounded-full overflow-hidden bg-card shrink-0 border border-card-border transition-colors group-hover:border-accent">
                     <Image
                         src={user.img}
                         alt={`Perfil de ${user.name}`}
@@ -65,7 +65,7 @@ export function HeaderMenu({ user, loading, isOpen }: HeaderMenuProps) {
 
                 <div className={textContainerClasses}>
                     <p className="text-base font-semibold text-text truncate">{user.name}</p>
-                    <p className="text-sm text-text-muted truncate mt-[-2px]">Ver perfil</p>
+                    <p className="text-sm text-sub-text truncate mt-[-2px]">Ver perfil</p>
                 </div>
             </Link>
 

@@ -26,18 +26,18 @@ const ProfileImageEditor: React.FC<ProfileImageEditorProps> = ({ image, onSave, 
     }, [onSave]);
 
     const modalContent = (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-            <div className="relative bg-zinc-900 border border-zinc-800 p-6 rounded-2xl flex flex-col items-center w-full max-w-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
+            <div className="relative border bg-background border-card-border p-6 rounded-2xl flex flex-col items-center w-full max-w-sm">
                 <button
-                    className="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors"
+                    className="absolute top-4 right-4 text-color-sub-text hover:text-text transition-colors"
                     onClick={onCancel}
                 >
                     <X size={24} />
                 </button>
 
-                <h1 className="text-xl font-bold mb-6 text-white w-full text-left">Editar Foto</h1>
+                <h1 className="text-xl font-bold mb-6 text-text w-full text-left">Editar Foto</h1>
 
-                <div className="overflow-hidden rounded-full mb-6 bg-black border border-zinc-800">
+                <div className="overflow-hidden rounded-full mb-6 bg-black border border-card-border">
                     <AvatarEditor
                         ref={editorRef}
                         image={image}
@@ -52,7 +52,7 @@ const ProfileImageEditor: React.FC<ProfileImageEditorProps> = ({ image, onSave, 
                 </div>
 
                 <div className="w-full px-4 flex items-center gap-3 mb-6">
-                    <ZoomIn size={20} className="text-zinc-400" />
+                    <ZoomIn size={20} className="text-sub-text" />
                     <input
                         type="range"
                         min={1}
@@ -60,19 +60,19 @@ const ProfileImageEditor: React.FC<ProfileImageEditorProps> = ({ image, onSave, 
                         step={0.1}
                         value={scale}
                         onChange={(e) => setScale(parseFloat(e.target.value))}
-                        className="flex-1 cursor-pointer accent-white h-1.5 bg-zinc-700 rounded-lg appearance-none"
+                        className="flex-1 cursor-pointer accent-text h-1.5 bg-card-border rounded-lg appearance-none"
                     />
                 </div>
 
                 <div className="flex gap-3 w-full">
                     <button
-                        className="flex-1 py-2.5 rounded-lg text-sm font-medium text-zinc-300 hover:bg-zinc-800 transition-colors border border-zinc-700"
+                        className="flex-1 py-2.5 rounded-lg text-sm font-medium text-text hover:bg-card transition-colors border border-card-border"
                         onClick={onCancel}
                     >
                         Cancelar
                     </button>
                     <button
-                        className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-white text-black hover:bg-zinc-200 transition-colors"
+                        className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-white text-black hover:bg-sub-text transition-colors"
                         onClick={handleSaveImage}
                     >
                         Salvar

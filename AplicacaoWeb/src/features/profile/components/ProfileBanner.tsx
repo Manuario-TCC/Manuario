@@ -17,13 +17,13 @@ export const ProfileBanner: React.FC<Props> = ({
     onChange,
 }) => (
     <div
-        className={`relative w-full h-48 md:h-64 bg-zinc-800 ${isOwnProfile ? 'cursor-pointer group' : ''}`}
+        className={`relative w-full h-48 md:h-64 bg-card-border ${isOwnProfile ? 'cursor-pointer group' : ''}`}
         onClick={onClick}
     >
         <img src={bannerUrl} alt="Banner" className="w-full h-full object-cover" />
 
         {isOwnProfile && (
-            <div className="absolute top-4 right-4 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-4 right-4 p-2 bg-black/50 backdrop-blur-sm rounded-full text-text opacity-0 group-hover:opacity-100 transition-opacity">
                 <Camera size={20} />
             </div>
         )}
