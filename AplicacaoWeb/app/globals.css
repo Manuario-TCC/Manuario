@@ -2,9 +2,10 @@
 @import 'tailwindcss';
 
 @theme {
-    --color-background: #17141b;
-    --color-card: #0f0d12;
+    --color-background: #0f0d12;
+    --color-card: #17141b;
     --color-card-border: #2a2438;
+    --color-gray: #201f22;
     --color-primary: #470279;
     --color-primary-hover: #5d03a1;
     --color-accent: #816cfb;
@@ -16,6 +17,38 @@
 
     --background-image-img-fundo: url('/img/background.jpg');
     --font-sans: 'Roboto', sans-serif;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    transition:
+        background-color 5000s ease-in-out 0s,
+        color 5000s ease-in-out 0s;
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-card) transparent;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-card);
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #27222d;
 }
 
 @layer base {
@@ -30,19 +63,16 @@
         font-size: 14px;
     }
 }
-
 @media screen and (min-width: 1600px) {
     html {
         font-size: 18px;
     }
 }
-
 @media screen and (min-width: 2000px) {
     html {
         font-size: 36px;
     }
 }
-
 @media screen and (min-width: 3000px) {
     html {
         font-size: 52px;

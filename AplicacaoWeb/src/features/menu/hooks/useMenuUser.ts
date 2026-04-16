@@ -11,6 +11,7 @@ export function useMenuUser() {
         async function fetchUser() {
             try {
                 const data = await getMe();
+
                 setUser(data);
             } catch (error) {
                 console.error('Erro ao buscar usuário do menu:', error);

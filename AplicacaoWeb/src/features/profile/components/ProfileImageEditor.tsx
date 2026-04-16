@@ -29,7 +29,7 @@ const ProfileImageEditor: React.FC<ProfileImageEditorProps> = ({ image, onSave, 
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
             <div className="relative border bg-background border-card-border p-6 rounded-2xl flex flex-col items-center w-full max-w-sm">
                 <button
-                    className="absolute top-4 right-4 text-color-sub-text hover:text-text transition-colors"
+                    className="absolute top-4 right-4 text-color-sub-text hover:text-text transition-colors  cursor-pointer"
                     onClick={onCancel}
                 >
                     <X size={24} />
