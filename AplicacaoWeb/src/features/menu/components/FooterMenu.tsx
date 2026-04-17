@@ -15,19 +15,19 @@ export function FooterMenu({ user, loading, isOpen }: FooterMenuProps) {
     const { logout } = useAuth();
 
     const containerClasses = `relative flex items-center h-16 shrink-0 w-full transition-all duration-300 ${
-        isOpen ? 'px-2' : 'px-0 justify-center min-[900px]:justify-start min-[900px]:px-2'
+        isOpen ? 'px-2' : 'px-0 justify-center lg:justify-start lg:px-2'
     }`;
 
     const textContainerClasses = `flex flex-col justify-center overflow-hidden transition-all duration-300 ${
         isOpen
             ? 'opacity-100 ml-3 w-auto block'
-            : 'opacity-0 w-0 hidden ml-0 min-[900px]:opacity-100 min-[900px]:w-auto min-[900px]:ml-3 min-[900px]:block'
+            : 'opacity-0 w-0 hidden ml-0 lg:opacity-100 lg:w-auto lg:ml-3 lg:block'
     }`;
 
     const logoutBtnClasses = `absolute right-2 p-2 rounded-lg text-sub-text hover:text-red-500 hover:bg-zinc-800 shrink-0 z-20 cursor-pointer transition-all duration-300 ${
         isOpen
             ? 'opacity-100 pointer-events-auto block'
-            : 'opacity-0 hidden pointer-events-none min-[900px]:opacity-100 min-[900px]:pointer-events-auto min-[900px]:block'
+            : 'opacity-0 hidden pointer-events-none lg:opacity-100 lg:pointer-events-auto lg:block'
     }`;
 
     if (loading)
@@ -48,7 +48,7 @@ export function FooterMenu({ user, loading, isOpen }: FooterMenuProps) {
             <Link
                 href={`/perfil/${user.idPublico}`}
                 className={`flex items-center group z-10 w-full overflow-hidden transition-all duration-300 ${
-                    isOpen ? 'justify-start' : 'justify-center min-[900px]:justify-start'
+                    isOpen ? 'justify-start' : 'justify-center lg:justify-start'
                 }`}
             >
                 <div className="relative size-10 rounded-full overflow-hidden bg-card shrink-0 border border-card-border transition-colors group-hover:border-accent">
@@ -56,7 +56,7 @@ export function FooterMenu({ user, loading, isOpen }: FooterMenuProps) {
                         src={user.img}
                         alt={`Perfil de ${user.name}`}
                         fill
-                        sizes="40px"
+                        sizes="2.5rem"
                         className="object-cover"
                     />
                 </div>
@@ -65,7 +65,9 @@ export function FooterMenu({ user, loading, isOpen }: FooterMenuProps) {
                     <p className="text-base font-semibold text-text whitespace-nowrap overflow-hidden text-ellipsis">
                         {user.name}
                     </p>
-                    <p className="text-sm text-sub-text whitespace-nowrap mt-[-2px]">Ver perfil</p>
+                    <p className="text-sm text-sub-text whitespace-nowrap mt-[-0.125rem]">
+                        Ver perfil
+                    </p>
                 </div>
             </Link>
 

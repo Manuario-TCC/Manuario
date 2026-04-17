@@ -2,6 +2,8 @@ import { useState, useRef } from 'react';
 import Swal from 'sweetalert2';
 import { profileService } from '../services/profileService';
 
+import { socket } from '@/src/utils/socket';
+
 export const useProfileAvatar = (initialAvatarUrl: string, isOwnProfile: boolean) => {
     const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
     const [isAvatarEditorOpen, setIsAvatarEditorOpen] = useState(false);
@@ -12,14 +14,18 @@ export const useProfileAvatar = (initialAvatarUrl: string, isOwnProfile: boolean
         if (isOwnProfile) avatarInputRef.current?.click();
     };
 
-    const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+
         if (file) {
             const imageUrl = URL.createObjectURL(file);
             setTempAvatarImage(imageUrl);
             setIsAvatarEditorOpen(true);
         }
-        if (event.target) event.target.value = '';
+
+        if (e.target) {
+            e.target.value = '';
+        }
     };
 
     const handleSaveEditedAvatar = async (file: File) => {
@@ -39,6 +45,8 @@ export const useProfileAvatar = (initialAvatarUrl: string, isOwnProfile: boolean
             background: '#18181b',
             color: '#fff',
         });
+
+        socket.emit('profile_updated', { type: 'avatar' });
     };
 
     return {

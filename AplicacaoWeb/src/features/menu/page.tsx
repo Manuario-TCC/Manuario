@@ -25,37 +25,39 @@ export default function Menu() {
 
     return (
         <>
+            {/* Overlay Escuro */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black/60 z-40 max-[900px]:block min-[900px]:hidden backdrop-blur-sm transition-opacity"
+                    className="fixed inset-0 bg-black/60 z-40 block lg:hidden backdrop-blur-sm transition-opacity"
                     onClick={closeMenu}
                 />
             )}
 
-            <div className="hidden min-[500px]:block min-[900px]:hidden w-24 shrink-0 transition-none" />
+            <div className="hidden sm:block lg:hidden w-24 shrink-0 transition-none" />
 
+            {/* Sidebar (Menu Lateral) */}
             <aside
                 className={`
                     top-0 left-0 h-screen bg-card border-r border-card-border z-50
                     transition-all duration-300 ease-in-out flex flex-col
-                    hidden min-[500px]:flex
-                    fixed min-[900px]:relative min-[900px]:shrink-0
+                    hidden sm:flex
+                    fixed lg:relative lg:shrink-0
                     ${isOpen ? 'translate-x-0 w-[20rem] shadow-2xl' : '-translate-x-0 w-24'}
-                    min-[900px]:w-[20%] min-[900px]:min-w-[16rem] min-[900px]:max-w-[20rem] min-[900px]:translate-x-0 min-[900px]:shadow-none
+                    lg:w-[20%] lg:min-w-[16rem] lg:max-w-[20rem] lg:translate-x-0 lg:shadow-none
                 `}
             >
                 <div
                     className={`transition-all duration-300 flex items-center justify-between p-6 ${!isOpen ? 'justify-center p-4' : ''}`}
                 >
                     <div
-                        className={`text-xl font-bold whitespace-nowrap transition-all ${!isOpen ? 'opacity-0 hidden min-[900px]:block min-[900px]:opacity-100' : 'opacity-100 block'}`}
+                        className={`text-xl font-bold whitespace-nowrap transition-all ${!isOpen ? 'opacity-0 hidden lg:block lg:opacity-100' : 'opacity-100 block'}`}
                     >
                         Manuario
                     </div>
 
                     <button
                         onClick={toggleMenu}
-                        className={`text-sub-text hover:text-text p-2 focus:outline-none transition-colors cursor-pointer min-[900px]:hidden ${!isOpen ? 'mx-auto' : ''}`}
+                        className={`text-sub-text hover:text-text p-2 focus:outline-none transition-colors cursor-pointer lg:hidden ${!isOpen ? 'mx-auto' : ''}`}
                         aria-label="Alternar Menu"
                     >
                         <svg
@@ -81,25 +83,25 @@ export default function Menu() {
                 </div>
             </aside>
 
-            <nav className="min-[500px]:hidden fixed bottom-0 left-0 w-full h-[72px] bg-card border-t border-card-border flex items-center justify-around z-[100] pb-safe px-2 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
+            <nav className="sm:hidden fixed bottom-0 left-0 w-full bg-card border-t border-card-border flex items-center justify-around z-[100] pb-safe px-2 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
                 <Link href="/procurar" className={getMobileLinkClass('/procurar')}>
                     <Search size={22} />
-                    <span className="text-[10px]">Buscar</span>
+                    <span className="text-[0.625rem]">Buscar</span>
                 </Link>
 
                 <Link href="/feed" className={getMobileLinkClass('/feed')}>
                     <Library size={22} />
-                    <span className="text-[10px]">Feed</span>
+                    <span className="text-[0.625rem]">Feed</span>
                 </Link>
 
                 <Link href="/chat" className={getMobileLinkClass('/chat')}>
                     <MessageSquare size={22} />
-                    <span className="text-[10px]">Chat</span>
+                    <span className="text-[0.625rem]">Chat</span>
                 </Link>
 
                 <Link href="/criar" className={getMobileLinkClass('/criar')}>
                     <PlusSquare size={22} />
-                    <span className="text-[10px]">Criar</span>
+                    <span className="text-[0.625rem]">Criar</span>
                 </Link>
 
                 <Link href={`/perfil/${user?.idPublico}`} className={getMobileLinkClass('/perfil')}>
@@ -118,7 +120,7 @@ export default function Menu() {
                     ) : (
                         <div className="size-7 rounded-full bg-card-border"></div>
                     )}
-                    <span className="text-[10px]">Perfil</span>
+                    <span className="text-[0.625rem]">Perfil</span>
                 </Link>
             </nav>
         </>

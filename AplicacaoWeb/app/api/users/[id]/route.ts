@@ -14,6 +14,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 id: true,
                 idPublico: true,
                 name: true,
+                email: true,
                 img: true,
                 banner: true,
             },
@@ -42,6 +43,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         const profileData = {
             publicId: dbUser.idPublico,
             name: dbUser.name,
+            ...(isOwnProfile && { email: dbUser.email }),
             avatarUrl: dbUser.img
                 ? `/upload/${dbUser.idPublico}/user/${dbUser.img}`
                 : '/img/iconePadrao.jpg',

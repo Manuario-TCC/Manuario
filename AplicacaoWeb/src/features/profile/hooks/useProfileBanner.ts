@@ -10,8 +10,9 @@ export const useProfileBanner = (initialBannerUrl: string, isOwnProfile: boolean
         if (isOwnProfile) bannerInputRef.current?.click();
     };
 
-    const handleBannerChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
+    const handleBannerChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+
         if (file) {
             const tempUrl = URL.createObjectURL(file);
             setBannerUrl(tempUrl);

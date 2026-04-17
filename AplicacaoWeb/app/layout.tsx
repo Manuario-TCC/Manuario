@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import Providers from '@/src/components/Providers';
 
 export const metadata: Metadata = {
     title: 'Manuario',
@@ -14,7 +15,7 @@ export default function RootLayout({
     return (
         <html lang="pt-BR" suppressHydrationWarning>
             <body className="min-h-full flex flex-col" suppressHydrationWarning>
-                {children}
+                <Providers>{children}</Providers>
             </body>
         </html>
     );
