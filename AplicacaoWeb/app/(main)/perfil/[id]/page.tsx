@@ -45,6 +45,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
             <ProfileHeader
                 initialData={{
                     name: profileData.name,
+                    email: profileData.email,
                     avatarUrl: profileData.avatarUrl,
                     bannerUrl: profileData.bannerUrl,
                 }}

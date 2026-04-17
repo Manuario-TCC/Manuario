@@ -1,61 +1,64 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/src/database/prisma';
-import { promises as fs } from 'fs';
-import path from 'path';
 import { getAuthUserId } from '@/src/utils/auth';
+import { writeFile, mkdir, unlink } from 'fs/promises';
+import path from 'path';
 
-export async function PATCH(request: Request) {
+export async function PATCH(req: Request) {
     try {
         const userId = await getAuthUserId();
+        if (!userId) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 
-        if (!userId) {
-            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        const formData = await req.formData();
+        const file = formData.get('file') as File;
+
+        if (!file) {
+            return NextResponse.json({ error: 'Nenhum arquivo enviado' }, { status: 400 });
         }
 
-        const dbUser = await prisma.user.findUnique({ where: { id: userId } });
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { idPublico: true, banner: true },
+        });
 
-        if (!dbUser) {
-            return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
-        }
+        if (!user) return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
 
-        const formData = await request.formData();
-        const banner = formData.get('banner') as File | null;
+        const uploadDir = path.join(process.cwd(), 'public', 'upload', user.idPublico, 'user');
 
-        if (!banner) {
-            return NextResponse.json({ error: 'Imagem não fornecida' }, { status: 400 });
-        }
-
-        const uploadDir = path.join(process.cwd(), 'public', 'upload', dbUser.idPublico, 'user');
-        await fs.mkdir(uploadDir, { recursive: true });
-
-        // Deletar o banner antigo
-        if (dbUser.banner) {
-            const oldBannerPath = path.join(uploadDir, dbUser.banner);
+        // Deleta antigo
+        if (user.banner) {
+            const oldBannerPath = path.join(uploadDir, user.banner);
             try {
-                await fs.access(oldBannerPath);
-                await fs.unlink(oldBannerPath);
+                await unlink(oldBannerPath);
+                console.log('Banner antigo deletado:', user.banner);
             } catch (err) {
-                console.log('Banner antigo não encontrado ou erro ao deletar:', err);
+                console.warn('Aviso: Banner antigo não encontrado no disco para deletar.');
             }
         }
 
-        const bytes = await banner.arrayBuffer();
+        // Salva novo banner
+        const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
-        const ext = banner.name.split('.').pop() || 'png';
-        const fileName = `banner-${Date.now()}.${ext}`;
-        const filePath = path.join(uploadDir, fileName);
+        const fileExtension = path.extname(file.name);
+        const fileName = `banner-${Date.now()}${fileExtension}`;
 
-        await fs.writeFile(filePath, buffer);
+        await mkdir(uploadDir, { recursive: true });
+
+        const filePath = path.join(uploadDir, fileName);
+        await writeFile(filePath, buffer);
 
         await prisma.user.update({
             where: { id: userId },
             data: { banner: fileName },
         });
 
-        return NextResponse.json({ success: true, banner: fileName });
+        return NextResponse.json({
+            message: 'Banner atualizado',
+            url: `/upload/${user.idPublico}/user/${fileName}`,
+        });
     } catch (error) {
-        console.error('Erro ao atualizar banner:', error);
-        return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
+        console.error(error);
+        return NextResponse.json({ error: 'Erro interno ao salvar banner' }, { status: 500 });
     }
 }

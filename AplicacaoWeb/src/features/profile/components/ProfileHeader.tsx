@@ -15,6 +15,7 @@ import { ProfileEditModal } from './ProfileEditModal';
 interface ProfileHeaderProps {
     initialData: {
         name: string;
+        email: string;
         avatarUrl?: string | null;
         bannerUrl?: string | null;
     };
@@ -25,7 +26,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ initialData, isOwnProfile
     const banner = useProfileBanner(initialData.bannerUrl || '/img/bannerPadrao.png', isOwnProfile);
     const avatar = useProfileAvatar(initialData.avatarUrl || '/img/iconePadrao.jpg', isOwnProfile);
 
-    const edit = useProfileEdit(initialData.name);
+    const edit = useProfileEdit(initialData.name, initialData.email);
 
     return (
         <div className="w-full flex flex-col min-h-screen">

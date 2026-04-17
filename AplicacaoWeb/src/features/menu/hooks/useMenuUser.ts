@@ -1,27 +1,29 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { getMe } from '../services/menuService';
+import { useEffect } from 'react';
+import { socket } from '@/src/utils/socket';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function useMenuUser() {
-    const [user, setUser] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+    const queryClient = useQueryClient();
+
+    const { data: user, isLoading: loading } = useQuery({
+        queryKey: ['user-me'],
+        queryFn: getMe,
+        staleTime: 1000 * 60 * 10,
+    });
 
     useEffect(() => {
-        async function fetchUser() {
-            try {
-                const data = await getMe();
+        socket.on('reload_profile_data', () => {
+            queryClient.invalidateQueries({ queryKey: ['user-me'] });
+        });
 
-                setUser(data);
-            } catch (error) {
-                console.error('Erro ao buscar usuário do menu:', error);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        fetchUser();
-    }, []);
+        return () => {
+            socket.off('reload_profile_data');
+        };
+    }, [queryClient]);
 
     return { user, loading };
 }

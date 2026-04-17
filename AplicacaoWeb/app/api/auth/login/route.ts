@@ -30,7 +30,7 @@ export async function POST(req: Request) {
         }
 
         const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'secret', {
-            expiresIn: '1d',
+            expiresIn: '7d',
         });
 
         const cookieStore = await cookies();

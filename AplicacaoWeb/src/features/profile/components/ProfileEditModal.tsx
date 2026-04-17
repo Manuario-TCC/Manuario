@@ -83,7 +83,6 @@ export const ProfileEditModal: React.FC<Props> = ({
                         name="email"
                         value={formData.email}
                         onChange={onChange}
-                        placeholder="seu@email.com"
                     />
 
                     <CustomInput
