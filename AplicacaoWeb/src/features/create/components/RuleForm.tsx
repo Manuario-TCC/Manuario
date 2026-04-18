@@ -31,7 +31,7 @@ export function RuleForm({ data, setData, isValid }: any) {
             />
 
             <div className="text-left">
-                <label className="mb-[0.5rem] block text-[0.875rem] font-medium ml-[0.25rem] text-sub-text">
+                <label className="mb-[0.5rem] block text-[0.875rem] font-medium ml-[0.26rem] text-sub-text">
                     Manual *
                 </label>
 
