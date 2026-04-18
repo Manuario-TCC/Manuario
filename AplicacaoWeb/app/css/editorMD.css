@@ -1,0 +1,178 @@
+.dark-editor .mdxeditor {
+    background-color: var(--color-card) !important;
+    color: var(--color-text) !important;
+}
+
+.dark-editor [role='toolbar'] {
+    background-color: var(--color-card) !important;
+    border-bottom: 1px solid var(--color-card-border) !important;
+}
+
+.dark-editor [role='toolbar'] button,
+.dark-editor [role='toolbar'] button svg {
+    color: var(--color-text) !important;
+    fill: var(--color-text) !important;
+}
+
+.dark-editor [role='toolbar'] button:hover {
+    background-color: var(--color-card-border) !important;
+}
+
+.dark-editor .mdxeditor-rich-text-editor {
+    background-color: var(--color-background) !important;
+}
+
+.mdxeditor-popup,
+.mdxeditor-select-content,
+[data-radix-popper-content-wrapper],
+.mdxeditor-dialog-content {
+    background-color: var(--color-card) !important;
+    color: var(--color-text) !important;
+    border: 1px solid var(--color-card-border) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+}
+
+.mdxeditor-select-item,
+.mdxeditor-select-label {
+    color: var(--color-text) !important;
+}
+
+.mdxeditor-select-item[data-highlighted],
+.mdxeditor-select-item:hover {
+    background-color: var(--color-card-border) !important;
+    outline: none !important;
+}
+
+.mdxeditor-separator {
+    background-color: var(--color-card-border) !important;
+}
+
+.dark-editor [role='combobox'],
+.dark-editor button[aria-haspopup='listbox'] {
+    background-color: var(--color-card) !important;
+    color: var(--color-text) !important;
+    border: 1px solid var(--color-card-border) !important;
+    border-radius: 0.5rem !important;
+}
+
+.dark-editor [role='combobox'] svg,
+.dark-editor button[aria-haspopup='listbox'] svg {
+    color: var(--color-text) !important;
+    fill: var(--color-text) !important;
+}
+
+[data-radix-popper-content-wrapper],
+.mdxeditor-select-content,
+div[role='listbox'] {
+    background-color: var(--color-card) !important;
+    color: var(--color-text) !important;
+    border: 1px solid var(--color-card-border) !important;
+    border-radius: 0.5rem !important;
+    overflow: hidden !important;
+}
+
+[data-radix-popper-content-wrapper] div,
+.mdxeditor-select-item {
+    background-color: transparent !important;
+    color: var(--color-text) !important;
+}
+
+.mdxeditor-select-item[data-highlighted],
+.mdxeditor-select-item:hover,
+[data-radix-popper-content-wrapper] div[data-highlighted] {
+    background-color: var(--color-card-border) !important;
+    outline: none !important;
+    cursor: pointer !important;
+}
+
+.dark-editor [data-lexical-decorator] button {
+    background-color: var(--color-card) !important;
+    color: var(--color-text) !important;
+    border: 1px solid var(--color-card-border) !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+    transition: background-color 0.2s ease !important;
+}
+
+.dark-editor [data-lexical-decorator] button:hover {
+    background-color: var(--color-card-border) !important;
+}
+
+.dark-editor [data-lexical-decorator] button svg {
+    color: var(--color-text) !important;
+    fill: var(--color-text) !important;
+}
+._dialogOverlay_1e2ox_870 {
+    background-color: transparent !important;
+}
+
+._dialogContent_1e2ox_603,
+._largeDialogContent_1e2ox_615 {
+    background: var(--color-background) !important;
+    border: none !important;
+    padding: 1rem !important;
+}
+
+._textInput_1e2ox_1206 {
+    background-color: transparent !important;
+    color: white !important;
+}
+
+._imageWrapper_1e2ox_920 ._editImageToolbar_1e2ox_933 {
+    background: transparent !important;
+}
+
+._primaryButton_1e2ox_507 {
+    background-color: var(--color-primary) !important;
+    border: none !important;
+}
+
+._secondaryButton_1e2ox_508 {
+    border: none !important;
+}
+
+._contentEditable_1e2ox_380 {
+    color: white !important;
+}
+
+._toolbarToggleItem_1e2ox_208[data-state='on'],
+._toolbarButton_1e2ox_239[data-state='on'],
+._toolbarToggleItem_1e2ox_208:active,
+._toolbarButton_1e2ox_239:active {
+    background-color: transparent !important;
+}
+
+body div[data-radix-popper-content-wrapper] {
+    color: var(--color-text) !important;
+    border: 1px solid var(--color-card-border) !important;
+    border-radius: 0.5rem !important;
+    overflow: hidden !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    position: static;
+}
+
+[data-radix-popper-content-wrapper] div,
+.mdxeditor-select-item {
+    background-color: var(--color-background) !important;
+    border: none !important;
+    padding: 0.5rem !important;
+}
+
+.mdxeditor .cm-mergeView .cm-scroller,
+.mdxeditor .cm-sourceView .cm-scroller {
+    background-color: var(--color-background) !important;
+}
+
+._diffSourceToggle_1e2ox_986 {
+    background-color: transparent !important;
+}
+
+.dark-editor button[aria-label='Diff mode'] {
+    display: none !important;
+}
