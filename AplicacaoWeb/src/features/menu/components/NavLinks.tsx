@@ -34,7 +34,7 @@ const navItems: NavItem[] = [
     {
         name: 'Publicar',
         icon: PlusCircle,
-        href: '/criar',
+        href: '/create',
     },
 ];
 

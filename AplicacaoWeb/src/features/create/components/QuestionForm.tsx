@@ -2,12 +2,16 @@ import dynamic from 'next/dynamic';
 import { Send } from 'lucide-react';
 import { CustomInput } from '../../../components/CustomInput';
 
-const EditorCompat = dynamic(() => import('./MDXEditorWrapper'), {
+import '../../../../app/css/editorMD.css';
+
+const EditorCompat = dynamic(() => import('./TextEditor'), {
     ssr: false,
     loading: () => <div className="p-4 text-sub-text">Carregando editor...</div>,
 });
 
 export function QuestionForm({ data, setData, isValid }: any) {
+    if (!data) return null;
+
     return (
         <div className="flex flex-col gap-[1.5rem]">
             <CustomInput
@@ -33,7 +37,7 @@ export function QuestionForm({ data, setData, isValid }: any) {
 
                 <div className="border border-card-border rounded-xl overflow-hidden bg-background">
                     <EditorCompat
-                        markdown={data.content}
+                        markdown={data.description || ''}
                         onChange={(val: string) => setData({ ...data, content: val || '' })}
                     />
                 </div>

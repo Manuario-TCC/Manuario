@@ -1,25 +1,31 @@
+import { useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { Bookmark, Send } from 'lucide-react';
+import { Bookmark, Send, ShieldCheck, Home } from 'lucide-react';
 import { CustomInput } from '../../../components/CustomInput';
 import Select from 'react-select';
-import '@mdxeditor/editor/style.css';
 
 import { customStyles } from './selectStyles';
 
-const EditorCompat = dynamic(() => import('./MDXEditorWrapper'), { ssr: false });
+const EditorCompat = dynamic(() => import('./TextEditor'), { ssr: false });
 
-const manualOptions = [
-    {
-        value: '1',
-        label: 'Manual do Jogador (D&D 5e)',
-    },
-    {
-        value: '2',
-        label: 'Manual do Jogador (D&D 5e)2',
-    },
-];
+export function RuleForm({
+    data,
+    setData,
+    isValid,
+    handleSubmit,
+    isLoading,
+    manuals,
+    handleImageAdded,
+}: any) {
+    const handleEditorChange = useCallback(
+        (val: string) => {
+            setData((prev: any) => ({ ...prev, content: val || '' }));
+        },
+        [setData],
+    );
 
-export function RuleForm({ data, setData, isValid }: any) {
+    if (!data) return null;
+
     return (
         <div className="flex flex-col gap-[1.5rem]" data-color-mode="dark">
             <CustomInput
@@ -32,17 +38,105 @@ export function RuleForm({ data, setData, isValid }: any) {
 
             <div className="text-left">
                 <label className="mb-[0.5rem] block text-[0.875rem] font-medium ml-[0.25rem] text-sub-text">
+                    Tipo de regra *
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div
+                        onClick={() => setData({ ...data, type: 'oficial' })}
+                        className={`group flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+                            data.type === 'oficial'
+                                ? 'border-primary bg-primary/5'
+                                : 'border-card-border bg-card hover:border-primary/50'
+                        }`}
+                    >
+                        <div
+                            className={`p-3 rounded-xl transition-colors ${
+                                data.type === 'oficial'
+                                    ? 'bg-primary text-white'
+                                    : 'bg-card-border text-sub-text'
+                            }`}
+                        >
+                            <ShieldCheck size={24} />
+                        </div>
+
+                        <div className="flex flex-col text-left flex-1">
+                            <span
+                                className={`text-sm font-bold transition-colors ${
+                                    data.type === 'oficial' ? 'text-white' : 'text-sub-text'
+                                }`}
+                            >
+                                Regra Oficial
+                            </span>
+
+                            <span className="text-[0.75rem] leading-relaxed text-sub-text/80 mt-1">
+                                Conteúdo proveniente de manuais e livros oficiais.
+                            </span>
+                        </div>
+
+                        <div
+                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                                data.type === 'oficial'
+                                    ? 'border-primary bg-primary'
+                                    : 'border-card-border bg-background'
+                            }`}
+                        ></div>
+                    </div>
+
+                    <div
+                        onClick={() => setData({ ...data, type: 'da_casa' })}
+                        className={`group flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+                            data.type === 'da_casa'
+                                ? 'border-primary bg-primary/5'
+                                : 'border-card-border bg-card hover:border-primary/50'
+                        }`}
+                    >
+                        <div
+                            className={`p-3 rounded-xl transition-colors ${
+                                data.type === 'da_casa'
+                                    ? 'bg-primary text-white'
+                                    : 'bg-card-border text-sub-text'
+                            }`}
+                        >
+                            <Home size={24} />
+                        </div>
+
+                        <div className="flex flex-col text-left flex-1">
+                            <span
+                                className={`text-sm font-bold transition-colors ${
+                                    data.type === 'da_casa' ? 'text-white' : 'text-sub-text'
+                                }`}
+                            >
+                                Regra da Casa
+                            </span>
+                            <span className="text-[0.75rem] leading-relaxed text-sub-text/80 mt-1">
+                                Regras customizadas, adaptações ou mecânicas criadas.
+                            </span>
+                        </div>
+
+                        <div
+                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                                data.type === 'da_casa'
+                                    ? 'border-primary bg-primary'
+                                    : 'border-card-border bg-background'
+                            }`}
+                        ></div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="text-left">
+                <label className="mb-[0.5rem] block text-[0.875rem] font-medium ml-[0.25rem] text-sub-text">
                     Manual *
                 </label>
 
                 <div className="max-w-[18rem]">
                     <Select
-                        options={manualOptions}
+                        options={manuals}
                         styles={customStyles}
                         placeholder="Selecione um manual"
-                        value={manualOptions.find((opt) => opt.value === data.manualId) || null}
+                        value={manuals.find((opt: any) => opt.value === data.manualId) || null}
                         onChange={(selected: any) =>
-                            setData({ ...data, manualId: selected ? selected.value : '' })
+                            setData({ ...data, manualId: selected?.value || '' })
                         }
                         noOptionsMessage={() => 'Nenhum manual encontrado'}
                     />
@@ -55,8 +149,9 @@ export function RuleForm({ data, setData, isValid }: any) {
                 </label>
                 <div className="border border-card-border rounded-xl overflow-hidden bg-background">
                     <EditorCompat
-                        markdown={data.content}
-                        onChange={(val: string) => setData({ ...data, content: val || '' })}
+                        markdown={data.content || ''}
+                        onChange={handleEditorChange}
+                        onImageAdded={handleImageAdded}
                     />
                 </div>
             </div>
@@ -64,15 +159,19 @@ export function RuleForm({ data, setData, isValid }: any) {
             <div className="flex justify-end gap-[1rem] mt-[0.5rem]">
                 <button
                     type="button"
+                    disabled={!isValid || isLoading}
+                    onClick={() => handleSubmit('PRIVADO')}
                     className="flex items-center gap-2 bg-card border border-card-border py-[0.5rem] px-[1.25rem] text-sm rounded-xl font-bold hover:bg-card-border transition-all cursor-pointer"
                 >
                     <Bookmark className="w-4 h-4" />
                     Salvar regra
                 </button>
+
                 <button
-                    type="submit"
-                    disabled={!isValid}
-                    className="flex items-center gap-2 bg-primary py-[0.5rem] px-[1.25rem] text-sm rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-hover transition-all text-white cursor-pointer"
+                    type="button"
+                    disabled={!isValid || isLoading}
+                    onClick={() => handleSubmit('PUBLICADO')}
+                    className="flex items-center gap-2 bg-primary py-[0.5rem] px-[1.25rem] text-sm rounded-xl font-bold hover:bg-primary-hover transition-all text-white cursor-pointer"
                 >
                     Postar regra
                     <Send className="w-4 h-4" />

@@ -1,26 +1,38 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { createManualService } from '../services/createService';
 
 export interface CreateManualData {
     title: string;
     game: string;
-    genre?: string;
-    system?: string;
+    genre: string;
+    system: string;
     banner: File | null;
     logo: File | null;
 }
 
-export function useCreateManual() {
+export function useManualForm() {
+    const [data, setData] = useState<CreateManualData>({
+        title: '',
+        game: '',
+        genre: '',
+        system: '',
+        banner: null,
+        logo: null,
+    });
+
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const submitManual = async (data: CreateManualData) => {
+    const isValid = useMemo(() => {
+        return data.title.trim() !== '' && data.game.trim() !== '';
+    }, [data]);
+
+    const handleSubmit = async () => {
         setIsLoading(true);
         setError(null);
 
         try {
             const formData = new FormData();
-
             formData.append('title', data.title);
             formData.append('game', data.game);
 
@@ -47,8 +59,9 @@ export function useCreateManual() {
                 throw new Error(errorData.error || 'Erro ao criar o manual');
             }
 
-            const result = await response.json();
-            return result;
+            setData({ title: '', game: '', genre: '', system: '', banner: null, logo: null });
+
+            return await response.json();
         } catch (err: any) {
             setError(err.message || 'Ocorreu um erro inesperado');
             throw err;
@@ -58,7 +71,10 @@ export function useCreateManual() {
     };
 
     return {
-        submitManual,
+        data,
+        setData,
+        isValid,
+        handleSubmit,
         isLoading,
         error,
     };

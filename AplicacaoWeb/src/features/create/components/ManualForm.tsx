@@ -1,10 +1,21 @@
 import { CustomInput } from '../../../components/CustomInput';
-import { ImagePlus, CirclePlus } from 'lucide-react';
+import { ImagePlus, CirclePlus, Loader2 } from 'lucide-react';
 import { ImageUpload } from './ImageUpload';
 
-export function ManualForm({ data, setData, isValid }: any) {
+export function ManualForm({ data, setData, isValid, handleSubmit, isLoading, error }: any) {
+    if (!data) return <p>Carregando formulário...</p>;
+
     const handleFile = (field: string, file: File | null) => {
         setData({ ...data, [field]: file });
+    };
+
+    const onSubmit = async () => {
+        try {
+            await handleSubmit();
+            alert('Manual criado com sucesso!');
+        } catch (err) {
+            console.error('Falha ao criar', err);
+        }
     };
 
     return (
@@ -59,13 +70,20 @@ export function ManualForm({ data, setData, isValid }: any) {
                 centerField
             />
 
+            {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
+
             <div className="flex justify-end gap-[1rem] mt-[0.5rem]">
                 <button
-                    disabled={!isValid}
+                    disabled={!isValid || isLoading}
+                    onClick={onSubmit}
                     className="flex items-center gap-2 bg-primary py-[0.5rem] px-[1.25rem] text-sm rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-hover transition-all text-white"
                 >
-                    <CirclePlus className="w-4 h-4" />
-                    Criar manual
+                    {isLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                        <CirclePlus className="w-4 h-4" />
+                    )}
+                    {isLoading ? 'Criando...' : 'Criar manual'}
                 </button>
             </div>
         </div>

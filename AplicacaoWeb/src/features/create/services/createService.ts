@@ -1,13 +1,30 @@
-export const createService = {
-    async postRule(data: any) {
-        return console.log('Enviando Regra:', data);
-    },
+export async function createManualService(formData: FormData) {
+    return fetch('/api/manual', {
+        method: 'POST',
+        body: formData,
+    });
+}
 
-    async postQuestion(data: any) {
-        return console.log('Enviando Dúvida:', data);
-    },
+export interface CreateRulePayload {
+    publicationId: string;
+    name: string;
+    description: string;
+    manualId: string;
+    isHouseRule: boolean;
+    userId: string;
+    status: 'PUBLICADO' | 'PRIVADO';
+}
 
-    async postManual(data: any) {
-        return console.log('Enviando Manual:', data);
-    },
-};
+export async function createRuleService(payload: CreateRulePayload) {
+    return fetch('/api/regra', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+    });
+}
+
+export async function fetchUserManuals() {
+    return fetch('/api/manual/me');
+}
