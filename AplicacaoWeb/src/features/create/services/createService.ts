@@ -28,3 +28,21 @@ export async function createRuleService(payload: CreateRulePayload) {
 export async function fetchUserManuals() {
     return fetch('/api/manual/me');
 }
+
+export interface CreateDoubtPayload {
+    publicationId: string;
+    title: string;
+    game: string;
+    description: string;
+    userId: string;
+}
+
+export async function createDoubtService(payload: CreateDoubtPayload) {
+    return fetch('/api/duvida', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+    });
+}

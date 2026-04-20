@@ -1,6 +1,7 @@
 import { CustomInput } from '../../../components/CustomInput';
 import { ImagePlus, CirclePlus, Loader2 } from 'lucide-react';
 import { ImageUpload } from './ImageUpload';
+import { customAlert } from '../../../components/customAlert';
 
 export function ManualForm({ data, setData, isValid, handleSubmit, isLoading, error }: any) {
     if (!data) return <p>Carregando formulário...</p>;
@@ -12,7 +13,7 @@ export function ManualForm({ data, setData, isValid, handleSubmit, isLoading, er
     const onSubmit = async () => {
         try {
             await handleSubmit();
-            alert('Manual criado com sucesso!');
+            customAlert.success('Manual criado com sucesso!');
         } catch (err) {
             console.error('Falha ao criar', err);
         }

@@ -5,6 +5,7 @@ import { CustomInput } from '../../../components/CustomInput';
 import Select from 'react-select';
 
 import { customStyles } from './selectStyles';
+import { customAlert } from '../../../components/customAlert';
 
 const EditorCompat = dynamic(() => import('./TextEditor'), { ssr: false });
 
@@ -23,6 +24,18 @@ export function RuleForm({
         },
         [setData],
     );
+
+    const onActionClick = (status: 'PRIVADO' | 'PUBLICADO') => {
+        if (!isValid) {
+            customAlert.warning(
+                'Atenção',
+                'Preencha todos os campos obrigatórios antes de prosseguir.',
+            );
+            return;
+        }
+
+        handleSubmit(status);
+    };
 
     if (!data) return null;
 
@@ -159,9 +172,9 @@ export function RuleForm({
             <div className="flex justify-end gap-[1rem] mt-[0.5rem]">
                 <button
                     type="button"
-                    disabled={!isValid || isLoading}
-                    onClick={() => handleSubmit('PRIVADO')}
-                    className="flex items-center gap-2 bg-card border border-card-border py-[0.5rem] px-[1.25rem] text-sm rounded-xl font-bold hover:bg-card-border transition-all cursor-pointer"
+                    disabled={isLoading}
+                    onClick={() => onActionClick('PRIVADO')}
+                    className="flex items-center gap-2 bg-card border border-card-border py-[0.5rem] px-[1.25rem] text-sm rounded-xl font-bold hover:bg-card-border transition-all cursor-pointer disabled:opacity-50"
                 >
                     <Bookmark className="w-4 h-4" />
                     Salvar regra
@@ -169,9 +182,9 @@ export function RuleForm({
 
                 <button
                     type="button"
-                    disabled={!isValid || isLoading}
-                    onClick={() => handleSubmit('PUBLICADO')}
-                    className="flex items-center gap-2 bg-primary py-[0.5rem] px-[1.25rem] text-sm rounded-xl font-bold hover:bg-primary-hover transition-all text-white cursor-pointer"
+                    disabled={isLoading}
+                    onClick={() => onActionClick('PUBLICADO')}
+                    className="flex items-center gap-2 bg-primary py-[0.5rem] px-[1.25rem] text-sm rounded-xl font-bold hover:bg-primary-hover transition-all text-white cursor-pointer disabled:opacity-50"
                 >
                     Postar regra
                     <Send className="w-4 h-4" />

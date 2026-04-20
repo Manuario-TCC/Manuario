@@ -1,12 +1,12 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { createRuleService, fetchUserManuals } from '../services/createService';
 import { useSession } from '@/src/hooks/useSession';
+import Swal from 'sweetalert2';
 
 export function useRuleForm() {
     const { user } = useSession();
     const [manuals, setManuals] = useState<{ value: string; label: string }[]>([]);
     const [publicationId] = useState(() => crypto.randomUUID());
-
     const [data, setData] = useState({ title: '', type: 'oficial', manualId: '', content: '' });
     const [isLoading, setIsLoading] = useState(false);
     const [pendingImages, setPendingImages] = useState<Record<string, File>>({});
@@ -29,8 +29,19 @@ export function useRuleForm() {
     }, []);
 
     const handleSubmit = async (status: 'PUBLICADO' | 'PRIVADO') => {
+        const swalConfig = {
+            background: '#17141b',
+            color: '#ffffff',
+            confirmButtonColor: '#470279',
+        };
+
         if (!isValid) {
-            alert('Preencha Título, Manual e Conteúdo antes de salvar.');
+            Swal.fire({
+                title: 'Atenção',
+                text: 'Preencha Título, Manual e Conteúdo.',
+                icon: 'info',
+                ...swalConfig,
+            });
             return;
         }
 
@@ -68,17 +79,23 @@ export function useRuleForm() {
 
             const response = await createRuleService(payload);
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || 'Erro ao criar regra');
-            }
+            if (!response.ok) throw new Error('Erro no banco');
 
-            const result = await response.json();
-            console.log('Sucesso:', result);
-            alert(`Regra salva com sucesso!`);
+            Swal.fire({
+                title: 'Postado!',
+                text: 'Sua regra foi salva com sucesso.',
+                icon: 'success',
+                ...swalConfig,
+            });
+
+            setData({ title: '', type: 'oficial', manualId: '', content: '' });
         } catch (error) {
-            console.error(error);
-            alert('Ocorreu um erro ao salvar.');
+            Swal.fire({
+                title: 'Erro!',
+                text: 'Ocorreu um erro ao salvar no banco.',
+                icon: 'error',
+                ...swalConfig,
+            });
         } finally {
             setIsLoading(false);
         }
