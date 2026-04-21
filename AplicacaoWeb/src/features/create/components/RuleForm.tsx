@@ -15,6 +15,8 @@ export function RuleForm({
     isValid,
     handleSubmit,
     isLoading,
+    isFetchingInitialData,
+    isEditing,
     manuals,
     handleImageAdded,
 }: any) {
@@ -40,7 +42,7 @@ export function RuleForm({
     if (!data) return null;
 
     return (
-        <div className="flex flex-col gap-[1.5rem]" data-color-mode="dark">
+        <div className="flex flex-col gap-6" data-color-mode="dark">
             <CustomInput
                 id="rule-title"
                 label="Título da regra *"
@@ -50,20 +52,21 @@ export function RuleForm({
             />
 
             <div className="text-left">
-                <label className="mb-[0.5rem] block text-[0.875rem] font-medium ml-[0.25rem] text-sub-text">
+                <label className="mb-2 ml-1 block text-sm font-medium text-sub-text">
                     Tipo de regra *
                 </label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div
                         onClick={() => setData({ ...data, type: 'oficial' })}
-                        className={`group flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+                        className={`group flex cursor-pointer items-center gap-4 rounded-xl border-2 p-4 transition-all duration-200 ${
                             data.type === 'oficial'
                                 ? 'border-primary bg-primary/5'
                                 : 'border-card-border bg-card hover:border-primary/50'
                         }`}
                     >
                         <div
-                            className={`p-3 rounded-xl transition-colors ${
+                            className={`rounded-xl p-3 transition-colors ${
                                 data.type === 'oficial'
                                     ? 'bg-primary text-white'
                                     : 'bg-card-border text-sub-text'
@@ -72,7 +75,7 @@ export function RuleForm({
                             <ShieldCheck size={24} />
                         </div>
 
-                        <div className="flex flex-col text-left flex-1">
+                        <div className="flex flex-1 flex-col text-left">
                             <span
                                 className={`text-sm font-bold transition-colors ${
                                     data.type === 'oficial' ? 'text-white' : 'text-sub-text'
@@ -81,30 +84,30 @@ export function RuleForm({
                                 Regra Oficial
                             </span>
 
-                            <span className="text-[0.75rem] leading-relaxed text-sub-text/80 mt-1">
+                            <span className="mt-1 text-xs leading-relaxed text-sub-text/80">
                                 Conteúdo proveniente de manuais e livros oficiais.
                             </span>
                         </div>
 
                         <div
-                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                            className={`flex h-6 w-6 items-center justify-center rounded-full border-2 transition-all ${
                                 data.type === 'oficial'
                                     ? 'border-primary bg-primary'
                                     : 'border-card-border bg-background'
                             }`}
-                        ></div>
+                        />
                     </div>
 
                     <div
                         onClick={() => setData({ ...data, type: 'da_casa' })}
-                        className={`group flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+                        className={`group flex cursor-pointer items-center gap-4 rounded-xl border-2 p-4 transition-all duration-200 ${
                             data.type === 'da_casa'
                                 ? 'border-primary bg-primary/5'
                                 : 'border-card-border bg-card hover:border-primary/50'
                         }`}
                     >
                         <div
-                            className={`p-3 rounded-xl transition-colors ${
+                            className={`rounded-xl p-3 transition-colors ${
                                 data.type === 'da_casa'
                                     ? 'bg-primary text-white'
                                     : 'bg-card-border text-sub-text'
@@ -113,7 +116,7 @@ export function RuleForm({
                             <Home size={24} />
                         </div>
 
-                        <div className="flex flex-col text-left flex-1">
+                        <div className="flex flex-1 flex-col text-left">
                             <span
                                 className={`text-sm font-bold transition-colors ${
                                     data.type === 'da_casa' ? 'text-white' : 'text-sub-text'
@@ -121,28 +124,29 @@ export function RuleForm({
                             >
                                 Regra da Casa
                             </span>
-                            <span className="text-[0.75rem] leading-relaxed text-sub-text/80 mt-1">
+
+                            <span className="mt-1 text-xs leading-relaxed text-sub-text/80">
                                 Regras customizadas, adaptações ou mecânicas criadas.
                             </span>
                         </div>
 
                         <div
-                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                            className={`flex h-6 w-6 items-center justify-center rounded-full border-2 transition-all ${
                                 data.type === 'da_casa'
                                     ? 'border-primary bg-primary'
                                     : 'border-card-border bg-background'
                             }`}
-                        ></div>
+                        />
                     </div>
                 </div>
             </div>
 
             <div className="text-left">
-                <label className="mb-[0.5rem] block text-[0.875rem] font-medium ml-[0.25rem] text-sub-text">
+                <label className="mb-2 ml-1 block text-sm font-medium text-sub-text">
                     Manual *
                 </label>
 
-                <div className="max-w-[18rem]">
+                <div className="max-w-xs">
                     <Select
                         options={manuals}
                         styles={customStyles}
@@ -156,38 +160,44 @@ export function RuleForm({
                 </div>
             </div>
 
-            <div className="flex flex-col gap-[0.5rem]">
-                <label className="text-[0.875rem] font-medium ml-[0.25rem] text-sub-text">
-                    Conteúdo
-                </label>
-                <div className="border border-card-border rounded-xl overflow-hidden bg-background">
-                    <EditorCompat
-                        markdown={data.content || ''}
-                        onChange={handleEditorChange}
-                        onImageAdded={handleImageAdded}
-                    />
+            <div className="flex flex-col gap-2">
+                <label className="ml-1 text-sm font-medium text-sub-text">Conteúdo</label>
+
+                <div className="overflow-hidden rounded-xl border border-card-border bg-background">
+                    {isFetchingInitialData ? (
+                        <div className="flex h-80 w-full flex-col items-center justify-center gap-3 text-sub-text">
+                            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+                            <span className="text-sm font-medium">Carregando conteúdo...</span>
+                        </div>
+                    ) : (
+                        <EditorCompat
+                            markdown={data.content || ''}
+                            onChange={handleEditorChange}
+                            onImageAdded={handleImageAdded}
+                        />
+                    )}
                 </div>
             </div>
 
-            <div className="flex justify-end gap-[1rem] mt-[0.5rem]">
+            <div className="mt-2 flex justify-end gap-4">
                 <button
                     type="button"
                     disabled={isLoading}
                     onClick={() => onActionClick('PRIVADO')}
-                    className="flex items-center gap-2 bg-card border border-card-border py-[0.5rem] px-[1.25rem] text-sm rounded-xl font-bold hover:bg-card-border transition-all cursor-pointer disabled:opacity-50"
+                    className="flex cursor-pointer items-center gap-2 rounded-xl border border-card-border bg-card px-5 py-2 text-sm font-bold transition-all hover:bg-card-border disabled:opacity-50"
                 >
-                    <Bookmark className="w-4 h-4" />
-                    Salvar regra
+                    <Bookmark className="h-4 w-4" />
+                    {isEditing ? 'Salvar alterações' : 'Salvar regra'}
                 </button>
 
                 <button
                     type="button"
                     disabled={isLoading}
                     onClick={() => onActionClick('PUBLICADO')}
-                    className="flex items-center gap-2 bg-primary py-[0.5rem] px-[1.25rem] text-sm rounded-xl font-bold hover:bg-primary-hover transition-all text-white cursor-pointer disabled:opacity-50"
+                    className="flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-bold text-white transition-all hover:bg-primary-hover disabled:opacity-50"
                 >
-                    Postar regra
-                    <Send className="w-4 h-4" />
+                    {isEditing ? 'Atualizar regra' : 'Postar regra'}
+                    <Send className="h-4 w-4" />
                 </button>
             </div>
         </div>

@@ -2,18 +2,20 @@
 
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
-import { useCreateTabs } from './hooks/useCreateTabs';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, Suspense } from 'react';
+import { TabType, useCreateTabs } from './hooks/useCreateTabs';
 import { useManualForm } from './hooks/useManualForm';
 import { useRuleForm } from './hooks/useRuleForm';
 import { useQuestionForm } from './hooks/useQuestionForm';
 
 // Skeleton
 const FormSkeleton = () => (
-    <div className="w-full flex flex-col gap-5 animate-pulse p-2">
-        <div className="h-10 bg-card-border/50 rounded-[0.5rem] w-1/4"></div>
-        <div className="h-14 bg-card-border/50 rounded-[0.5rem] w-full"></div>
-        <div className="h-[200px] bg-card-border/50 rounded-[0.5rem] w-full mt-4"></div>
-        <div className="h-12 bg-card-border/50 rounded-[0.5rem] w-1/3 self-end mt-4"></div>
+    <div className="flex w-full animate-pulse flex-col gap-5 p-2">
+        <div className="h-10 w-1/4 rounded-lg bg-card-border/50" />
+        <div className="h-14 w-full rounded-lg bg-card-border/50" />
+        <div className="mt-4 h-52 w-full rounded-lg bg-card-border/50" />
+        <div className="mt-4 h-12 w-1/3 self-end rounded-lg bg-card-border/50" />
     </div>
 );
 
@@ -33,29 +35,39 @@ const LazyQuestionForm = dynamic(
     { loading: () => <FormSkeleton />, ssr: false },
 );
 
-const ManualTab = () => {
-    const manualForm = useManualForm();
+const ManualTab = ({ editId }: { editId?: string | null }) => {
+    const manualForm = useManualForm(editId);
     return <LazyManualForm {...manualForm} />;
 };
 
-const RuleTab = () => {
-    const ruleForm = useRuleForm();
+const RuleTab = ({ editId }: { editId?: string | null }) => {
+    const ruleForm = useRuleForm(editId);
     return <LazyRuleForm {...ruleForm} />;
 };
 
-const QuestionTab = () => {
-    const questionForm = useQuestionForm();
+const QuestionTab = ({ editId }: { editId?: string | null }) => {
+    const questionForm = useQuestionForm(editId);
     return <LazyQuestionForm {...questionForm} />;
 };
 
-export default function CreateFeature() {
+function CreateFeatureContent() {
     const { activeTab, setActiveTab, tabs } = useCreateTabs();
+    const searchParams = useSearchParams();
+
+    const editId = searchParams.get('id');
+    const tabParam = searchParams.get('tab') as TabType;
+
+    useEffect(() => {
+        if (tabParam && ['manual', 'regra', 'duvida'].includes(tabParam)) {
+            setActiveTab(tabParam);
+        }
+    }, [tabParam, setActiveTab]);
 
     return (
-        <div className="w-full max-w-[62rem] mx-auto py-[2.5rem] px-[1rem]">
-            <div className="bg-card border border-card-border rounded-[1.5rem] overflow-hidden shadow-2xl">
-                <div className="flex p-4 mt-2 bg-card">
-                    <div className="flex bg-background rounded-[10rem] overflow-hidden">
+        <div className="mx-auto w-full max-w-5xl px-4 py-10">
+            <div className="overflow-hidden rounded-3xl border border-card-border bg-card shadow-2xl">
+                <div className="mt-2 flex bg-card p-4">
+                    <div className="flex overflow-hidden rounded-full bg-background">
                         {tabs.map((tab) => {
                             const Icon = tab.icon;
                             const isActive = activeTab === tab.id;
@@ -63,15 +75,15 @@ export default function CreateFeature() {
                             return (
                                 <button
                                     key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`relative flex items-center gap-[0.625rem] py-[0.75rem] px-[1.5rem] transition-colors rounded-[10rem] ${
+                                    onClick={() => setActiveTab(tab.id as TabType)}
+                                    className={`relative flex items-center gap-2 rounded-full px-6 py-3 transition-colors ${
                                         isActive ? 'text-white' : 'text-sub-text hover:text-text'
                                     }`}
                                 >
                                     {isActive && (
                                         <motion.div
                                             layoutId="active-tab-indicator"
-                                            className="absolute inset-0 bg-primary rounded-[10rem]"
+                                            className="absolute inset-0 rounded-full bg-primary"
                                             initial={false}
                                             transition={{
                                                 type: 'spring',
@@ -81,7 +93,7 @@ export default function CreateFeature() {
                                         />
                                     )}
 
-                                    <span className="relative z-10 flex items-center gap-2 font-bold text-[0.875rem] whitespace-nowrap">
+                                    <span className="relative z-10 flex items-center gap-2 whitespace-nowrap text-sm font-bold">
                                         <Icon size={18} />
                                         {tab.label}
                                     </span>
@@ -91,12 +103,26 @@ export default function CreateFeature() {
                     </div>
                 </div>
 
-                <div className="p-[1.5rem] sm:p-[2.5rem]">
-                    {activeTab === 'manual' && <ManualTab />}
-                    {activeTab === 'regra' && <RuleTab />}
-                    {activeTab === 'duvida' && <QuestionTab />}
+                <div className="p-6 sm:p-10">
+                    {activeTab === 'manual' && (
+                        <ManualTab editId={tabParam === 'manual' ? editId : null} />
+                    )}
+                    {activeTab === 'regra' && (
+                        <RuleTab editId={tabParam === 'regra' ? editId : null} />
+                    )}
+                    {activeTab === 'duvida' && (
+                        <QuestionTab editId={tabParam === 'duvida' ? editId : null} />
+                    )}
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function CreateFeature() {
+    return (
+        <Suspense fallback={<FormSkeleton />}>
+            <CreateFeatureContent />
+        </Suspense>
     );
 }

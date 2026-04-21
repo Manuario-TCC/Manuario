@@ -22,7 +22,7 @@ import {
     AlignCenter,
     AlignRight,
 } from 'lucide-react';
-import { useState, useRef, useEffect, useCallback, memo } from 'react';
+import { useState, useRef, useEffect, useCallback, memo, useMemo } from 'react';
 import Swal from 'sweetalert2';
 
 interface TextEditorProps {
@@ -31,7 +31,7 @@ interface TextEditorProps {
     onImageAdded: (file: File, tempUrl: string) => void;
 }
 
-// COMPONENTE DE IMAGEM
+// Componente de imgagens
 const ImageNode = (props: any) => {
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -65,7 +65,7 @@ const ImageNode = (props: any) => {
               : 'justify-center';
 
     return (
-        <NodeViewWrapper className={`relative flex ${alignClass} group my-8`}>
+        <NodeViewWrapper className={`relative flex w-full ${alignClass} group my-8`}>
             <div
                 ref={containerRef}
                 className="relative inline-block"
@@ -91,6 +91,7 @@ const ImageNode = (props: any) => {
                     <div className="absolute -top-14 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-card border border-card-border p-1.5 rounded-xl shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200 w-max">
                         <button
                             type="button"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={() => props.updateAttributes({ width: '30%' })}
                             className="px-2 py-1 text-xs font-bold text-sub-text hover:text-white hover:bg-card-border rounded-lg cursor-pointer"
                         >
@@ -99,6 +100,7 @@ const ImageNode = (props: any) => {
 
                         <button
                             type="button"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={() => props.updateAttributes({ width: '60%' })}
                             className="px-2 py-1 text-xs font-bold text-sub-text hover:text-white hover:bg-card-border rounded-lg cursor-pointer"
                         >
@@ -107,6 +109,7 @@ const ImageNode = (props: any) => {
 
                         <button
                             type="button"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={() => props.updateAttributes({ width: '100%' })}
                             className="px-2 py-1 text-xs font-bold text-sub-text hover:text-white hover:bg-card-border rounded-lg cursor-pointer"
                         >
@@ -117,6 +120,7 @@ const ImageNode = (props: any) => {
 
                         <button
                             type="button"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={() => props.updateAttributes({ align: 'left' })}
                             className={`p-1.5 rounded-lg transition-colors cursor-pointer ${props.node.attrs.align === 'left' ? 'text-white bg-primary' : 'text-sub-text hover:text-white hover:bg-card-border'}`}
                         >
@@ -125,6 +129,7 @@ const ImageNode = (props: any) => {
 
                         <button
                             type="button"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={() => props.updateAttributes({ align: 'center' })}
                             className={`p-1.5 rounded-lg transition-colors cursor-pointer ${props.node.attrs.align === 'center' ? 'text-white bg-primary' : 'text-sub-text hover:text-white hover:bg-card-border'}`}
                         >
@@ -133,6 +138,7 @@ const ImageNode = (props: any) => {
 
                         <button
                             type="button"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={() => props.updateAttributes({ align: 'right' })}
                             className={`p-1.5 rounded-lg transition-colors cursor-pointer ${props.node.attrs.align === 'right' ? 'text-white bg-primary' : 'text-sub-text hover:text-white hover:bg-card-border'}`}
                         >
@@ -143,6 +149,7 @@ const ImageNode = (props: any) => {
 
                         <button
                             type="button"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={props.deleteNode}
                             className="p-1.5 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
                         >
@@ -156,11 +163,22 @@ const ImageNode = (props: any) => {
 };
 
 const CustomImage = BaseImage.extend({
+    inline: false,
+    group: 'block',
     addAttributes() {
         return {
             ...this.parent?.(),
-            width: { default: '100%', renderHTML: (attrs) => ({ style: `width: ${attrs.width}` }) },
-            align: { default: 'center', renderHTML: (attrs) => ({ 'data-align': attrs.align }) },
+            width: {
+                default: '100%',
+                parseHTML: (element) =>
+                    element.getAttribute('width') || element.style.width || '100%',
+                renderHTML: (attrs) => ({ width: attrs.width, style: `width: ${attrs.width}` }),
+            },
+            align: {
+                default: 'center',
+                parseHTML: (element) => element.getAttribute('data-align') || 'center',
+                renderHTML: (attrs) => ({ 'data-align': attrs.align }),
+            },
         };
     },
     addNodeView() {
@@ -168,24 +186,13 @@ const CustomImage = BaseImage.extend({
     },
 });
 
-// COMPONENTE DO EDITOR PRINCIPAL
+// Componente do editor principal
 function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
     const [isSourceMode, setIsSourceMode] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleImageFile = useCallback(
-        (file: File) => {
-            if (!file.type.startsWith('image/')) return null;
-            const tempUrl = URL.createObjectURL(file);
-            onImageAdded(file, tempUrl);
-            return tempUrl;
-        },
-        [onImageAdded],
-    );
-
-    const editor = useEditor({
-        immediatelyRender: false,
-        extensions: [
+    const extensions = useMemo(
+        () => [
             StarterKit.configure({
                 heading: {
                     levels: [1, 2, 3],
@@ -208,14 +215,30 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
             }),
             Markdown.configure({
                 html: true,
+                transformPastedText: true,
             }),
         ],
-        content: markdown,
+        [],
+    );
+
+    const handleImageFile = useCallback(
+        (file: File) => {
+            if (!file.type.startsWith('image/')) return null;
+            const tempUrl = URL.createObjectURL(file);
+            onImageAdded(file, tempUrl);
+            return tempUrl;
+        },
+        [onImageAdded],
+    );
+
+    const editor = useEditor({
+        immediatelyRender: false,
+        extensions: extensions,
+        content: typeof markdown === 'string' ? markdown.replace(/\\n/g, '\n') : '',
         editorProps: {
             attributes: {
                 class: 'prose prose-invert max-w-none p-6 min-h-[350px] outline-none text-text',
             },
-
             handleDrop: (view, event, slice, moved) => {
                 if (
                     !moved &&
@@ -224,7 +247,6 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
                     event.dataTransfer.files[0]
                 ) {
                     event.preventDefault();
-
                     const file = event.dataTransfer.files[0];
                     const tempUrl = handleImageFile(file);
 
@@ -234,10 +256,11 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
                             left: event.clientX,
                             top: event.clientY,
                         });
+
                         const node = schema.nodes.image.create({ src: tempUrl });
                         const transaction = view.state.tr.insert(coordinates?.pos || 0, node);
-                        view.dispatch(transaction);
 
+                        view.dispatch(transaction);
                         return true;
                     }
                 }
@@ -257,6 +280,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
                         const { schema } = view.state;
                         const node = schema.nodes.image.create({ src: tempUrl });
                         const transaction = view.state.tr.replaceSelectionWith(node);
+
                         view.dispatch(transaction);
                         return true;
                     }
@@ -265,15 +289,36 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
             },
         },
         onUpdate: ({ editor }) => {
-            onChange((editor.storage as any).markdown.getMarkdown());
+            const htmlContent = editor.getHTML();
+            let mdContent = (editor.storage as any).markdown.getMarkdown();
+
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            const images = tempDiv.querySelectorAll('img');
+
+            images.forEach((img) => {
+                const src = img.getAttribute('src') || '';
+                const width = img.getAttribute('width') || img.style.width || '100%';
+                const align = img.getAttribute('data-align') || 'center';
+
+                const mdImageRegex = new RegExp(
+                    `!\\[.*?\\]\\(${src.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\)`,
+                );
+
+                const htmlTag = `\n\n<img src="${src}" width="${width}" data-align="${align}" />\n\n`;
+
+                mdContent = mdContent.replace(mdImageRegex, htmlTag);
+            });
+
+            mdContent = mdContent.replace(/\n{3,}/g, '\n\n').trim();
+
+            onChange(mdContent);
         },
     });
 
     const setLink = useCallback(async () => {
         if (!editor) return;
-
         const previousUrl = editor.getAttributes('link').href;
-
         const { value: url, isConfirmed } = await Swal.fire({
             title: previousUrl ? 'Editar Link' : 'Inserir Link',
             input: 'text',
@@ -296,30 +341,40 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
             buttonsStyling: false,
         });
 
-        if (!isConfirmed) return;
+        if (isConfirmed && url) {
+            let finalUrl = url.trim();
+            if (!/^https?:\/\//i.test(finalUrl) && !finalUrl.startsWith('mailto:')) {
+                finalUrl = 'https://' + finalUrl;
+            }
 
-        if (!url || url.trim() === '') {
+            editor.chain().focus().extendMarkRange('link').setLink({ href: finalUrl }).run();
+        } else if (isConfirmed) {
             editor.chain().focus().extendMarkRange('link').unsetLink().run();
-            return;
         }
-
-        let finalUrl = url.trim();
-        if (!/^https?:\/\//i.test(finalUrl) && !finalUrl.startsWith('mailto:')) {
-            finalUrl = 'https://' + finalUrl;
-        }
-
-        editor.chain().focus().extendMarkRange('link').setLink({ href: finalUrl }).run();
     }, [editor]);
 
     useEffect(() => {
-        if (
-            !isSourceMode &&
-            editor &&
-            markdown !== (editor.storage as any).markdown.getMarkdown()
-        ) {
-            editor.commands.setContent(markdown);
+        if (!editor || isSourceMode || markdown === undefined) return;
+
+        let safeMarkdown = typeof markdown === 'string' ? markdown.replace(/\\n/g, '\n') : '';
+
+        // Remove as barras que o Tiptap
+        safeMarkdown = safeMarkdown.replace(/\\#/g, '#');
+
+        // Garante a tag de imagem tenha uma linha em branco
+        safeMarkdown = safeMarkdown.replace(/(<img[^>]+>)/gi, '\n\n$1\n\n');
+
+        // Limpa quebras de linha
+        safeMarkdown = safeMarkdown.replace(/\n{3,}/g, '\n\n');
+
+        const currentMarkdown = (editor.storage as any).markdown?.getMarkdown() || '';
+
+        if (safeMarkdown !== currentMarkdown && !editor.isFocused) {
+            queueMicrotask(() => {
+                editor.commands.setContent(safeMarkdown);
+            });
         }
-    }, [isSourceMode, editor, markdown]);
+    }, [markdown, editor, isSourceMode]);
 
     if (!editor) return null;
 
@@ -328,6 +383,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
             <div className="flex items-center flex-wrap gap-1 bg-card p-2 border-b border-card-border">
                 <button
                     type="button"
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
                     className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 cursor-pointer ${editor.isActive('heading', { level: 2 }) ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-sub-text hover:bg-card-border hover:text-text'}`}
                 >
@@ -338,6 +394,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
 
                 <button
                     type="button"
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => editor.chain().focus().toggleBold().run()}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive('bold') ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
@@ -346,6 +403,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
 
                 <button
                     type="button"
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => editor.chain().focus().toggleItalic().run()}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive('italic') ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
@@ -354,6 +412,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
 
                 <button
                     type="button"
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => editor.chain().focus().toggleUnderline().run()}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive('underline') ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
@@ -364,6 +423,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
 
                 <button
                     type="button"
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => editor.chain().focus().setTextAlign('left').run()}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive({ textAlign: 'left' }) ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
@@ -372,6 +432,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
 
                 <button
                     type="button"
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => editor.chain().focus().setTextAlign('center').run()}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive({ textAlign: 'center' }) ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
@@ -380,6 +441,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
 
                 <button
                     type="button"
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => editor.chain().focus().setTextAlign('right').run()}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive({ textAlign: 'right' }) ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
@@ -390,7 +452,19 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
 
                 <button
                     type="button"
-                    onClick={() => editor.chain().focus().toggleBulletList().run()}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                        if (editor.isActive('heading')) {
+                            editor
+                                .chain()
+                                .focus()
+                                .insertContent('<p></p>')
+                                .toggleBulletList()
+                                .run();
+                        } else {
+                            editor.chain().focus().toggleBulletList().run();
+                        }
+                    }}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive('bulletList') ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
                     <List size={18} />
@@ -398,7 +472,19 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
 
                 <button
                     type="button"
-                    onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                        if (editor.isActive('heading')) {
+                            editor
+                                .chain()
+                                .focus()
+                                .insertContent('<p></p>')
+                                .toggleOrderedList()
+                                .run();
+                        } else {
+                            editor.chain().focus().toggleOrderedList().run();
+                        }
+                    }}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive('orderedList') ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
                     <ListOrdered size={18} />
@@ -408,6 +494,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
 
                 <button
                     type="button"
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={setLink}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive('link') ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
@@ -416,6 +503,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
 
                 <button
                     type="button"
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => fileInputRef.current?.click()}
                     className="p-2 rounded-lg text-sub-text hover:bg-card-border hover:text-text transition-colors cursor-pointer"
                 >
@@ -426,6 +514,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
 
                 <button
                     type="button"
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => setIsSourceMode(!isSourceMode)}
                     className={`px-4 py-1.5 rounded-lg flex items-center gap-2 text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
                         isSourceMode
@@ -446,9 +535,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
                         const file = e.target.files?.[0];
                         if (file) {
                             const url = handleImageFile(file);
-                            if (url) {
-                                editor.chain().focus().setImage({ src: url }).run();
-                            }
+                            if (url) editor.chain().focus().setImage({ src: url }).run();
                         }
                     }}
                 />

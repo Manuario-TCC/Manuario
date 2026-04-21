@@ -1,14 +1,53 @@
-import { useState, useMemo, useCallback } from 'react';
-import { createDoubtService } from '../services/createService';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { createDoubtService, updateDoubtService, getDoubtById } from '../services/createService';
 import { useSession } from '@/src/hooks/useSession';
-import Swal from 'sweetalert2';
+import { customAlert } from '@/src/components/customAlert';
 
-export function useQuestionForm() {
+export function useQuestionForm(editId?: string | null) {
     const { user } = useSession();
+    const router = useRouter();
+
     const [data, setData] = useState({ title: '', game: '', description: '' });
     const [publicationId] = useState(() => crypto.randomUUID());
     const [isLoading, setIsLoading] = useState(false);
     const [pendingImages, setPendingImages] = useState<Record<string, File>>({});
+
+    const isEditing = !!editId;
+
+    useEffect(() => {
+        if (isEditing && editId && user?.idPublico) {
+            setIsLoading(true);
+
+            getDoubtById(editId)
+                .then(async (res) => {
+                    if (!res.ok) {
+                        throw new Error('Dúvida não encontrada');
+                    }
+
+                    return res.json();
+                })
+                .then((fetchedData) => {
+                    const ownerPublicId = fetchedData.user?.idPublico;
+
+                    if (ownerPublicId !== user.idPublico) {
+                        router.push('/404');
+                    } else {
+                        setData({
+                            title: fetchedData.name || fetchedData.title,
+                            game: fetchedData.game,
+                            description: fetchedData.description,
+                        });
+                    }
+                })
+                .catch(() => {
+                    router.push('/404');
+                })
+                .finally(() => {
+                    setIsLoading(false);
+                });
+        }
+    }, [editId, isEditing, user?.idPublico, router]);
 
     const isValid = useMemo(() => {
         return (
@@ -24,7 +63,7 @@ export function useQuestionForm() {
         if (e) e.preventDefault();
 
         if (!isValid) {
-            Swal.fire('Atenção', 'Preencha todos os campos.', 'info');
+            customAlert.warning('Atenção', 'Preencha todos os campos obrigatórios.');
             return;
         }
 
@@ -32,6 +71,7 @@ export function useQuestionForm() {
         try {
             let finalContent = data.description;
 
+            // Processamento de imagens no Markdown
             for (const [tempUrl, file] of Object.entries(pendingImages)) {
                 if (finalContent.includes(tempUrl)) {
                     const formData = new FormData();
@@ -58,14 +98,28 @@ export function useQuestionForm() {
                 userId: user.idPublico,
             };
 
-            const response = await createDoubtService(payload);
+            let response;
+            if (isEditing && editId) {
+                response = await updateDoubtService(editId, payload);
+            } else {
+                response = await createDoubtService(payload);
+            }
 
-            if (!response.ok) throw new Error('Erro no banco');
+            if (!response.ok) {
+                throw new Error('Erro na comunicação com o servidor');
+            }
 
-            Swal.fire('Postado!', 'Sua dúvida foi enviada.', 'success');
-            setData({ title: '', game: '', description: '' });
+            const message = isEditing
+                ? 'Sua dúvida foi atualizada!'
+                : 'Sua dúvida foi enviada com sucesso.';
+            customAlert.success('Sucesso!', message);
+
+            if (!isEditing) {
+                setData({ title: '', game: '', description: '' });
+                setPendingImages({});
+            }
         } catch (error) {
-            Swal.fire('Erro', 'Não foi possível salvar a dúvida no banco.', 'error');
+            customAlert.error('Erro', 'Não foi possível salvar a dúvida no momento.');
         } finally {
             setIsLoading(false);
         }
@@ -79,5 +133,6 @@ export function useQuestionForm() {
         isLoading,
         publicationId,
         handleImageAdded,
+        isEditing,
     };
 }

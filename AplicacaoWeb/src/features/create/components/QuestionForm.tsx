@@ -14,6 +14,7 @@ export function QuestionForm({
     isValid,
     handleSubmit,
     isLoading,
+    isEditing,
     handleImageAdded,
 }: any) {
     if (!data) return null;
@@ -30,7 +31,7 @@ export function QuestionForm({
     };
 
     return (
-        <div className="flex flex-col gap-[1.5rem]">
+        <div className="flex flex-col gap-6">
             <CustomInput
                 id="q-title"
                 label="Título da dúvida *"
@@ -47,12 +48,10 @@ export function QuestionForm({
                 onChange={(e: any) => setData({ ...data, game: e.target.value })}
             />
 
-            <div className="flex flex-col gap-[0.5rem]">
-                <label className="text-[0.875rem] font-medium ml-[0.25rem] text-sub-text">
-                    Detalhes *
-                </label>
+            <div className="flex flex-col gap-2">
+                <label className="ml-1 text-sm font-medium text-sub-text">Detalhes *</label>
 
-                <div className="border border-card-border rounded-xl overflow-hidden bg-background">
+                <div className="overflow-hidden rounded-xl border border-card-border bg-background">
                     <EditorCompat
                         markdown={data.description || ''}
                         onChange={(val: string) => setData({ ...data, description: val || '' })}
@@ -61,15 +60,15 @@ export function QuestionForm({
                 </div>
             </div>
 
-            <div className="flex justify-end gap-[1rem] mt-[0.5rem]">
+            <div className="mt-2 flex justify-end gap-4">
                 <button
                     type="button"
                     onClick={onSubmitClick}
                     disabled={isLoading}
-                    className="flex items-center gap-2 bg-primary py-[0.5rem] px-[1.25rem] text-sm rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-hover transition-all text-white cursor-pointer"
+                    className="flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-bold text-white transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                    <Send className="w-4 h-4" />
-                    {isLoading ? 'Postando...' : 'Postar dúvida'}
+                    <Send className="h-4 w-4" />
+                    {isLoading ? 'Carregando...' : isEditing ? 'Editar Dúvida' : 'Postar Dúvida'}
                 </button>
             </div>
         </div>

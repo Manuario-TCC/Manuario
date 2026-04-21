@@ -20,7 +20,7 @@ export function ManualForm({ data, setData, isValid, handleSubmit, isLoading, er
     };
 
     return (
-        <div className="flex flex-col gap-[1.5rem]">
+        <div className="flex flex-col gap-6">
             <CustomInput
                 id="m-title"
                 label="Título do Manual *"
@@ -37,7 +37,7 @@ export function ManualForm({ data, setData, isValid, handleSubmit, isLoading, er
                 onChange={(e) => setData({ ...data, game: e.target.value })}
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-[1.25rem]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <CustomInput
                     id="m-genre"
                     label="Gênero *"
@@ -58,26 +58,38 @@ export function ManualForm({ data, setData, isValid, handleSubmit, isLoading, er
                 label="Banner do Manual"
                 icon={<ImagePlus size={24} />}
                 onSelect={(f) => handleFile('banner', f)}
-                preview={data.banner ? URL.createObjectURL(data.banner) : null}
-                className="w-full h-[14rem]"
+                preview={
+                    data.banner
+                        ? data.banner instanceof File
+                            ? URL.createObjectURL(data.banner)
+                            : data.banner
+                        : null
+                }
+                className="w-full h-56"
             />
 
             <ImageUpload
                 label="Logo do Manual"
                 icon={<ImagePlus size={24} />}
                 onSelect={(f) => handleFile('logo', f)}
-                preview={data.logo ? URL.createObjectURL(data.logo) : null}
-                className="w-[8rem] h-[8rem]"
+                preview={
+                    data.logo
+                        ? data.logo instanceof File
+                            ? URL.createObjectURL(data.logo)
+                            : data.logo
+                        : null
+                }
+                className="w-32 h-32"
                 centerField
             />
 
             {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
 
-            <div className="flex justify-end gap-[1rem] mt-[0.5rem]">
+            <div className="flex justify-end gap-4 mt-2">
                 <button
                     disabled={!isValid || isLoading}
                     onClick={onSubmit}
-                    className="flex items-center gap-2 bg-primary py-[0.5rem] px-[1.25rem] text-sm rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-hover transition-all text-white"
+                    className="flex items-center gap-2 bg-primary py-2 px-5 text-sm rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-hover transition-all text-white"
                 >
                     {isLoading ? (
                         <Loader2 className="w-4 h-4 animate-spin" />

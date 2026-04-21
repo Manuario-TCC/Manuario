@@ -1,17 +1,19 @@
 import Swal, { SweetAlertOptions } from 'sweetalert2';
 
 const swalCustom = Swal.mixin({
-    background: 'hsl(var(--card))',
-    color: 'hsl(var(--foreground))',
-    confirmButtonColor: 'hsl(var(--primary))',
-    cancelButtonColor: 'hsl(var(--muted))',
+    background: '#151718',
+    color: '#ffffff',
     customClass: {
-        popup: 'border border-card-border rounded-xl bg-card',
+        popup: 'border border-card-border rounded-xl shadow-2xl',
         title: 'text-white text-lg',
         htmlContainer: 'text-sub-text',
-        confirmButton: 'rounded-xl px-5 py-2.5 font-bold text-white transition-all',
-        cancelButton: 'rounded-xl px-5 py-2.5 font-bold text-white transition-all',
+        confirmButton:
+            'bg-primary rounded-xl px-5 py-2.5 font-bold text-white transition-all hover:bg-primary/90',
+        cancelButton:
+            'bg-card-border rounded-xl px-5 py-2.5 font-bold text-sub-text transition-all hover:text-white',
+        actions: 'gap-3 mt-4',
     },
+    buttonsStyling: false,
 });
 
 export const customAlert = {

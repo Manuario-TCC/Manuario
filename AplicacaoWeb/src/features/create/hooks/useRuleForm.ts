@@ -1,15 +1,58 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { createRuleService, fetchUserManuals } from '../services/createService';
+import { useRouter } from 'next/navigation';
+import {
+    createRuleService,
+    updateRuleService,
+    fetchUserManuals,
+    getRuleById,
+} from '../services/createService';
 import { useSession } from '@/src/hooks/useSession';
-import Swal from 'sweetalert2';
+import { customAlert } from '@/src/components/customAlert';
 
-export function useRuleForm() {
+export function useRuleForm(editId?: string | null) {
     const { user } = useSession();
+    const router = useRouter();
+
     const [manuals, setManuals] = useState<{ value: string; label: string }[]>([]);
     const [publicationId] = useState(() => crypto.randomUUID());
     const [data, setData] = useState({ title: '', type: 'oficial', manualId: '', content: '' });
     const [isLoading, setIsLoading] = useState(false);
+    const [isFetchingInitialData, setIsFetchingInitialData] = useState(!!editId);
     const [pendingImages, setPendingImages] = useState<Record<string, File>>({});
+
+    const isEditing = !!editId;
+
+    useEffect(() => {
+        if (isEditing && editId && user?.idPublico) {
+            setIsFetchingInitialData(true);
+            setIsLoading(true);
+
+            getRuleById(editId)
+                .then(async (res) => {
+                    if (!res.ok) throw new Error();
+                    return res.json();
+                })
+                .then((fetchedData) => {
+                    if (fetchedData.user?.idPublico !== user.idPublico) {
+                        router.push('/404');
+                    } else {
+                        setData({
+                            title: fetchedData.name,
+                            manualId: fetchedData.manualId,
+                            content: fetchedData.description,
+                            type: fetchedData.isHouseRule ? 'da_casa' : 'oficial',
+                        });
+                    }
+                })
+                .catch(() => {
+                    router.push('/404');
+                })
+                .finally(() => {
+                    setIsFetchingInitialData(false);
+                    setIsLoading(false);
+                });
+        }
+    }, [editId, isEditing, user?.idPublico, router]);
 
     useEffect(() => {
         fetchUserManuals()
@@ -29,19 +72,8 @@ export function useRuleForm() {
     }, []);
 
     const handleSubmit = async (status: 'PUBLICADO' | 'PRIVADO') => {
-        const swalConfig = {
-            background: '#17141b',
-            color: '#ffffff',
-            confirmButtonColor: '#470279',
-        };
-
         if (!isValid) {
-            Swal.fire({
-                title: 'Atenção',
-                text: 'Preencha Título, Manual e Conteúdo.',
-                icon: 'info',
-                ...swalConfig,
-            });
+            customAlert.warning('Atenção', 'Preencha Título, Manual e Conteúdo.');
             return;
         }
 
@@ -77,25 +109,26 @@ export function useRuleForm() {
                 status,
             };
 
-            const response = await createRuleService(payload);
+            let response;
+            if (isEditing && editId) {
+                response = await updateRuleService(editId, payload);
+            } else {
+                response = await createRuleService(payload);
+            }
 
             if (!response.ok) throw new Error('Erro no banco');
 
-            Swal.fire({
-                title: 'Postado!',
-                text: 'Sua regra foi salva com sucesso.',
-                icon: 'success',
-                ...swalConfig,
-            });
+            customAlert.success(
+                'Sucesso!',
+                isEditing ? 'Sua regra foi atualizada.' : 'Sua regra foi salva com sucesso.',
+            );
 
-            setData({ title: '', type: 'oficial', manualId: '', content: '' });
+            if (!isEditing) {
+                setData({ title: '', type: 'oficial', manualId: '', content: '' });
+                setPendingImages({});
+            }
         } catch (error) {
-            Swal.fire({
-                title: 'Erro!',
-                text: 'Ocorreu um erro ao salvar no banco.',
-                icon: 'error',
-                ...swalConfig,
-            });
+            customAlert.error('Erro!', 'Ocorreu um erro ao salvar no banco.');
         } finally {
             setIsLoading(false);
         }
@@ -108,7 +141,9 @@ export function useRuleForm() {
         handleSubmit,
         isLoading,
         publicationId,
+        isFetchingInitialData,
         manuals,
         handleImageAdded,
+        isEditing,
     };
 }
