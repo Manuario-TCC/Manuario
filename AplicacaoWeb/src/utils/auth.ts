@@ -16,3 +16,15 @@ export async function getAuthUserId(): Promise<string | null> {
         return null;
     }
 }
+
+export async function getServerSession() {
+    const userId = await getAuthUserId();
+
+    if (!userId) return null;
+
+    return {
+        user: {
+            id: userId,
+        },
+    };
+}

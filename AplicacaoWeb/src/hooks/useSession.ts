@@ -1,12 +1,11 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { getMe } from '../services/menuService';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getMe } from '@/src/services/authService';
 import { useEffect } from 'react';
 import { socket } from '@/src/utils/socket';
-import { useQueryClient } from '@tanstack/react-query';
 
-export function useMenuUser() {
+export function useSession() {
     const queryClient = useQueryClient();
 
     const { data: user, isLoading: loading } = useQuery({

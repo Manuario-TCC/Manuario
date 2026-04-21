@@ -2,7 +2,7 @@
 
 import { NavLinks } from './components/NavLinks';
 import { FooterMenu } from './components/FooterMenu';
-import { useMenuUser } from './hooks/useMenuUser';
+import { useSession } from '@/src/hooks/useSession';
 import { useMenuUI } from './hooks/useMenuUI';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -10,7 +10,7 @@ import { usePathname } from 'next/navigation';
 import { Search, Library, MessageSquare, PlusSquare } from 'lucide-react';
 
 export default function Menu() {
-    const { user, loading } = useMenuUser();
+    const { user, loading } = useSession();
     const { isOpen, toggleMenu, closeMenu } = useMenuUI();
     const pathname = usePathname();
 
@@ -25,7 +25,6 @@ export default function Menu() {
 
     return (
         <>
-            {/* Overlay Escuro */}
             {isOpen && (
                 <div
                     className="fixed inset-0 bg-black/60 z-40 block lg:hidden backdrop-blur-sm transition-opacity"
@@ -35,7 +34,6 @@ export default function Menu() {
 
             <div className="hidden sm:block lg:hidden w-24 shrink-0 transition-none" />
 
-            {/* Sidebar (Menu Lateral) */}
             <aside
                 className={`
                     top-0 left-0 h-screen bg-card border-r border-card-border z-50
