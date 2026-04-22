@@ -3,21 +3,13 @@ import { prisma } from '@/src/database/prisma';
 import { getAuthUserId } from '@/src/utils/auth';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+import crypto from 'crypto';
 
 export async function POST(req: Request) {
     try {
         const userId = await getAuthUserId();
         if (!userId) {
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
-        }
-
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: { idPublico: true },
-        });
-
-        if (!user) {
-            return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
         }
 
         const formData = await req.formData();
@@ -34,18 +26,20 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Título e Jogo são obrigatórios' }, { status: 400 });
         }
 
+        const manualIdPublic = crypto.randomUUID();
+
         const uploadDir = path.join(
             process.cwd(),
             'public',
             'upload',
             'manual',
-            user.idPublico,
+            manualIdPublic,
             'img',
         );
 
         await mkdir(uploadDir, { recursive: true });
 
-        //salvar a imagem do Banner
+        // Salvar a imagem do Banner
         let bannerName = null;
 
         if (bannerFile && bannerFile.name) {
@@ -60,6 +54,7 @@ export async function POST(req: Request) {
             await writeFile(filePath, buffer);
         }
 
+        // Salvar a imagem do Logo
         let logoName = null;
 
         if (logoFile && logoFile.name) {
@@ -75,6 +70,7 @@ export async function POST(req: Request) {
 
         const novoManual = await prisma.manual.create({
             data: {
+                idPublic: manualIdPublic,
                 name: title,
                 game: game,
                 genero: genre,
