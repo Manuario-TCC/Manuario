@@ -2,8 +2,8 @@
 
 import { useRef, useCallback } from 'react';
 import { useFeed } from './hooks/useFeed';
-import DuvidaCard from './components/DuvidaCard';
-import RegraCard from './components/RegraCard';
+import DuvidaCard from '../../components/cards/DuvidaCard';
+import RegraCard from '../../components/cards/RegraCard';
 
 export default function FeedPage() {
     const { posts, loading, loadPosts, hasMore } = useFeed();

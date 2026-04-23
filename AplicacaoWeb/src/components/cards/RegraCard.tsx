@@ -1,9 +1,13 @@
 import Link from 'next/link';
-import MarkdownViewer from './MarkdownViewer';
+import MarkdownViewer from '../MarkdownViewer';
 import FeedCardBase from './FeedCardBase';
 import { ChevronRight } from 'lucide-react';
 
-export default function RegraCard({ post }: { post: any }) {
+interface RegraCardProps {
+    post: any;
+}
+
+export default function RegraCard({ post }: RegraCardProps) {
     const postUrl = `/regra/${post.idPublic}`;
     const manualUrl = `/manual/${post.manual?.idPublic}`;
 
@@ -48,7 +52,7 @@ export default function RegraCard({ post }: { post: any }) {
                         </div>
                         <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-background to-transparent pointer-events-none"></div>
                     </div>
-                    <span className="text-accent font-bold text-xs mt-3 inline-block hover:underline">
+                    <span className="text-text font-bold text-xs mt-3 inline-block hover:underline">
                         Ver regra completa
                     </span>
                 </Link>

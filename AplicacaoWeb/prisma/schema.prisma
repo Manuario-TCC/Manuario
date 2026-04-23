@@ -106,25 +106,24 @@ model TrechoSalvo {
 }
 
 model Comentario {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  content     String
-  
-  userId      String   @db.ObjectId
-  user        User     @relation(fields: [userId], references: [id])
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  texto        String
+  criadoEm     DateTime     @default(now())
+  atualizadoEm DateTime     @updatedAt
 
-  parentId    String?      @db.ObjectId
-  parent      Comentario?  @relation("RespostasComentario", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  respostas   Comentario[] @relation("RespostasComentario")
+  autorId      String       @db.ObjectId
+  autor        User         @relation(fields: [autorId], references: [id]) 
 
-  ruleId      String?      @db.ObjectId
-  rule        Regra?       @relation(fields: [ruleId], references: [id])
+  regraId      String?      @db.ObjectId
+  regra        Regra?       @relation(fields: [regraId], references: [id], onDelete: Cascade)
 
-  doubtId     String?      @db.ObjectId
-  doubt       Duvida?      @relation(fields: [doubtId], references: [id])
+  duvidaId     String?      @db.ObjectId
+  duvida       Duvida?      @relation(fields: [duvidaId], references: [id], onDelete: Cascade)
 
-  postId      String?      @db.ObjectId
-  postIA      PostIA?      @relation(fields: [postId], references: [id])
+  postIAId     String?      @db.ObjectId
+  postIA       PostIA?      @relation(fields: [postIAId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  parentId     String?      @db.ObjectId
+  parent       Comentario?  @relation("ComentarioRespostas", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  respostas    Comentario[] @relation("ComentarioRespostas")
 }
