@@ -1,8 +1,12 @@
 import Link from 'next/link';
-import MarkdownViewer from './MarkdownViewer';
+import MarkdownViewer from '../MarkdownViewer';
 import FeedCardBase from './FeedCardBase';
 
-export default function DuvidaCard({ post }: { post: any }) {
+interface DuvidaCardProps {
+    post: any;
+}
+
+export default function DuvidaCard({ post }: DuvidaCardProps) {
     const postUrl = `/duvida/${post.id}`;
 
     return (

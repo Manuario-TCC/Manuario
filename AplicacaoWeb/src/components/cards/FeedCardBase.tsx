@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { formatTimeAgo } from '../../../utils/formatTimeAgo';
+import { formatTimeAgo } from '../../utils/formatTimeAgo';
 import { MoreHorizontal, Heart, MessageCircle, Share2 } from 'lucide-react';
 import { ReactNode } from 'react';
 
@@ -15,7 +15,9 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
         : '/img/iconePadrao.jpg';
 
     return (
-        <div className="bg-card border border-card-border rounded-xl p-5 mb-4 hover:border-gray transition-colors w-full max-w-[33.75rem] mx-auto shadow-md">
+        <div
+            className={`bg-card border border-card-border rounded-xl p-5 mb-4 hover:border-gray transition-colors w-full shadow-md max-w-[40rem]`}
+        >
             <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-3">
                     <Link href={`/perfil/${post.user.id}`}>
