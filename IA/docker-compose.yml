@@ -15,6 +15,7 @@ services:
       - GENERIC_TIMEZONE=America/Sao_Paulo
     depends_on:
       - redis_memory
+      - ollama # Garante que o Ollama inicie antes do n8n
     volumes:
       - n8n_data:/home/node/.n8n
     networks:
@@ -66,11 +67,24 @@ services:
     networks:
       - ia_network
 
+  # Motor de Embeddings Local (Ollama)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: always
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - ia_network
+
 volumes:
   n8n_data:
   redis_data:
   rag_postgres_data:
   rag_pgadmin_data:
+  ollama_data: # Volume novo para guardar os modelos do Ollama
 
 networks:
   ia_network: # Rede fechada apenas para a IA
