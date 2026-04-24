@@ -10,8 +10,9 @@ interface FeedCardBaseProps {
 }
 
 export default function FeedCardBase({ post, postUrl, children }: FeedCardBaseProps) {
+    const userIdUrl = post.user?.idPublico || post.user?.id;
     const userAvatarUrl = post.user?.img
-        ? `/upload/${post.user.idPublico || post.user.id}/user/${post.user.img}`
+        ? `/upload/${userIdUrl}/user/${post.user.img}`
         : '/img/iconePadrao.jpg';
 
     return (
@@ -20,7 +21,7 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
         >
             <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-3">
-                    <Link href={`/perfil/${post.user.id}`}>
+                    <Link href={`/perfil/${userIdUrl}`}>
                         <img
                             src={userAvatarUrl}
                             alt={post.user.name}
@@ -29,7 +30,7 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
                     </Link>
                     <div className="flex items-center gap-2">
                         <Link
-                            href={`/perfil/${post.user.id}`}
+                            href={`/perfil/${userIdUrl}`}
                             className="text-text font-bold text-base"
                         >
                             {post.user.name}

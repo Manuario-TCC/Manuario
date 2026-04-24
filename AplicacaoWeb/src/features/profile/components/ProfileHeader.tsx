@@ -19,10 +19,23 @@ interface ProfileHeaderProps {
         avatarUrl?: string | null;
         bannerUrl?: string | null;
     };
+    stats: {
+        followers: number;
+        following: number;
+        rules: number;
+    };
     isOwnProfile: boolean;
+    isFollowing: boolean;
+    onFollowToggle: () => void;
 }
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({ initialData, isOwnProfile }) => {
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({
+    initialData,
+    stats,
+    isOwnProfile,
+    isFollowing,
+    onFollowToggle,
+}) => {
     const banner = useProfileBanner(initialData.bannerUrl || '/img/bannerPadrao.png', isOwnProfile);
     const avatar = useProfileAvatar(initialData.avatarUrl || '/img/iconePadrao.jpg', isOwnProfile);
 
@@ -51,6 +64,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ initialData, isOwnProfile
                             />
                         </div>
 
+                        {/* Botão Mobile */}
                         <div className="min-[900px]:hidden pb-2 flex-shrink-0">
                             {isOwnProfile ? (
                                 <button
@@ -60,17 +74,29 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ initialData, isOwnProfile
                                     Editar Perfil
                                 </button>
                             ) : (
-                                <button className="px-6 py-1.5 rounded-full bg-text text-text-inverted font-semibold hover:bg-sub-text transition text-sm cursor-pointer">
-                                    Seguir
+                                <button
+                                    onClick={onFollowToggle}
+                                    className={`px-6 py-1.5 rounded-full font-semibold transition text-sm cursor-pointer ${
+                                        isFollowing
+                                            ? 'bg-transparent border border-text text-text hover:bg-card-border'
+                                            : 'bg-text text-text-inverted hover:bg-sub-text'
+                                    }`}
+                                >
+                                    {isFollowing ? 'Seguindo' : 'Seguir'}
                                 </button>
                             )}
                         </div>
                     </div>
 
                     <div className="flex-1 min-[900px]:pt-4">
-                        <ProfileUserInfo name={edit.formData.name} isOwnProfile={isOwnProfile} />
+                        <ProfileUserInfo
+                            name={edit.formData.name}
+                            isOwnProfile={isOwnProfile}
+                            stats={stats}
+                        />
                     </div>
 
+                    {/* Botão Desktop */}
                     <div className="hidden min-[900px]:block pt-4 flex-shrink-0">
                         {isOwnProfile ? (
                             <button
@@ -80,8 +106,15 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ initialData, isOwnProfile
                                 Editar Perfil
                             </button>
                         ) : (
-                            <button className="px-6 py-2 rounded-full bg-text text-text-inverted font-semibold hover:bg-sub-text transition text-sm cursor-pointer">
-                                Seguir
+                            <button
+                                onClick={onFollowToggle}
+                                className={`px-6 py-2 rounded-full font-semibold transition text-sm cursor-pointer ${
+                                    isFollowing
+                                        ? 'bg-transparent border border-text text-text hover:bg-card-border'
+                                        : 'bg-text text-text-inverted hover:bg-sub-text'
+                                }`}
+                            >
+                                {isFollowing ? 'Seguindo' : 'Seguir'}
                             </button>
                         )}
                     </div>

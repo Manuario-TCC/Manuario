@@ -17,6 +17,13 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 email: true,
                 img: true,
                 banner: true,
+                _count: {
+                    select: {
+                        seguidores: true,
+                        seguindo: true,
+                        regras: true,
+                    },
+                },
             },
         });
 
@@ -25,6 +32,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         }
 
         let isOwnProfile = false;
+        let isFollowing = false;
 
         const cookieStore = await cookies();
         const token = cookieStore.get('manuario_token')?.value;
@@ -34,8 +42,19 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as {
                     userId: string;
                 };
+
                 if (dbUser.id === decoded.userId) {
                     isOwnProfile = true;
+                } else {
+                    const segue = await prisma.follow.findUnique({
+                        where: {
+                            followerId_followedId: {
+                                followerId: decoded.userId,
+                                followedId: dbUser.id,
+                            },
+                        },
+                    });
+                    isFollowing = !!segue;
                 }
             } catch (error) {}
         }
@@ -51,10 +70,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 ? `/upload/${dbUser.idPublico}/user/${dbUser.banner}`
                 : '/img/bannerPadrao.png',
 
-            followers: 142,
-            following: 89,
-            rules: 12,
+            followers: dbUser._count.seguidores,
+            following: dbUser._count.seguindo,
+            rules: dbUser._count.regras,
+
             isOwnProfile,
+            isFollowing,
         };
 
         return NextResponse.json(profileData, { status: 200 });

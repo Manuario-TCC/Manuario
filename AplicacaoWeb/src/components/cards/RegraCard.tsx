@@ -8,7 +8,7 @@ interface RegraCardProps {
 }
 
 export default function RegraCard({ post }: RegraCardProps) {
-    const postUrl = `/regra/${post.idPublic}`;
+    const postUrl = `/post/regra/${post.idPublic}`;
     const manualUrl = `/manual/${post.manual?.idPublic}`;
 
     const manualLogoUrl = post.manual?.imgLogo

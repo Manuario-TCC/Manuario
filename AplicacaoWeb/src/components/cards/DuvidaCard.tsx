@@ -7,7 +7,7 @@ interface DuvidaCardProps {
 }
 
 export default function DuvidaCard({ post }: DuvidaCardProps) {
-    const postUrl = `/duvida/${post.id}`;
+    const postUrl = `/post/duvida/${post.idPublic || post.id}`;
 
     return (
         <FeedCardBase post={post} postUrl={postUrl}>
