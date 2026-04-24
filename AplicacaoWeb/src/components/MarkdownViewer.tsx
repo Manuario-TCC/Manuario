@@ -35,15 +35,13 @@ export default function MarkdownViewer({ content }: MarkdownViewerProps) {
                 .tiptap-content .ProseMirror {
                     outline: none;
                 }
-                /* Estilo para o título ## */
                 .tiptap-content h2 {
                     font-size: 1.5rem;
                     font-weight: 700;
-                    color: #f4f4f5; /* zinc-100 */
+                    color: #f4f4f5;
                     margin-top: 1rem;
                     margin-bottom: 0.5rem;
                 }
-                /* Centralizar imagem */
                 .tiptap-content img {
                     display: block;
                     margin: 1.5rem auto;
@@ -52,7 +50,27 @@ export default function MarkdownViewer({ content }: MarkdownViewerProps) {
                 }
                 .tiptap-content p {
                     margin-bottom: 0.75rem;
-                    color: #a1a1aa; /* zinc-400 */
+                    color: #a1a1aa;
+                }
+
+                .tiptap-content ul {
+                    list-style-type: disc;
+                    padding-left: 1.5rem;
+                    margin-bottom: 0.75rem;
+                    color: #a1a1aa;
+                }
+                .tiptap-content ol {
+                    list-style-type: decimal;
+                    padding-left: 1.5rem;
+                    margin-bottom: 0.75rem;
+                    color: #a1a1aa;
+                }
+                .tiptap-content li {
+                    margin-bottom: 0.25rem;
+                }
+                .tiptap-content li p {
+                    margin-bottom: 0;
+                    display: inline;
                 }
             `}</style>
         </div>
