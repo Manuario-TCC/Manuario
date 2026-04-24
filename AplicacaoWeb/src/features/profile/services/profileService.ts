@@ -37,4 +37,26 @@ export const profileService = {
         if (!response.ok) throw new Error('Erro ao atualizar o avatar');
         return response.json();
     },
+
+    getProfile: async (idPublico: string) => {
+        const response = await fetch(`/api/users/${idPublico}`);
+
+        if (!response.ok) {
+            throw new Error('Falha ao buscar dados do perfil');
+        }
+
+        return response.json();
+    },
+
+    toggleFollow: async (idPublico: string) => {
+        const response = await fetch(`/api/users/${idPublico}/follow`, {
+            method: 'POST',
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao processar a ação de seguir');
+        }
+
+        return response.json();
+    },
 };

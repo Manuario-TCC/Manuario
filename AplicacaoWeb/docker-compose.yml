@@ -11,20 +11,6 @@ services:
       - web_network
     command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
 
-  neo4j_db:
-    image: neo4j:5
-    container_name: neo4j_manuario
-    restart: always
-    ports:
-      - "7474:7474"
-      - "7687:7687"
-    environment:
-      NEO4J_AUTH: neo4j/123456789
-    volumes:
-      - neo4j-data:/data
-    networks:
-      - web_network
-
   socket_server:
     build: ./socket_server
     container_name: socket_manuario
@@ -38,10 +24,7 @@ volumes:
   mongo-data:
     external: true
     name: ia_mongo-data
-  neo4j-data:
-    external: true
-    name: ia_neo4j-data
-
+    
 networks:
   web_network:
     driver: bridge

@@ -23,6 +23,9 @@ model User {
   postsIA     PostIA[]
   comentarios Comentario[]
   salvos      TrechoSalvo[]
+
+  seguindo    Follow[] @relation("FollowingRelation")
+  seguidores  Follow[] @relation("FollowersRelation")
 }
 
 model Manual {
@@ -126,4 +129,18 @@ model Comentario {
   parentId     String?      @db.ObjectId
   parent       Comentario?  @relation("ComentarioRespostas", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   respostas    Comentario[] @relation("ComentarioRespostas")
+}
+
+model Follow {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  
+  followerId  String   @db.ObjectId
+  follower    User     @relation("FollowingRelation", fields: [followerId], references: [id])
+  
+  followedId  String   @db.ObjectId
+  followed    User     @relation("FollowersRelation", fields: [followedId], references: [id])
+  
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followedId])
 }
