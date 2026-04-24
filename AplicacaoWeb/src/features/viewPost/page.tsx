@@ -17,8 +17,8 @@ export default function ViewPostFeature({ tipo, idPublico }: any) {
     return (
         <div className="flex flex-col items-start w-full py-8 px-4">
             <div className="w-full max-w-5xl">
-                {tipo === 'duvida' && <DuvidaCard post={post} isFullView={true} />}
-                {tipo === 'regra' && <RegraCard post={post} isFullView={true} />}
+                {tipo === 'duvida' && <DuvidaCard post={post} />}
+                {tipo === 'regra' && <RegraCard post={post} />}
             </div>
 
             <div className="w-full max-w-3xl">
