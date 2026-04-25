@@ -1,31 +1,32 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FileText, Users, Bookmark, Info } from 'lucide-react';
+import { FileText, Bookmark, BookText } from 'lucide-react';
 
 import { PublicationsTab } from '../views/PublicationsTab';
-import { QuestionsTab } from '../views/QuestionsTab';
-import { RulesTab } from '../views/RulesTab';
+import { ManualTab } from '../views/ManualTab';
 import { SavedTab } from '../views/SavedTab';
 
-export const ProfileTabs: React.FC = () => {
+interface ProfileTabsProps {
+    idPublico: string;
+    isOwnProfile: boolean;
+}
+
+export const ProfileTabs: React.FC<ProfileTabsProps> = ({ idPublico, isOwnProfile }) => {
     const [activeTab, setActiveTab] = useState('Publicações');
 
     const tabs = [
         { id: 'Publicações', label: 'Publicações', icon: FileText },
-        { id: 'Minhas dúvidas', label: 'Minhas dúvidas', icon: Users },
-        { id: 'Minhas Regras', label: 'Minhas Regras', icon: Info },
-        { id: 'Salvos', label: 'Salvos', icon: Bookmark },
+        { id: 'Meus manuais', label: 'Meus manuais', icon: BookText },
+        ...(isOwnProfile ? [{ id: 'Salvos', label: 'Salvos', icon: Bookmark }] : []),
     ];
 
     const renderActiveTab = () => {
         switch (activeTab) {
             case 'Publicações':
-                return <PublicationsTab />;
-            case 'Minhas dúvidas':
-                return <QuestionsTab />;
-            case 'Minhas Regras':
-                return <RulesTab />;
+                return <PublicationsTab idPublico={idPublico} />;
+            case 'Meus manuais':
+                return <ManualTab idPublico={idPublico} />;
             case 'Salvos':
                 return <SavedTab />;
             default:

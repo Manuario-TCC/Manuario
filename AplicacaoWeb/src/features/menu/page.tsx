@@ -32,7 +32,7 @@ export default function Menu() {
                 />
             )}
 
-            <div className="hidden sm:block lg:hidden w-24 shrink-0 transition-none" />
+            <div className="hidden sm:block lg:hidden w-20 shrink-0 transition-none" />
 
             <aside
                 className={`
@@ -40,8 +40,8 @@ export default function Menu() {
                     transition-all duration-300 ease-in-out flex flex-col
                     hidden sm:flex
                     fixed lg:relative lg:shrink-0
-                    ${isOpen ? 'translate-x-0 w-[20rem] shadow-2xl' : '-translate-x-0 w-24'}
-                    lg:w-[20%] lg:min-w-[16rem] lg:max-w-[20rem] lg:translate-x-0 lg:shadow-none
+                    ${isOpen ? 'translate-x-0 w-[15rem] shadow-2xl' : '-translate-x-0 w-20'}
+                    lg:w-[15%] lg:min-w-[14rem] lg:max-w-[16rem] lg:translate-x-0 lg:shadow-none
                 `}
             >
                 <div

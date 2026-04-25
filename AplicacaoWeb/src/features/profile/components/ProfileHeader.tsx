@@ -18,6 +18,7 @@ interface ProfileHeaderProps {
         email: string;
         avatarUrl?: string | null;
         bannerUrl?: string | null;
+        idPublico: string;
     };
     stats: {
         followers: number;
@@ -64,7 +65,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                             />
                         </div>
 
-                        {/* Botão Mobile */}
                         <div className="min-[900px]:hidden pb-2 flex-shrink-0">
                             {isOwnProfile ? (
                                 <button
@@ -96,7 +96,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                         />
                     </div>
 
-                    {/* Botão Desktop */}
                     <div className="hidden min-[900px]:block pt-4 flex-shrink-0">
                         {isOwnProfile ? (
                             <button
@@ -121,7 +120,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 </div>
             </div>
 
-            <ProfileTabs />
+            <ProfileTabs idPublico={initialData.idPublico} isOwnProfile={isOwnProfile} />
 
             {avatar.isAvatarEditorOpen && (
                 <ProfileImageEditor
