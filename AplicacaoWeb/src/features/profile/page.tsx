@@ -22,8 +22,8 @@ export default function ProfilePage({ id }: ProfilePageProps) {
                     email: profileData.email,
                     avatarUrl: profileData.avatarUrl,
                     bannerUrl: profileData.bannerUrl,
+                    idPublico: profileData.publicId,
                 }}
-                // PASSE AS ESTATÍSTICAS AQUI
                 stats={{
                     followers: profileData.followers,
                     following: profileData.following,

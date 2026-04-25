@@ -1,146 +1,146 @@
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  idPublico String   @unique @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  img       String?
-  banner    String?
-  manuais     Manual[]
-  regras      Regra[]
-  duvidas     Duvida[]
-  postsIA     PostIA[]
-  comentarios Comentario[]
-  salvos      TrechoSalvo[]
+    id          String        @id @default(auto()) @map("_id") @db.ObjectId
+    idPublico   String        @unique @default(uuid())
+    name        String
+    email       String        @unique
+    password    String
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
+    img         String?
+    banner      String?
+    manuais     Manual[]
+    regras      Regra[]
+    duvidas     Duvida[]
+    postsIA     PostIA[]
+    comentarios Comentario[]
+    salvos      TrechoSalvo[]
 
-  seguindo    Follow[] @relation("FollowingRelation")
-  seguidores  Follow[] @relation("FollowersRelation")
+    seguindo   Follow[] @relation("FollowingRelation")
+    seguidores Follow[] @relation("FollowersRelation")
 }
 
 model Manual {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  idPublic    String   @unique @default(uuid())
-  name        String
-  game        String
-  genero      String?
-  sistema     String?
-  imgBanner   String?
-  imgLogo     String?
-  userId      String   @db.ObjectId
-  user        User     @relation(fields: [userId], references: [id])
+    id        String  @id @default(auto()) @map("_id") @db.ObjectId
+    idPublic  String  @unique @default(uuid())
+    name      String
+    game      String
+    genero    String?
+    sistema   String?
+    imgBanner String?
+    imgLogo   String?
+    userId    String  @db.ObjectId
+    user      User    @relation(fields: [userId], references: [id])
 
-  regras      Regra[]
+    regras Regra[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Regra {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  idPublic    String   @unique @default(uuid())
-  name        String
-  description String  
-  status      String   @default("PUBLICADO")
-  likeCount   Int      @default(0)
-  isHouseRule Boolean  @default(false)
+    id          String  @id @default(auto()) @map("_id") @db.ObjectId
+    idPublic    String  @unique @default(uuid())
+    name        String
+    description String
+    status      String  @default("PUBLICADO")
+    likeCount   Int     @default(0)
+    isHouseRule Boolean @default(false)
 
-  userId      String   @db.ObjectId
-  user        User     @relation(fields: [userId], references: [id])
+    userId String @db.ObjectId
+    user   User   @relation(fields: [userId], references: [id])
 
-  manualId    String   @db.ObjectId
-  manual      Manual   @relation(fields: [manualId], references: [id])
+    manualId String @db.ObjectId
+    manual   Manual @relation(fields: [manualId], references: [id])
 
-  comentarios Comentario[]
+    comentarios Comentario[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Duvida {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  idPublic    String   @unique @default(uuid())
-  name        String
-  game        String
-  description String 
-  likeCount   Int      @default(0)
-  userId      String   @db.ObjectId
-  user        User     @relation(fields: [userId], references: [id])
-  comentarios Comentario[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+    id          String       @id @default(auto()) @map("_id") @db.ObjectId
+    idPublic    String       @unique @default(uuid())
+    name        String
+    game        String
+    description String
+    likeCount   Int          @default(0)
+    userId      String       @db.ObjectId
+    user        User         @relation(fields: [userId], references: [id])
+    comentarios Comentario[]
+    createdAt   DateTime     @default(now())
+    updatedAt   DateTime     @updatedAt
 }
 
 model PostIA {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  idPublic    String   @unique @default(uuid())
-  title       String? 
-  promptUser  String  
-  respostaIA  String 
-  likeCount   Int      @default(0)
+    id         String  @id @default(auto()) @map("_id") @db.ObjectId
+    idPublic   String  @unique @default(uuid())
+    title      String?
+    promptUser String
+    respostaIA String
+    likeCount  Int     @default(0)
 
-  userId      String   @db.ObjectId
-  user        User     @relation(fields: [userId], references: [id])
+    userId String @db.ObjectId
+    user   User   @relation(fields: [userId], references: [id])
 
-  comentarios Comentario[]
+    comentarios Comentario[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model TrechoSalvo {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  textoSalvo  String
+    id         String @id @default(auto()) @map("_id") @db.ObjectId
+    textoSalvo String
 
-  userId      String   @db.ObjectId
-  user        User     @relation(fields: [userId], references: [id])
+    userId String @db.ObjectId
+    user   User   @relation(fields: [userId], references: [id])
 
-  createdAt   DateTime @default(now())
+    createdAt DateTime @default(now())
 }
 
 model Comentario {
-  id           String       @id @default(auto()) @map("_id") @db.ObjectId
-  texto        String
-  criadoEm     DateTime     @default(now())
-  atualizadoEm DateTime     @updatedAt
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
+    texto        String
+    criadoEm     DateTime @default(now())
+    atualizadoEm DateTime @updatedAt
 
-  autorId      String       @db.ObjectId
-  autor        User         @relation(fields: [autorId], references: [id]) 
+    autorId String @db.ObjectId
+    autor   User   @relation(fields: [autorId], references: [id])
 
-  regraId      String?      @db.ObjectId
-  regra        Regra?       @relation(fields: [regraId], references: [id], onDelete: Cascade)
+    regraId String? @db.ObjectId
+    regra   Regra?  @relation(fields: [regraId], references: [id], onDelete: Cascade)
 
-  duvidaId     String?      @db.ObjectId
-  duvida       Duvida?      @relation(fields: [duvidaId], references: [id], onDelete: Cascade)
+    duvidaId String? @db.ObjectId
+    duvida   Duvida? @relation(fields: [duvidaId], references: [id], onDelete: Cascade)
 
-  postIAId     String?      @db.ObjectId
-  postIA       PostIA?      @relation(fields: [postIAId], references: [id], onDelete: Cascade)
+    postIAId String? @db.ObjectId
+    postIA   PostIA? @relation(fields: [postIAId], references: [id], onDelete: Cascade)
 
-  parentId     String?      @db.ObjectId
-  parent       Comentario?  @relation("ComentarioRespostas", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  respostas    Comentario[] @relation("ComentarioRespostas")
+    parentId  String?      @db.ObjectId
+    parent    Comentario?  @relation("ComentarioRespostas", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    respostas Comentario[] @relation("ComentarioRespostas")
 }
 
 model Follow {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  
-  followerId  String   @db.ObjectId
-  follower    User     @relation("FollowingRelation", fields: [followerId], references: [id])
-  
-  followedId  String   @db.ObjectId
-  followed    User     @relation("FollowersRelation", fields: [followedId], references: [id])
-  
-  createdAt   DateTime @default(now())
+    id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  @@unique([followerId, followedId])
+    followerId String @db.ObjectId
+    follower   User   @relation("FollowingRelation", fields: [followerId], references: [id])
+
+    followedId String @db.ObjectId
+    followed   User   @relation("FollowersRelation", fields: [followedId], references: [id])
+
+    createdAt DateTime @default(now())
+
+    @@unique([followerId, followedId])
 }
