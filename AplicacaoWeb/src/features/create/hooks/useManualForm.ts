@@ -4,6 +4,12 @@ import { createManualService, updateManualService, getManualById } from '../serv
 import { useSession } from '@/src/hooks/useSession';
 import { customAlert } from '@/src/components/customAlert';
 
+export interface Contributor {
+    id: string;
+    name: string;
+    email: string;
+}
+
 export interface CreateManualData {
     title: string;
     game: string;
@@ -11,6 +17,14 @@ export interface CreateManualData {
     system: string;
     banner: File | string | null;
     logo: File | string | null;
+    playtime: number | '';
+    type: string;
+    edition: string;
+    minPlayers: number | '';
+    maxPlayers: number | '';
+    ageRating: string;
+    description: string;
+    contributors: Contributor[];
 }
 
 export function useManualForm(editId?: string | null) {
@@ -24,6 +38,14 @@ export function useManualForm(editId?: string | null) {
         system: '',
         banner: null,
         logo: null,
+        playtime: '',
+        type: '',
+        edition: '',
+        minPlayers: '',
+        maxPlayers: '',
+        ageRating: '',
+        description: '',
+        contributors: [],
     });
 
     const [isLoading, setIsLoading] = useState(false);
@@ -54,12 +76,21 @@ export function useManualForm(editId?: string | null) {
 
                         setData((prev) => ({
                             ...prev,
-                            title: fetchedData.name,
-                            game: fetchedData.game,
+                            title: fetchedData.name || '',
+                            game: fetchedData.game || '',
                             genre: fetchedData.genero || '',
                             system: fetchedData.sistema || '',
                             banner: getImageUrl(fetchedData.imgBanner),
                             logo: getImageUrl(fetchedData.imgLogo),
+
+                            playtime: fetchedData.playtime.toString() || '',
+                            type: fetchedData.type || '',
+                            edition: fetchedData.edition || '',
+                            minPlayers: fetchedData.minPlayers?.toString() || '',
+                            maxPlayers: fetchedData.maxPlayers?.toString() || '',
+                            ageRating: fetchedData.ageRating || '',
+                            description: fetchedData.description || '',
+                            contributors: fetchedData.contributors || [],
                         }));
                     }
                 })
@@ -69,7 +100,18 @@ export function useManualForm(editId?: string | null) {
     }, [editId, isEditing, user?.idPublico, router]);
 
     const isValid = useMemo(() => {
-        return data.title.trim() !== '' && data.game.trim() !== '';
+        return (
+            data.title.trim() !== '' &&
+            data.game.trim() !== '' &&
+            data.type.trim() !== '' &&
+            data.edition.trim() !== '' &&
+            data.ageRating.trim() !== '' &&
+            data.description.trim() !== '' &&
+            data.minPlayers !== '' &&
+            data.maxPlayers !== '' &&
+            data.playtime !== '' &&
+            data.maxPlayers >= data.minPlayers
+        );
     }, [data]);
 
     const handleSubmit = async () => {
@@ -80,22 +122,21 @@ export function useManualForm(editId?: string | null) {
             const formData = new FormData();
             formData.append('title', data.title);
             formData.append('game', data.game);
+            formData.append('type', data.type);
+            formData.append('edition', data.edition);
+            formData.append('ageRating', data.ageRating);
+            formData.append('description', data.description);
+            formData.append('playtime', String(data.playtime));
+            formData.append('minPlayers', String(data.minPlayers));
+            formData.append('maxPlayers', String(data.maxPlayers));
 
-            if (data.genre) {
-                formData.append('genre', data.genre);
-            }
+            const contributorIds = data.contributors.map((c) => c.id);
+            formData.append('contributors', JSON.stringify(contributorIds));
 
-            if (data.system) {
-                formData.append('system', data.system);
-            }
-
-            if (data.banner && data.banner instanceof File) {
-                formData.append('banner', data.banner);
-            }
-
-            if (data.logo && data.logo instanceof File) {
-                formData.append('logo', data.logo);
-            }
+            if (data.genre) formData.append('genre', data.genre);
+            if (data.system) formData.append('system', data.system);
+            if (data.banner && data.banner instanceof File) formData.append('banner', data.banner);
+            if (data.logo && data.logo instanceof File) formData.append('logo', data.logo);
 
             let response;
             if (isEditing && editId) {
@@ -122,6 +163,14 @@ export function useManualForm(editId?: string | null) {
                     system: '',
                     banner: null,
                     logo: null,
+                    playtime: '',
+                    type: '',
+                    edition: '',
+                    minPlayers: '',
+                    maxPlayers: '',
+                    ageRating: '',
+                    description: '',
+                    contributors: [],
                 });
             }
 
