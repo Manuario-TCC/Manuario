@@ -19,11 +19,34 @@ export async function POST(req: Request) {
         const genre = formData.get('genre') as string | null;
         const system = formData.get('system') as string | null;
 
+        const type = formData.get('type') as string;
+        const edition = formData.get('edition') as string;
+        const ageRating = formData.get('ageRating') as string;
+        const description = formData.get('description') as string;
+        const playtime = formData.get('playtime') as string;
+
+        const minPlayers = parseInt(formData.get('minPlayers') as string, 10);
+        const maxPlayers = parseInt(formData.get('maxPlayers') as string, 10);
+
+        // Array de Contribuidores
+        const contributorsStr = formData.get('contributors') as string;
+        let contribuidorIds: string[] = [];
+        if (contributorsStr) {
+            try {
+                contribuidorIds = JSON.parse(contributorsStr);
+            } catch (e) {
+                console.error('Erro ao ler contribuidores', e);
+            }
+        }
+
         const bannerFile = formData.get('banner') as File | null;
         const logoFile = formData.get('logo') as File | null;
 
-        if (!title || !game) {
-            return NextResponse.json({ error: 'Título e Jogo são obrigatórios' }, { status: 400 });
+        if (!title || !game || !type || !edition || !ageRating || !description) {
+            return NextResponse.json(
+                { error: 'Preencha todos os campos obrigatórios.' },
+                { status: 400 },
+            );
         }
 
         const manualIdPublic = crypto.randomUUID();
@@ -41,40 +64,42 @@ export async function POST(req: Request) {
 
         // Salvar a imagem do Banner
         let bannerName = null;
-
-        if (bannerFile && bannerFile.name) {
+        if (bannerFile && bannerFile.size > 0) {
             const bytes = await bannerFile.arrayBuffer();
             const buffer = Buffer.from(bytes);
-
             const fileExtension = path.extname(bannerFile.name);
             bannerName = `banner-${Date.now()}${fileExtension}`;
-
             const filePath = path.join(uploadDir, bannerName);
-
             await writeFile(filePath, buffer);
         }
 
         // Salvar a imagem do Logo
         let logoName = null;
-
-        if (logoFile && logoFile.name) {
+        if (logoFile && logoFile.size > 0) {
             const bytes = await logoFile.arrayBuffer();
             const buffer = Buffer.from(bytes);
-
             const fileExtension = path.extname(logoFile.name);
             logoName = `logo-${Date.now()}${fileExtension}`;
-
             const filePath = path.join(uploadDir, logoName);
             await writeFile(filePath, buffer);
         }
 
+        // 5. Salvar tudo no banco de dados
         const novoManual = await prisma.manual.create({
             data: {
                 idPublic: manualIdPublic,
                 name: title,
                 game: game,
-                genero: genre,
+                genero: genre || 'Geral',
                 sistema: system,
+                tipo: type,
+                edicao: edition,
+                idade: ageRating,
+                descricao: description,
+                tempoJogo: playtime || '',
+                minPlayers: isNaN(minPlayers) ? 1 : minPlayers,
+                maxPlayers: isNaN(maxPlayers) ? 1 : maxPlayers,
+                contribuidorIds: contribuidorIds,
                 imgBanner: bannerName,
                 imgLogo: logoName,
                 userId: userId,

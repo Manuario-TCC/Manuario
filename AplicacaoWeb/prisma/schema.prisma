@@ -26,21 +26,40 @@ model User {
 
     seguindo   Follow[] @relation("FollowingRelation")
     seguidores Follow[] @relation("FollowersRelation")
+
+    manualContribuidoIds String[] @db.ObjectId
+    manuaisContribuidos  Manual[] @relation("ManualContribuidores", fields: [manualContribuidoIds], references: [id])
 }
 
 model Manual {
-    id        String  @id @default(auto()) @map("_id") @db.ObjectId
-    idPublic  String  @unique @default(uuid())
-    name      String
-    game      String
-    genero    String?
-    sistema   String?
-    imgBanner String?
-    imgLogo   String?
-    userId    String  @db.ObjectId
-    user      User    @relation(fields: [userId], references: [id])
+    id         String  @id @default(auto()) @map("_id") @db.ObjectId
+    idPublic   String  @unique @default(uuid())
+    name       String
+    game       String
+    genero     String
+    tempoJogo  String?
+    minPlayers Int
+    maxPlayers Int
+    descricao  String
+    idade      String
+    edicao     String
+    tipo       String
+    sistema    String?
+    imgBanner  String?
+    imgLogo    String?
+    isOficial  Boolean @default(false)
 
-    regras Regra[]
+    contribuidorIds String[] @db.ObjectId
+    contribuidores  User[]   @relation("ManualContribuidores", fields: [contribuidorIds], references: [id])
+
+    userId String @db.ObjectId
+    user   User   @relation(fields: [userId], references: [id])
+
+    clonadoDeId     String?  @db.ObjectId
+    historicoClones String[] @db.ObjectId
+
+    regraIds String[] @db.ObjectId
+    regras   Regra[]  @relation(fields: [regraIds], references: [id])
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -58,8 +77,10 @@ model Regra {
     userId String @db.ObjectId
     user   User   @relation(fields: [userId], references: [id])
 
-    manualId String @db.ObjectId
-    manual   Manual @relation(fields: [manualId], references: [id])
+    manualIds String[] @db.ObjectId
+    manuais   Manual[] @relation(fields: [manualIds], references: [id])
+
+    manualOrigemId String? @db.ObjectId
 
     comentarios Comentario[]
 
