@@ -1,5 +1,6 @@
 import Swal, { SweetAlertOptions } from 'sweetalert2';
 
+// Configuração do Modal Grande
 const swalCustom = Swal.mixin({
     background: '#151718',
     color: '#ffffff',
@@ -16,7 +17,27 @@ const swalCustom = Swal.mixin({
     buttonsStyling: false,
 });
 
+// Configuração do Toast Pequeno
+const toastCustom = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 1200,
+    timerProgressBar: true,
+    background: '#151718',
+    color: '#ffffff',
+    customClass: {
+        popup: 'border border-card-border rounded-xl shadow-lg mt-2 mr-2',
+        title: 'text-white text-sm font-medium',
+    },
+    didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer);
+        toast.addEventListener('mouseleave', Swal.resumeTimer);
+    },
+});
+
 export const customAlert = {
+    // Alertas grandes MODAIS
     success: (title: string, text?: string) => {
         return swalCustom.fire({ icon: 'success', title, text });
     },
@@ -36,8 +57,21 @@ export const customAlert = {
             cancelButtonText: 'Cancelar',
         });
     },
-
     fire: (options: SweetAlertOptions) => {
         return swalCustom.fire(options as any);
+    },
+
+    // Alertas pequenos TOASTS
+    toastSuccess: (title: string) => {
+        return toastCustom.fire({ icon: 'success', title });
+    },
+    toastError: (title: string) => {
+        return toastCustom.fire({ icon: 'error', title });
+    },
+    toastWarning: (title: string) => {
+        return toastCustom.fire({ icon: 'warning', title });
+    },
+    toastInfo: (title: string) => {
+        return toastCustom.fire({ icon: 'info', title });
     },
 };
