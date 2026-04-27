@@ -6,8 +6,10 @@ import { customAlert } from '@/src/components/customAlert';
 
 export interface Contributor {
     id: string;
+    idPublico?: string;
     name: string;
     email: string;
+    img?: string;
 }
 
 export interface CreateManualData {
@@ -63,6 +65,7 @@ export function useManualForm(editId?: string | null) {
                     return res.json();
                 })
                 .then((fetchedData) => {
+                    // Verifica se o usuário é o dono do manual
                     if (fetchedData.user?.idPublico !== user.idPublico) {
                         router.push('/404');
                     } else {
@@ -71,7 +74,7 @@ export function useManualForm(editId?: string | null) {
                             if (imgName.startsWith('http') || imgName.startsWith('/')) {
                                 return imgName;
                             }
-                            return `/upload/manual/${user.idPublico}/img/${imgName}`;
+                            return `/upload/manual/${fetchedData.idPublic}/img/${imgName}`;
                         };
 
                         setData((prev) => ({
@@ -82,15 +85,23 @@ export function useManualForm(editId?: string | null) {
                             system: fetchedData.sistema || '',
                             banner: getImageUrl(fetchedData.imgBanner),
                             logo: getImageUrl(fetchedData.imgLogo),
+                            playtime: fetchedData.tempoJogo || '',
+                            type: fetchedData.tipo || '',
+                            edition: fetchedData.edicao || '',
+                            minPlayers: fetchedData.minPlayers || '',
+                            maxPlayers: fetchedData.maxPlayers || '',
+                            ageRating: fetchedData.idade || '',
+                            description: fetchedData.descricao || '',
 
-                            playtime: fetchedData.playtime.toString() || '',
-                            type: fetchedData.type || '',
-                            edition: fetchedData.edition || '',
-                            minPlayers: fetchedData.minPlayers?.toString() || '',
-                            maxPlayers: fetchedData.maxPlayers?.toString() || '',
-                            ageRating: fetchedData.ageRating || '',
-                            description: fetchedData.description || '',
-                            contributors: fetchedData.contributors || [],
+                            contributors: fetchedData.contribuidores
+                                ? fetchedData.contribuidores.map((c: any) => ({
+                                      id: c.id,
+                                      idPublico: c.idPublico,
+                                      name: c.name,
+                                      email: c.email,
+                                      img: c.img,
+                                  }))
+                                : [],
                         }));
                     }
                 })
@@ -133,12 +144,24 @@ export function useManualForm(editId?: string | null) {
             const contributorIds = data.contributors.map((c) => c.id);
             formData.append('contributors', JSON.stringify(contributorIds));
 
-            if (data.genre) formData.append('genre', data.genre);
-            if (data.system) formData.append('system', data.system);
-            if (data.banner && data.banner instanceof File) formData.append('banner', data.banner);
-            if (data.logo && data.logo instanceof File) formData.append('logo', data.logo);
+            if (data.genre) {
+                formData.append('genre', data.genre);
+            }
+
+            if (data.system) {
+                formData.append('system', data.system);
+            }
+
+            if (data.banner && data.banner instanceof File) {
+                formData.append('banner', data.banner);
+            }
+
+            if (data.logo && data.logo instanceof File) {
+                formData.append('logo', data.logo);
+            }
 
             let response;
+
             if (isEditing && editId) {
                 response = await updateManualService(editId, formData);
             } else {
@@ -190,5 +213,6 @@ export function useManualForm(editId?: string | null) {
         handleSubmit,
         isLoading,
         error,
+        isEditing,
     };
 }
