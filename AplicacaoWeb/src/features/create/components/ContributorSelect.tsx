@@ -1,3 +1,4 @@
+import React from 'react';
 import { X, Search, Loader2 } from 'lucide-react';
 import { useContributorSearch } from '../hooks/useContributorSearch';
 
@@ -13,7 +14,7 @@ export function ContributorSelect({ data, setData }: any) {
 
     const getAvatarUrl = (user: any) => {
         if (user.img) {
-            if (user.img.startsWith('http') || user.img.startsWith('/')) return user.img;
+            if (user.img.startsWith('http')) return user.img;
             return `/upload/${user.idPublico}/user/${user.img}`;
         }
         return '/img/iconePadrao.jpg';
@@ -30,29 +31,25 @@ export function ContributorSelect({ data, setData }: any) {
 
             {data.contributors.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4">
-                    {data.contributors.map((c: any, index: number) => {
-                        const uniqueKey = c.id || c.idPublico || `contributor-${index}`;
-
-                        return (
-                            <span
-                                key={uniqueKey}
-                                className="flex items-center gap-2 bg-background text-text px-3 py-1.5 rounded-full text-sm font-medium border border-card-border"
+                    {data.contributors.map((c: any) => (
+                        <span
+                            key={c.id}
+                            className="flex items-center gap-2 bg-background text-text px-3 py-1.5 rounded-full text-sm font-medium"
+                        >
+                            <img
+                                src={getAvatarUrl(c)}
+                                alt={c.name}
+                                className="w-5 h-5 rounded-full object-cover"
+                            />
+                            {c.name}
+                            <button
+                                onClick={() => removeContributor(c.id)}
+                                className="hover:text-red-500 ml-1 transition-colors"
                             >
-                                <img
-                                    src={getAvatarUrl(c)}
-                                    alt={c.name}
-                                    className="w-5 h-5 rounded-full object-cover border border-zinc-700"
-                                />
-                                {c.name}
-                                <button
-                                    onClick={() => removeContributor(c.id || c.idPublico)}
-                                    className="hover:text-red-500 ml-1 transition-colors cursor-pointer"
-                                >
-                                    <X size={14} />
-                                </button>
-                            </span>
-                        );
-                    })}
+                                <X size={14} />
+                            </button>
+                        </span>
+                    ))}
                 </div>
             )}
 
@@ -73,31 +70,27 @@ export function ContributorSelect({ data, setData }: any) {
 
                 {searchResults.length > 0 && (
                     <div className="absolute z-50 w-full mt-2 bg-background border border-card-border rounded-xl shadow-lg overflow-hidden flex flex-col max-h-60 overflow-y-auto">
-                        {searchResults.map((user: any, index: number) => {
-                            const searchKey = user.id || user.idPublico || `search-${index}`;
-
-                            return (
-                                <button
-                                    key={searchKey}
-                                    onClick={() => addContributor(user)}
-                                    className="flex items-center gap-3 w-full text-left px-4 py-3 hover:bg-secondary/50 transition-colors border-b border-card-border last:border-0 cursor-pointer"
-                                >
-                                    <img
-                                        src={getAvatarUrl(user)}
-                                        alt={user.name}
-                                        className="w-8 h-8 rounded-full object-cover"
-                                    />
-                                    <div className="flex flex-col">
-                                        <span className="font-medium text-sm text-foreground">
-                                            {user.name}
-                                        </span>
-                                        <span className="text-muted-foreground text-xs">
-                                            {user.email}
-                                        </span>
-                                    </div>
-                                </button>
-                            );
-                        })}
+                        {searchResults.map((user: any) => (
+                            <button
+                                key={user.id}
+                                onClick={() => addContributor(user)}
+                                className="flex items-center gap-3 w-full text-left px-4 py-3 hover:bg-secondary/50 transition-colors border-b border-card-border last:border-0 cursor-pointer"
+                            >
+                                <img
+                                    src={getAvatarUrl(user)}
+                                    alt={user.name}
+                                    className="w-8 h-8 rounded-full object-cover"
+                                />
+                                <div className="flex flex-col">
+                                    <span className="font-medium text-sm text-foreground">
+                                        {user.name}
+                                    </span>
+                                    <span className="text-muted-foreground text-xs">
+                                        {user.email}
+                                    </span>
+                                </div>
+                            </button>
+                        ))}
                     </div>
                 )}
             </div>

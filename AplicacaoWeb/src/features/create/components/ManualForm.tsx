@@ -7,15 +7,7 @@ import { ContributorSelect } from './ContributorSelect';
 import { customStyles } from './selectStyles';
 import { ImagePlus, CirclePlus, Loader2 } from 'lucide-react';
 
-export function ManualForm({
-    data,
-    setData,
-    isValid,
-    handleSubmit,
-    isLoading,
-    error,
-    isEditing,
-}: any) {
+export function ManualForm({ data, setData, isValid, handleSubmit, isLoading, error }: any) {
     if (!data) return <p className="text-muted-foreground">Carregando formulário...</p>;
 
     const handleFile = (field: string, file: File | null) => {
@@ -109,14 +101,12 @@ export function ManualForm({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 items-end">
-                <NumberStepper
-                    label="Tempo de jogo (Min)*"
-                    placeholder="Ex: 120"
+                <CustomInput
+                    id="playtime"
+                    label="Tempo de Jogo*"
+                    placeholder="Ex: 1h20"
                     value={data.playtime}
-                    maxLimit={9999}
-                    onChange={(valStr: string) =>
-                        setData({ ...data, playtime: valStr ? Number(valStr) : '' })
-                    }
+                    onChange={(e: any) => setData({ ...data, playtime: e.target.value })}
                 />
 
                 <NumberStepper
@@ -189,20 +179,14 @@ export function ManualForm({
                 <button
                     disabled={!isValid || isLoading}
                     onClick={onSubmit}
-                    className="flex items-center gap-2 bg-primary py-3 px-8 text-sm rounded-full font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-110 transition-all text-white shadow-lg cursor-pointer"
+                    className="flex items-center gap-2 bg-primary py-3 px-8 text-sm rounded-full font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-110 transition-all text-white shadow-lg"
                 >
                     {isLoading ? (
                         <Loader2 className="w-5 h-5 animate-spin" />
                     ) : (
                         <CirclePlus className="w-5 h-5" />
                     )}
-                    {isLoading
-                        ? isEditing
-                            ? 'Salvando...'
-                            : 'Criando...'
-                        : isEditing
-                          ? 'Editar manual'
-                          : 'Criar manual'}
+                    {isLoading ? 'Criando...' : 'Criar manual'}
                 </button>
             </div>
         </div>

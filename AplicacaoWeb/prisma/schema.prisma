@@ -37,7 +37,7 @@ model Manual {
     name       String
     game       String
     genero     String
-    tempoJogo  Int
+    tempoJogo  String?
     minPlayers Int
     maxPlayers Int
     descricao  String

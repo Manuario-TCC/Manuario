@@ -8,18 +8,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         const manual = await prisma.manual.findUnique({
             where: { idPublic: id },
             include: {
-                user: {
-                    select: { idPublico: true, name: true, img: true },
-                },
-                contribuidores: {
-                    select: {
-                        id: true,
-                        idPublico: true,
-                        name: true,
-                        email: true,
-                        img: true,
-                    },
-                },
+                user: { select: { idPublico: true } },
             },
         });
 
@@ -29,12 +18,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
         return NextResponse.json(manual);
     } catch (error) {
-        console.error('ERRO NA API DE MANUAL:', error);
-
-        return NextResponse.json(
-            { error: 'Erro ao buscar manual. Verifique o terminal para mais detalhes.' },
-            { status: 500 },
-        );
+        return NextResponse.json({ error: 'Erro ao buscar manual' }, { status: 500 });
     }
 }
 

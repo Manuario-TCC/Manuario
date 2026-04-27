@@ -23,8 +23,8 @@ export async function POST(req: Request) {
         const edition = formData.get('edition') as string;
         const ageRating = formData.get('ageRating') as string;
         const description = formData.get('description') as string;
+        const playtime = formData.get('playtime') as string;
 
-        const playtime = parseInt(formData.get('playtime') as string, 10);
         const minPlayers = parseInt(formData.get('minPlayers') as string, 10);
         const maxPlayers = parseInt(formData.get('maxPlayers') as string, 10);
 
@@ -84,7 +84,7 @@ export async function POST(req: Request) {
             await writeFile(filePath, buffer);
         }
 
-        // Salvar tudo no banco de dados
+        // 5. Salvar tudo no banco de dados
         const novoManual = await prisma.manual.create({
             data: {
                 idPublic: manualIdPublic,
@@ -96,7 +96,7 @@ export async function POST(req: Request) {
                 edicao: edition,
                 idade: ageRating,
                 descricao: description,
-                tempoJogo: isNaN(playtime) ? 1 : playtime,
+                tempoJogo: playtime || '',
                 minPlayers: isNaN(minPlayers) ? 1 : minPlayers,
                 maxPlayers: isNaN(maxPlayers) ? 1 : maxPlayers,
                 contribuidorIds: contribuidorIds,
