@@ -24,7 +24,7 @@ export function ContributorsModal({ isOpen, onClose, contributors }: Contributor
             <div className="bg-card rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 text-zinc-500 hover:text-white p-1.5 rounded-lg cursor-pointer"
+                    className="absolute top-4 right-4 text-sub-text hover:text-white p-1.5 rounded-lg cursor-pointer"
                 >
                     <X className="w-[1.25rem] h-[1.25rem]" />
                 </button>
@@ -46,7 +46,7 @@ export function ContributorsModal({ isOpen, onClose, contributors }: Contributor
                                 href={`/perfil/${user.idPublico}`}
                                 className="flex items-center gap-4 p-3 rounded-xl bg-background hover:bg-gray"
                             >
-                                <div className="w-12 h-12 rounded-full overflow-hidden relative bg-zinc-800 shrink-0 border-2 border-zinc-700">
+                                <div className="w-12 h-12 rounded-full overflow-hidden relative bg-gray shrink-0 border-2 border-gray">
                                     <Image
                                         src={avatarImg}
                                         alt={user.name}
@@ -55,12 +55,7 @@ export function ContributorsModal({ isOpen, onClose, contributors }: Contributor
                                     />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-zinc-100 font-bold text-sm">
-                                        {user.name}
-                                    </span>
-                                    <span className="text-zinc-500 text-xs">
-                                        @{user.name.toLowerCase().replace(/\s/g, '')}
-                                    </span>
+                                    <span className="text-text font-bold text-sm">{user.name}</span>
                                 </div>
                             </Link>
                         );

@@ -41,7 +41,7 @@ export function ContributorSelect({ data, setData }: any) {
                                 <img
                                     src={getAvatarUrl(c)}
                                     alt={c.name}
-                                    className="w-5 h-5 rounded-full object-cover border border-zinc-700"
+                                    className="w-5 h-5 rounded-full object-cover border border-gray"
                                 />
                                 {c.name}
                                 <button

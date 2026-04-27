@@ -24,9 +24,10 @@ import { customAlert } from '@/src/components/customAlert';
 
 interface ManualHeaderProps {
     manual: any;
+    loading?: boolean;
 }
 
-export function ManualHeader({ manual }: ManualHeaderProps) {
+export function ManualHeader({ manual, loading }: ManualHeaderProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const bannerImg = manual?.imgBanner
@@ -45,7 +46,6 @@ export function ManualHeader({ manual }: ManualHeaderProps) {
         ? new Date(manual.createdAt).toLocaleDateString('pt-BR')
         : '27/04/2026';
 
-    // Função para copiar a URL atual
     const handleShare = async () => {
         try {
             await navigator.clipboard.writeText(window.location.href);
@@ -53,12 +53,44 @@ export function ManualHeader({ manual }: ManualHeaderProps) {
         } catch (err) {}
     };
 
+    if (loading) {
+        return (
+            <div className="relative w-full animate-pulse">
+                <div className="h-[15.6rem] md:h-[21.8rem] w-full bg-gray/50" />
+
+                <div className="max-w-4xl mx-auto px-4 relative">
+                    <div className="flex flex-col md:flex-row gap-6 -mt-20 md:-mt-24 items-start">
+                        <div className="w-40 h-40 md:w-48 md:h-48 bg-zinc-900 rounded-xl overflow-hidden shrink-0 shadow-2xl relative">
+                            <div className="w-full h-full bg-gray" />
+                        </div>
+
+                        <div className="flex-1 space-y-3 pt-20 md:pt-28 w-full">
+                            <div className="h-8 bg-gray rounded w-3/4 mb-4" />
+
+                            <div className="flex flex-wrap gap-3">
+                                <div className="h-6 bg-gray rounded w-20" />
+                                <div className="h-6 bg-gray rounded w-20" />
+                                <div className="h-6 bg-gray rounded w-24" />
+                            </div>
+
+                            <div className="pt-8 space-y-2.5">
+                                <div className="h-4 bg-gray/60 rounded w-full" />
+                                <div className="h-4 bg-gray/60 rounded w-[95%]" />
+                                <div className="h-4 bg-gray/60 rounded w-[40%]" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="w-full text-zinc-100 relative">
+        <div className="w-full text-text relative">
             {manual?.idPublic && (
                 <Link
                     href={`/create?tab=manual&id=${manual.idPublic}`}
-                    className="absolute top-6 right-6 z-50 p-3 bg-zinc-900/50 backdrop-blur-md hover:bg-purple-600 text-white rounded-full transition-all shadow-lg border border-zinc-700/50 hover:border-purple-500"
+                    className="absolute top-6 right-6 z-50 p-3 bg-gray/50 backdrop-blur-md hover:bg-background text-white rounded-full transition-all shadow-lg"
                     title="Editar Manual"
                 >
                     <Pencil className="w-[1.125rem] h-[1.125rem]" />
@@ -75,7 +107,7 @@ export function ManualHeader({ manual }: ManualHeaderProps) {
 
             <div className="w-full px-6 md:px-12">
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 -mt-16 md:-mt-20 relative z-10 w-full">
-                    <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden border-4 border-background bg-zinc-800 shadow-xl shrink-0 relative">
+                    <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden shrink-0 relative select-none">
                         <Image src={logoImg} alt="Logo" fill className="object-cover" />
                     </div>
 
@@ -88,13 +120,13 @@ export function ManualHeader({ manual }: ManualHeaderProps) {
 
                                 <button
                                     onClick={handleShare}
-                                    className="p-2 text-zinc-400 hover:text-purple-400 hover:bg-purple-500/10 rounded-full transition-all cursor-pointer"
+                                    className="p-2 text-sub-text hover:text-purple-400 hover:bg-purple-500/10 rounded-full transition-all cursor-pointer"
                                     title="Compartilhar Manual"
                                 >
                                     <Share2 size={24} />
                                 </button>
                             </div>
-                            <p className="text-zinc-400 text-xs mt-1.5 font-medium drop-shadow-md">
+                            <p className="text-sub-text text-xs mt-1.5 font-medium drop-shadow-md">
                                 Criado por{' '}
                                 {criadorIdPublico ? (
                                     <Link
@@ -124,7 +156,7 @@ export function ManualHeader({ manual }: ManualHeaderProps) {
                         </div>
 
                         <div className="w-full">
-                            <hr className="border-zinc-800/60" />
+                            <hr className="border-gray/60" />
 
                             <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between py-4 gap-6">
                                 <div className="flex flex-wrap justify-center md:justify-start items-center gap-x-6 gap-y-4 flex-1">
@@ -229,7 +261,7 @@ function SimpleInfoItem({ icon, value, text }: { icon: any; value: any; text?: s
         <div className="flex items-center gap-2">
             <div className="text-purple-500">{icon}</div>
             <span className="text-purple-500 text-sm font-medium">{text}</span>
-            <span className="text-zinc-200 font-medium text-sm">{value || '-'}</span>
+            <span className="text-text font-medium text-sm">{value || '-'}</span>
         </div>
     );
 }

@@ -36,7 +36,7 @@ export const ProfileTabs: React.FC<ProfileTabsProps> = ({ idPublico, isOwnProfil
 
     return (
         <div className="w-full flex flex-col">
-            <div className="max-w-5xl w-full mx-auto mt-4 px-4 md:px-8 flex items-center gap-8 border-b border-zinc-800">
+            <div className="max-w-5xl w-full mx-auto mt-4 px-4 md:px-8 flex items-center gap-8 border-b border-gray">
                 {tabs.map((tab) => {
                     const Icon = tab.icon;
                     const isActive = activeTab === tab.id;

@@ -24,7 +24,7 @@ export function FooterMenu({ user, loading, isOpen }: FooterMenuProps) {
             : 'opacity-0 w-0 hidden ml-0 lg:opacity-100 lg:w-auto lg:ml-3 lg:block'
     }`;
 
-    const logoutBtnClasses = `absolute right-2 p-2 rounded-lg text-sub-text hover:text-red-500 hover:bg-zinc-800 shrink-0 z-20 cursor-pointer transition-all duration-300 ${
+    const logoutBtnClasses = `absolute right-2 p-2 rounded-lg text-sub-text hover:text-red-500 hover:bg-gray shrink-0 z-20 cursor-pointer transition-all duration-300 ${
         isOpen
             ? 'opacity-100 pointer-events-auto block'
             : 'opacity-0 hidden pointer-events-none lg:opacity-100 lg:pointer-events-auto lg:block'
