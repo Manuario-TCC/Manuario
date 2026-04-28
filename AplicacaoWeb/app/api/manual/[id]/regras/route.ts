@@ -12,41 +12,39 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         const limit = parseInt(searchParams.get('limit') || '10');
         const skip = (page - 1) * limit;
 
+        const manual = await prisma.manual.findUnique({
+            where: { idPublic: manualIdPublic },
+            select: { id: true },
+        });
+
+        if (!manual) {
+            return NextResponse.json({ error: 'Manual não encontrado' }, { status: 404 });
+        }
+
+        const whereClause = {
+            manualIds: { has: manual.id },
+            name: { contains: search, mode: 'insensitive' as const },
+        };
+
         const regras = await prisma.regra.findMany({
-            where: {
-                manuais: {
-                    some: {
-                        idPublic: manualIdPublic,
-                    },
-                },
-                name: {
-                    contains: search,
-                    mode: 'insensitive',
-                },
-            },
+            where: whereClause,
             select: {
+                id: true,
                 idPublic: true,
                 name: true,
                 description: true,
                 userId: true,
+                user: {
+                    select: { idPublico: true },
+                },
+                manualOrigemId: true,
             },
             skip,
             take: limit,
-            orderBy: {
-                createdAt: 'desc',
-            },
+            orderBy: { createdAt: 'desc' },
         });
 
-        const total = await prisma.regra.count({
-            where: {
-                manuais: {
-                    some: {
-                        idPublic: manualIdPublic,
-                    },
-                },
-                name: { contains: search, mode: 'insensitive' },
-            },
-        });
+        const total = await prisma.regra.count({ where: whereClause });
 
         return NextResponse.json(
             { regras, total, hasMore: skip + regras.length < total },

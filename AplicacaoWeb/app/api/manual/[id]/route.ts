@@ -3,7 +3,8 @@ import { prisma } from '@/src/database/prisma';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
-        const { id } = await params;
+        const resolvedParams = await params;
+        const id = resolvedParams.id;
 
         const manual = await prisma.manual.findUnique({
             where: { idPublic: id },
@@ -20,6 +21,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
                         img: true,
                     },
                 },
+                regras: true,
             },
         });
 
@@ -27,7 +29,26 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
             return NextResponse.json({ error: 'Manual não encontrado' }, { status: 404 });
         }
 
-        return NextResponse.json(manual);
+        let manualFinal: any = { ...manual };
+
+        if (manual.clonadoDeId) {
+            const manualOriginal = await prisma.manual.findUnique({
+                where: { id: manual.clonadoDeId },
+                select: {
+                    user: {
+                        select: { name: true, idPublico: true },
+                    },
+                },
+            });
+
+            if (manualOriginal) {
+                manualFinal.clonadoDe = {
+                    user: manualOriginal.user,
+                };
+            }
+        }
+
+        return NextResponse.json(manualFinal);
     } catch (error) {
         console.error('ERRO NA API DE MANUAL:', error);
 
@@ -40,7 +61,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
-        const { id } = await params;
+        const resolvedParams = await params;
+        const id = resolvedParams.id;
         const body = await req.json();
 
         const manualAtualizado = await prisma.manual.update({

@@ -20,10 +20,10 @@ export default function ViewManualFeature({ id }: { id: string }) {
     }
 
     return (
-        <div className="animate-in fade-in duration-500 pb-20">
+        <div className="animate-in fade-in duration-500 pb-40">
             <ManualHeader manual={manual} loading={loading} />
 
-            <div className="max-w-4xl mx-auto mt-8 px-6 md:px-12">
+            <div className="w-full px-6 md:px-12">
                 <div className="flex flex-col items-start mb-6 gap-4">
                     <h2 className="text-base text-text">Regras</h2>
 
@@ -50,7 +50,14 @@ export default function ViewManualFeature({ id }: { id: string }) {
                             <RuleCard loading />
                         </>
                     ) : (
-                        regras.map((regra) => <RuleCard key={regra.idPublic} regra={regra} />)
+                        regras.map((regra) => (
+                            <RuleCard
+                                key={regra.idPublic}
+                                regra={regra}
+                                manualId={manual?.id}
+                                manualUserId={manual?.user?.idPublico}
+                            />
+                        ))
                     )}
 
                     {!loading && !loadingRegras && regras.length === 0 && (

@@ -18,9 +18,12 @@ import {
     Pencil,
     X,
     Share2,
+    GitFork,
 } from 'lucide-react';
 import { ContributorsModal } from './ContributorsModal';
 import { customAlert } from '@/src/components/customAlert';
+import { useManualActions } from '../hooks/useManualActions';
+import { useSession } from '@/src/hooks/useSession';
 
 interface ManualHeaderProps {
     manual: any;
@@ -29,6 +32,15 @@ interface ManualHeaderProps {
 
 export function ManualHeader({ manual, loading }: ManualHeaderProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const { user } = useSession();
+    const { handleFork, isForking } = useManualActions();
+
+    const originalOwner = manual?.clonadoDe?.user;
+
+    const isOwner = user?.id === manual?.userId || user?.idPublico === manual?.user?.idPublico;
+
+    const canClone = user && !isOwner;
 
     const bannerImg = manual?.imgBanner
         ? `/upload/manual/${manual.idPublic}/img/${manual.imgBanner}`
@@ -87,7 +99,7 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
 
     return (
         <div className="w-full text-text relative">
-            {manual?.idPublic && (
+            {manual?.idPublic && isOwner && (
                 <Link
                     href={`/create?tab=manual&id=${manual.idPublic}`}
                     className="absolute top-6 right-6 z-50 p-3 bg-gray/50 backdrop-blur-md hover:bg-background text-white rounded-full transition-all shadow-lg"
@@ -99,9 +111,7 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
 
             <div className="w-full h-[18rem] md:h-[21rem] relative">
                 <Image src={bannerImg} alt="Banner" fill className="object-cover" priority />
-
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-
                 <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
             </div>
 
@@ -126,33 +136,37 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                                     <Share2 size={24} />
                                 </button>
                             </div>
+
                             <p className="text-sub-text text-xs mt-1.5 font-medium drop-shadow-md">
                                 Criado por{' '}
-                                {criadorIdPublico ? (
-                                    <Link
-                                        href={`/perfil/${criadorIdPublico}`}
-                                        className="text-purple-500 font-bold hover:underline transition-all"
-                                    >
-                                        @{criador.toLowerCase().replace(/\s/g, '')}
-                                    </Link>
-                                ) : (
-                                    <span className="text-purple-500 font-bold">
-                                        @{criador.toLowerCase().replace(/\s/g, '')}
-                                    </span>
-                                )}
-                                {qtdContribuidores > 0 && (
+                                <Link
+                                    href={`/perfil/${criadorIdPublico}`}
+                                    className="text-purple-500 font-bold hover:underline transition-all"
+                                >
+                                    {criador}
+                                </Link>
+                                {originalOwner && (
                                     <>
-                                        {' e '}
-                                        <button
-                                            onClick={() => setIsModalOpen(true)}
-                                            className="text-purple-500 font-bold hover:underline transition-all cursor-pointer"
+                                        {' | '}
+                                        <span className="text-sub-text">Clonado de </span>
+                                        <Link
+                                            href={`/perfil/${originalOwner.idPublico}`}
+                                            className="text-purple-400 font-bold hover:underline transition-all"
                                         >
-                                            +{qtdContribuidores} outros
-                                        </button>
+                                            {originalOwner.name}
+                                        </Link>
                                     </>
                                 )}{' '}
                                 em {dataCriacao} — Downloads: 543
                             </p>
+
+                            {manual?.clonadoDeId && (
+                                <div className="mt-2 flex justify-center md:justify-start">
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                                        <GitFork size={14} /> Versão Clonada
+                                    </span>
+                                </div>
+                            )}
                         </div>
 
                         <div className="w-full">
@@ -220,14 +234,24 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                                     )}
                                 </div>
 
-                                <div className="flex gap-2.5 shrink-0 mt-2 lg:mt-0">
+                                <div className="flex gap-2.5 shrink-0 mt-2 lg:mt-0 items-center">
                                     <button className="p-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer">
                                         <Eye className="w-[1.25rem] h-[1.25rem]" />
                                     </button>
 
-                                    <button className="p-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer">
-                                        <SquareStack className="w-[1.25rem] h-[1.25rem]" />
-                                    </button>
+                                    {canClone && (
+                                        <button
+                                            // Agora você passa só o manual.id, pois o backend acha o usuário sozinho!
+                                            onClick={() => handleFork(manual.id)}
+                                            disabled={isForking}
+                                            title="Clonar Manual para minha conta"
+                                            className="p-2 bg-purple-600 hover:bg-purple-500 disabled:bg-purple-600/50 disabled:cursor-wait text-white rounded-xl transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer flex items-center justify-center"
+                                        >
+                                            <SquareStack
+                                                className={`w-[1.25rem] h-[1.25rem] ${isForking ? 'animate-pulse' : ''}`}
+                                            />
+                                        </button>
+                                    )}
 
                                     <button className="p-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer">
                                         <Download className="w-[1.25rem] h-[1.25rem]" />
@@ -238,7 +262,7 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                     </div>
                 </div>
 
-                <div className="max-w-4xl mx-auto mt-6 md:mt-6 mb-24 px-4">
+                <div className="max-w-4xl mx-auto mt-6 md:mt-6 mb-18 px-4">
                     <h1 className="text-text text-lg md:text-xl font-bold mb-4">Sobre o jogo</h1>
 
                     <p className="text-sub-text leading-relaxed text-sm md:text-base opacity-90">

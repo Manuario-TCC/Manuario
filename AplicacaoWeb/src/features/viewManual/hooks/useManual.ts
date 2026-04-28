@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { manualService } from '../services/manualService';
+import { useRouter } from 'next/navigation';
 
 export function useManual(id: string) {
     const [manual, setManual] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
 
     useEffect(() => {
         if (!id) return;
@@ -13,16 +15,22 @@ export function useManual(id: string) {
             try {
                 setLoading(true);
                 const data = await manualService.getManualById(id);
+
+                if (!data) {
+                    router.push('/404');
+                    return;
+                }
+
                 setManual(data);
             } catch (err) {
-                setError('Não foi possível carregar os dados do manual.');
+                router.push('/404');
             } finally {
                 setLoading(false);
             }
         };
 
         loadManual();
-    }, [id]);
+    }, [id, router]);
 
     return { manual, loading, error };
 }

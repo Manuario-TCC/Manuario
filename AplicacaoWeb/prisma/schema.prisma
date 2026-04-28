@@ -81,6 +81,7 @@ model Regra {
     manuais   Manual[] @relation(fields: [manualIds], references: [id])
 
     manualOrigemId String? @db.ObjectId
+    overrideId     String? @db.ObjectId
 
     comentarios Comentario[]
 
