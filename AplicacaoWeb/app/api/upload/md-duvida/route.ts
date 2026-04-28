@@ -15,7 +15,7 @@ export async function POST(request: Request) {
         const buffer = Buffer.from(await file.arrayBuffer());
         const filename = `img-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
 
-        const uploadDir = path.join(process.cwd(), 'public', 'upload', 'duvidas', publicationId);
+        const uploadDir = path.join(process.cwd(), 'public', 'upload', 'questions', publicationId);
 
         await mkdir(uploadDir, { recursive: true });
 
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
         await writeFile(filePath, buffer);
 
         return NextResponse.json(
-            { url: `/upload/duvidas/${publicationId}/${filename}` },
+            { url: `/upload/questions/${publicationId}/${filename}` },
             { status: 201 },
         );
     } catch (error) {

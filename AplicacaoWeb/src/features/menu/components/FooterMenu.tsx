@@ -46,7 +46,7 @@ export function FooterMenu({ user, loading, isOpen }: FooterMenuProps) {
     return (
         <div className={containerClasses}>
             <Link
-                href={`/perfil/${user.idPublico}`}
+                href={`/perfil/${user.idPublic}`}
                 className={`flex items-center group z-10 w-full overflow-hidden transition-all duration-300 ${
                     isOpen ? 'justify-start' : 'justify-center lg:justify-start'
                 }`}

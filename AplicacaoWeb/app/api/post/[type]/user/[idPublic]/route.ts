@@ -3,9 +3,9 @@ import { prisma } from '@/src/database/prisma';
 
 export async function GET(
     req: Request,
-    { params }: { params: Promise<{ tipo: string; idPublico: string }> },
+    { params }: { params: Promise<{ type: string; idPublic: string }> },
 ) {
-    const { tipo, idPublico } = await params;
+    const { type, idPublic } = await params;
     const { searchParams } = new URL(req.url);
 
     const limit = parseInt(searchParams.get('limit') || '10', 10);
@@ -15,10 +15,10 @@ export async function GET(
         let items = [];
         let totalItems = 0;
 
-        const baseWhereCondition = { user: { idPublico: idPublico } };
+        const baseWhereCondition = { user: { idPublic: idPublic } };
 
-        if (tipo === 'duvida') {
-            items = await prisma.duvida.findMany({
+        if (type === 'duvida') {
+            items = await prisma.question.findMany({
                 where: baseWhereCondition,
                 orderBy: { createdAt: 'desc' },
                 skip: offset,
@@ -26,8 +26,8 @@ export async function GET(
                 include: { user: true },
             });
 
-            totalItems = await prisma.duvida.count({ where: baseWhereCondition });
-        } else if (tipo === 'regra') {
+            totalItems = await prisma.question.count({ where: baseWhereCondition });
+        } else if (type === 'regra') {
             const regraWhereCondition = {
                 ...baseWhereCondition,
                 status: {
@@ -35,16 +35,16 @@ export async function GET(
                 },
             };
 
-            items = await prisma.regra.findMany({
+            items = await prisma.rule.findMany({
                 where: regraWhereCondition,
                 orderBy: { createdAt: 'desc' },
                 skip: offset,
                 take: limit,
-                include: { user: true, manuais: true },
+                include: { user: true, manuals: true },
             });
 
-            totalItems = await prisma.regra.count({ where: regraWhereCondition });
-        } else if (tipo === 'ia') {
+            totalItems = await prisma.rule.count({ where: regraWhereCondition });
+        } else if (type === 'ia') {
             items = [];
             totalItems = 0;
         } else {

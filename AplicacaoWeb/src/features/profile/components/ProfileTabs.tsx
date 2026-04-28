@@ -8,11 +8,11 @@ import { ManualTab } from '../views/ManualTab';
 import { SavedTab } from '../views/SavedTab';
 
 interface ProfileTabsProps {
-    idPublico: string;
+    idPublic: string;
     isOwnProfile: boolean;
 }
 
-export const ProfileTabs: React.FC<ProfileTabsProps> = ({ idPublico, isOwnProfile }) => {
+export const ProfileTabs: React.FC<ProfileTabsProps> = ({ idPublic, isOwnProfile }) => {
     const [activeTab, setActiveTab] = useState('Publicações');
 
     const tabs = [
@@ -24,9 +24,9 @@ export const ProfileTabs: React.FC<ProfileTabsProps> = ({ idPublico, isOwnProfil
     const renderActiveTab = () => {
         switch (activeTab) {
             case 'Publicações':
-                return <PublicationsTab idPublico={idPublico} />;
+                return <PublicationsTab idPublic={idPublic} />;
             case 'Meus manuais':
-                return <ManualTab idPublico={idPublico} />;
+                return <ManualTab idPublic={idPublic} />;
             case 'Salvos':
                 return <SavedTab />;
             default:

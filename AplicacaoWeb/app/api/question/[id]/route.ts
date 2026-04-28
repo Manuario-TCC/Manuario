@@ -5,7 +5,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     try {
         const { id } = await params;
 
-        const duvida = await prisma.duvida.findUnique({
+        const duvida = await prisma.question.findUnique({
             where: { idPublic: id },
             include: { user: true },
         });
@@ -25,7 +25,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         const { id } = await params;
         const body = await req.json();
 
-        const duvidaAtualizada = await prisma.duvida.update({
+        const duvidaAtualizada = await prisma.question.update({
             where: { idPublic: id },
             data: {
                 name: body.title,

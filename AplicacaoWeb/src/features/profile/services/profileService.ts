@@ -38,8 +38,8 @@ export const profileService = {
         return response.json();
     },
 
-    getProfile: async (idPublico: string) => {
-        const response = await fetch(`/api/users/${idPublico}`);
+    getProfile: async (idPublic: string) => {
+        const response = await fetch(`/api/users/${idPublic}`);
 
         if (!response.ok) {
             throw new Error('Falha ao buscar dados do perfil');
@@ -48,8 +48,8 @@ export const profileService = {
         return response.json();
     },
 
-    toggleFollow: async (idPublico: string) => {
-        const response = await fetch(`/api/users/${idPublico}/follow`, {
+    toggleFollow: async (idPublic: string) => {
+        const response = await fetch(`/api/users/${idPublic}/follow`, {
             method: 'POST',
         });
 

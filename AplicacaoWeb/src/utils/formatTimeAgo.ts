@@ -1,4 +1,5 @@
 export function formatTimeAgo(dateString: string | Date): string {
+    if (!dateString) return '';
     const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);

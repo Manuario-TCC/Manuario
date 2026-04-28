@@ -6,22 +6,22 @@ import * as jwt from 'jsonwebtoken';
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const resolvedParams = await params;
-        const idPublicoParams = resolvedParams.id;
+        const idPublicParams = resolvedParams.id;
 
         const dbUser = await prisma.user.findUnique({
-            where: { idPublico: idPublicoParams },
+            where: { idPublic: idPublicParams },
             select: {
                 id: true,
-                idPublico: true,
+                idPublic: true,
                 name: true,
                 email: true,
                 img: true,
                 banner: true,
                 _count: {
                     select: {
-                        seguidores: true,
-                        seguindo: true,
-                        regras: true,
+                        followers: true,
+                        following: true,
+                        rules: true,
                     },
                 },
             },
@@ -60,19 +60,19 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         }
 
         const profileData = {
-            publicId: dbUser.idPublico,
+            publicId: dbUser.idPublic,
             name: dbUser.name,
             ...(isOwnProfile && { email: dbUser.email }),
             avatarUrl: dbUser.img
-                ? `/upload/${dbUser.idPublico}/user/${dbUser.img}`
+                ? `/upload/${dbUser.idPublic}/user/${dbUser.img}`
                 : '/img/iconePadrao.jpg',
             bannerUrl: dbUser.banner
-                ? `/upload/${dbUser.idPublico}/user/${dbUser.banner}`
+                ? `/upload/${dbUser.idPublic}/user/${dbUser.banner}`
                 : '/img/bannerPadrao.png',
 
-            followers: dbUser._count.seguidores,
-            following: dbUser._count.seguindo,
-            rules: dbUser._count.regras,
+            followers: dbUser._count.followers,
+            following: dbUser._count.following,
+            rules: dbUser._count.rules,
 
             isOwnProfile,
             isFollowing,

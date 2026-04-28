@@ -6,15 +6,15 @@ export interface ManualResponse {
     nextOffset?: number | null;
 }
 
-export function useManuals(idPublico: string) {
+export function useManuals(idPublic: string) {
     const limit = 12;
 
     return useInfiniteQuery<ManualResponse, Error>({
-        queryKey: ['user-manuals', idPublico],
+        queryKey: ['user-manuals', idPublic],
         queryFn: ({ pageParam = 0 }) =>
-            manualsService.getUserManuals(idPublico, limit, pageParam as number),
+            manualsService.getUserManuals(idPublic, limit, pageParam as number),
         initialPageParam: 0,
         getNextPageParam: (lastPage) => lastPage.nextOffset ?? undefined,
-        enabled: !!idPublico,
+        enabled: !!idPublic,
     });
 }

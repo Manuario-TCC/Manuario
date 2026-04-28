@@ -14,31 +14,31 @@ export const useRuleActions = ({
 }: UseRuleActionsProps) => {
     const router = useRouter();
 
-    const handleEdit = (regra: any) => {
+    const handleEdit = (rules: any) => {
         if (isAutorDaRegra) {
-            router.push(`/create?tab=regra&id=${regra.idPublic}`);
+            router.push(`/create?tab=regra&id=${rules.idPublic}`);
         } else if (isDonoDoManual) {
             const queryParams = new URLSearchParams({
                 tab: 'regra',
-                overrideId: regra.id,
+                overrideId: rules.id,
                 manualId: manualId,
-                nomePrefill: regra.name,
-                descPrefill: regra.description,
+                nomePrefill: rules.name,
+                descPrefill: rules.description,
             }).toString();
 
             router.push(`/create?${queryParams}`);
         }
     };
 
-    const handleDelete = async (regraId: string) => {
+    const handleDelete = async (ruleId: string) => {
         const confirmou = confirm('Tem certeza que deseja remover esta regra?');
         if (!confirmou) return;
 
         try {
             if (isAutorDaRegra) {
-                await manualService.deleteRegra(regraId);
+                await manualService.deleteRegra(ruleId);
             } else if (isDonoDoManual) {
-                await manualService.hideRule(manualId, regraId);
+                await manualService.hideRule(manualId, ruleId);
             }
 
             alert('Regra removida com sucesso!');

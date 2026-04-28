@@ -10,7 +10,7 @@ import { usePublications } from '../hooks/usePublications';
 type SubTabType = 'duvida' | 'regra' | 'ia';
 
 interface PublicationsTabProps {
-    idPublico: string;
+    idPublic: string;
 }
 
 const PostSkeleton = () => (
@@ -27,7 +27,7 @@ const PostSkeleton = () => (
     </div>
 );
 
-export const PublicationsTab: React.FC<PublicationsTabProps> = ({ idPublico }) => {
+export const PublicationsTab: React.FC<PublicationsTabProps> = ({ idPublic }) => {
     const [activeTab, setActiveTab] = useState<SubTabType>('duvida');
 
     const tabs = [
@@ -37,7 +37,7 @@ export const PublicationsTab: React.FC<PublicationsTabProps> = ({ idPublico }) =
     ] as const;
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } =
-        usePublications(idPublico, activeTab);
+        usePublications(idPublic, activeTab);
 
     const renderContent = () => {
         if (activeTab === 'ia') {

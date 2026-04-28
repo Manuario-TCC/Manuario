@@ -14,16 +14,16 @@ export async function POST(request: Request) {
             );
         }
 
-        const novaRegra = await prisma.regra.create({
+        const novaRegra = await prisma.rule.create({
             data: {
                 idPublic: publicationId,
                 name: nomeDaRegra,
                 description: description,
                 isHouseRule: isHouseRule || false,
                 user: {
-                    connect: { idPublico: userId },
+                    connect: { idPublic: userId },
                 },
-                manuais: {
+                manuals: {
                     connect: { id: manualId },
                 },
             },

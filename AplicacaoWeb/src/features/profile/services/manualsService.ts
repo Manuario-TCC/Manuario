@@ -1,7 +1,7 @@
 export const manualsService = {
-    getUserManuals: async (idPublico: string, limit: number, offset: number) => {
+    getUserManuals: async (idPublic: string, limit: number, offset: number) => {
         const response = await fetch(
-            `/api/manual/user/${idPublico}?limit=${limit}&offset=${offset}`,
+            `/api/manual/user/${idPublic}?limit=${limit}&offset=${offset}`,
         );
 
         if (!response.ok) {

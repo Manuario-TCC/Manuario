@@ -16,7 +16,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         // Busca o manual e todas as regras
         const manualOriginal = await prisma.manual.findUnique({
             where: { id: manualOriginalId },
-            include: { regras: true },
+            include: { rules: true },
         });
 
         if (!manualOriginal)
@@ -27,22 +27,22 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
             data: {
                 name: `${manualOriginal.name} (Meu Clone)`,
                 game: manualOriginal.game || '',
-                genero: manualOriginal.genero || '',
-                tempoJogo: manualOriginal.tempoJogo || 0,
+                genre: manualOriginal.genre || '',
+                playTime: manualOriginal.playTime || 0,
                 minPlayers: manualOriginal.minPlayers || 0,
                 maxPlayers: manualOriginal.maxPlayers || 0,
-                descricao: manualOriginal.descricao || '',
-                idade: manualOriginal.idade || '',
-                edicao: manualOriginal.edicao || '',
-                tipo: manualOriginal.tipo || '',
-                sistema: manualOriginal.sistema,
+                description: manualOriginal.description || '',
+                ageRange: manualOriginal.ageRange || '',
+                edition: manualOriginal.edition || '',
+                type: manualOriginal.type || '',
+                system: manualOriginal.system,
                 imgBanner: manualOriginal.imgBanner,
                 imgLogo: manualOriginal.imgLogo,
-                isOficial: false,
+                isOfficial: false,
                 userId: userId,
-                clonadoDeId: manualOriginal.id,
-                historicoClones: manualOriginal.historicoClones
-                    ? [...manualOriginal.historicoClones, manualOriginal.id]
+                clonedFromId: manualOriginal.id,
+                cloneHistory: manualOriginal.cloneHistory
+                    ? [...manualOriginal.cloneHistory, manualOriginal.id]
                     : [manualOriginal.id],
             },
         });
@@ -90,20 +90,20 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         } catch (fsError) {}
 
         // AClona as Regras
-        if (manualOriginal.regras && manualOriginal.regras.length > 0) {
-            const regrasParaClonar = manualOriginal.regras.map((regra) => ({
+        if (manualOriginal.rules && manualOriginal.rules.length > 0) {
+            const regrasParaClonar = manualOriginal.rules.map((rules) => ({
                 idPublic: crypto.randomUUID(),
-                name: regra.name,
-                description: regra.description,
+                name: rules.name,
+                description: rules.description,
                 status: 'CLONADO',
-                isHouseRule: regra.isHouseRule,
+                isHouseRule: rules.isHouseRule,
                 userId: userId,
-                manualOrigemId: regra.id,
+                originManualId: rules.id,
                 manualIds: [novoManual.id],
             }));
 
             // Salva todas as regras no banco
-            await prisma.regra.createMany({
+            await prisma.rule.createMany({
                 data: regrasParaClonar,
             });
         }

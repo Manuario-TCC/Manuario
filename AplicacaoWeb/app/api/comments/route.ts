@@ -12,46 +12,46 @@ export async function GET(req: Request) {
 
         const where: any = { parentId: null };
 
-        if (postType === 'regra') {
-            where.regraId = postId;
-        } else if (postType === 'duvida') {
-            where.duvidaId = postId;
+        if (postType === 'regra' || postType === 'rule' || postType === 'rules') {
+            where.ruleId = postId;
+        } else if (postType === 'duvida' || postType === 'question') {
+            where.questionId = postId;
         }
 
-        const comentarios = await prisma.comentario.findMany({
+        const comments = await prisma.comment.findMany({
             where,
-            orderBy: { criadoEm: 'desc' },
+            orderBy: { createdAt: 'desc' },
             include: {
-                autor: {
+                author: {
                     select: {
                         id: true,
-                        idPublico: true,
+                        idPublic: true,
                         name: true,
                         img: true,
                     },
                 },
-                respostas: {
+                replies: {
                     include: {
-                        autor: {
+                        author: {
                             select: {
                                 id: true,
-                                idPublico: true,
+                                idPublic: true,
                                 name: true,
                                 img: true,
                             },
                         },
-                        respostas: {
+                        replies: {
                             include: {
-                                autor: true,
+                                author: true,
                             },
                         },
                     },
-                    orderBy: { criadoEm: 'asc' },
+                    orderBy: { createdAt: 'asc' },
                 },
             },
         });
 
-        return NextResponse.json(comentarios);
+        return NextResponse.json(comments);
     } catch (error) {
         console.error('Erro ao buscar comentários:', error);
         return NextResponse.json({ error: 'Erro ao buscar comentários' }, { status: 500 });
@@ -66,21 +66,21 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
         }
 
-        const { texto, postId, postType, parentId } = await req.json();
+        const { texto, text, postId, postType, parentId } = await req.json();
 
         const data: any = {
-            texto,
-            autorId: session.user.id,
+            text: text || texto,
+            authorId: session.user.id,
             parentId: parentId || null,
         };
 
-        if (postType === 'regra') {
-            data.regraId = postId;
+        if (postType === 'regra' || postType === 'rule' || postType === 'rules') {
+            data.ruleId = postId;
         } else {
-            data.duvidaId = postId;
+            data.questionId = postId;
         }
 
-        const novoComentario = await prisma.comentario.create({ data });
+        const novoComentario = await prisma.comment.create({ data });
         return NextResponse.json(novoComentario, { status: 201 });
     } catch (error) {
         console.error('Erro ao postar comentário:', error);

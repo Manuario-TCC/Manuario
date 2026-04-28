@@ -12,18 +12,18 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
             where: { idPublic: id },
             include: {
                 user: {
-                    select: { idPublico: true, name: true, img: true },
+                    select: { idPublic: true, name: true, img: true },
                 },
-                contribuidores: {
+                contributors: {
                     select: {
                         id: true,
-                        idPublico: true,
+                        idPublic: true,
                         name: true,
                         email: true,
                         img: true,
                     },
                 },
-                regras: true,
+                rules: true,
             },
         });
 
@@ -33,12 +33,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
         let manualFinal: any = { ...manual };
 
-        if (manual.clonadoDeId) {
+        if (manual.clonedFromId) {
             const manualOriginal = await prisma.manual.findUnique({
-                where: { id: manual.clonadoDeId },
+                where: { id: manual.clonedFromId },
                 select: {
                     user: {
-                        select: { name: true, idPublico: true },
+                        select: { name: true, idPublic: true },
                     },
                 },
             });
@@ -82,10 +82,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
         // Tratando os contribuidores
         const contributorsStr = formData.get('contributors') as string;
-        let contribuidorIds: string[] = [];
+        let contributorIds: string[] = [];
         if (contributorsStr) {
             try {
-                contribuidorIds = JSON.parse(contributorsStr);
+                contributorIds = JSON.parse(contributorsStr);
             } catch (e) {
                 console.error('Erro ao ler contribuidores', e);
             }
@@ -94,18 +94,17 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         let updateData: any = {
             name: title,
             game: game,
-            genero: genre || 'Geral',
-            sistema: system,
-            tipo: type,
-            edicao: edition,
-            idade: ageRating,
-            descricao: description,
-            contribuidorIds: contribuidorIds,
+            genre: genre || 'Geral',
+            system: system,
+            type: type,
+            edition: edition,
+            ageRange: ageRating,
+            description: description,
+            contributorIds: contributorIds,
         };
 
-        // validacão simples para campos num
         if (!isNaN(playtime)) {
-            updateData.tempoJogo = playtime;
+            updateData.playTime = playtime;
         }
 
         if (!isNaN(minPlayers)) {
@@ -116,10 +115,32 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
             updateData.maxPlayers = maxPlayers;
         }
 
+        const manualExistente = await prisma.manual.findUnique({
+            where: { idPublic: id },
+            select: {
+                user: {
+                    select: { idPublic: true },
+                },
+            },
+        });
+
+        if (!manualExistente || !manualExistente.user) {
+            return NextResponse.json({ error: 'Manual não encontrado.' }, { status: 404 });
+        }
+
+        const userIdPublic = manualExistente.user.idPublic;
+
         const bannerFile = formData.get('banner') as File | null;
         const logoFile = formData.get('logo') as File | null;
 
-        const uploadDir = path.join(process.cwd(), 'public', 'upload', 'manual', id, 'img');
+        const uploadDir = path.join(
+            process.cwd(),
+            'public',
+            'upload',
+            'manual',
+            userIdPublic,
+            'img',
+        );
 
         if ((bannerFile && bannerFile.size > 0) || (logoFile && logoFile.size > 0)) {
             await mkdir(uploadDir, { recursive: true });

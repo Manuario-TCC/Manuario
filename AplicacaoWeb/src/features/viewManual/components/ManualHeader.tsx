@@ -39,7 +39,7 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
 
     const originalOwner = manual?.clonadoDe?.user;
 
-    const isOwner = user?.id === manual?.userId || user?.idPublico === manual?.user?.idPublico;
+    const isOwner = user?.id === manual?.userId || user?.idPublic === manual?.user?.idPublic;
 
     const canClone = user && !isOwner;
 
@@ -52,9 +52,9 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
         : '/img/iconePadrao.jpg';
 
     const criador = manual?.user?.name || 'usuário';
-    const criadorIdPublico = manual?.user?.idPublico;
-    const contribuidores = manual?.contribuidores || [];
-    const qtdContribuidores = contribuidores.length;
+    const criadorIdPublic = manual?.user?.idPublic;
+    const contributors = manual?.contributors || [];
+    const qtdContribuidores = contributors.length;
     const dataCriacao = manual?.createdAt
         ? new Date(manual.createdAt).toLocaleDateString('pt-BR')
         : '27/04/2026';
@@ -141,7 +141,7 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                             <p className="text-sub-text text-xs mt-1.5 font-medium drop-shadow-md">
                                 Criado por{' '}
                                 <Link
-                                    href={`/perfil/${criadorIdPublico}`}
+                                    href={`/perfil/${criadorIdPublic}`}
                                     className="text-purple-500 font-bold hover:underline transition-all"
                                 >
                                     {criador}
@@ -151,7 +151,7 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                                         {' | '}
                                         <span className="text-sub-text">Clonado de </span>
                                         <Link
-                                            href={`/perfil/${originalOwner.idPublico}`}
+                                            href={`/perfil/${originalOwner.idPublic}`}
                                             className="text-purple-400 font-bold hover:underline transition-all"
                                         >
                                             {originalOwner.name}
@@ -161,7 +161,7 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                                 em {dataCriacao} — Downloads: 543
                             </p>
 
-                            {manual?.clonadoDeId && (
+                            {manual?.clonedFromId && (
                                 <div className="mt-2 flex justify-center md:justify-start">
                                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-purple-500/20 text-purple-400 border border-purple-500/30">
                                         <GitFork size={14} /> Versão Clonada
@@ -182,48 +182,48 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                                             value={manual.game}
                                         />
                                     )}
-                                    {manual?.genero && (
+                                    {manual?.genre && (
                                         <SimpleInfoItem
                                             icon={<Swords className="w-[1.125rem] h-[1.125rem]" />}
                                             text="Genero:"
-                                            value={manual.genero}
+                                            value={manual.genre}
                                         />
                                     )}
-                                    {manual?.tipo && (
+                                    {manual?.type && (
                                         <SimpleInfoItem
                                             icon={<Dice6 className="w-[1.125rem] h-[1.125rem]" />}
                                             text="Tipo:"
-                                            value={manual.tipo}
+                                            value={manual.type}
                                         />
                                     )}
-                                    {manual?.edicao && (
+                                    {manual?.edition && (
                                         <SimpleInfoItem
                                             icon={
                                                 <Calendar className="w-[1.125rem] h-[1.125rem]" />
                                             }
                                             text="Edição:"
-                                            value={manual.edicao}
+                                            value={manual.edition}
                                         />
                                     )}
-                                    {manual?.idade && (
+                                    {manual?.ageRange && (
                                         <SimpleInfoItem
                                             icon={<Info className="w-[1.125rem] h-[1.125rem]" />}
                                             text="Idade:"
-                                            value={manual.idade}
+                                            value={manual.ageRange}
                                         />
                                     )}
-                                    {manual?.sistema && (
+                                    {manual?.system && (
                                         <SimpleInfoItem
                                             icon={<Cpu className="w-[1.125rem] h-[1.125rem]" />}
                                             text="Sistema:"
-                                            value={manual.sistema}
+                                            value={manual.system}
                                         />
                                     )}
-                                    {manual?.tempoJogo && (
+                                    {manual?.playTime && (
                                         <SimpleInfoItem
                                             icon={<Clock className="w-[1.125rem] h-[1.125rem]" />}
                                             text="Tempo de jogo:"
-                                            value={`${manual.tempoJogo} min`}
+                                            value={`${manual.playTime} min`}
                                         />
                                     )}
                                     {(manual?.minPlayers || manual?.maxPlayers) && (
@@ -266,7 +266,7 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                     <h1 className="text-text text-lg md:text-xl font-bold mb-4">Sobre o jogo</h1>
 
                     <p className="text-sub-text leading-relaxed text-sm md:text-base opacity-90">
-                        {manual?.descricao || 'Este manual não possui uma descrição detalhada.'}
+                        {manual?.description || 'Este manual não possui uma descrição detalhada.'}
                     </p>
                 </div>
             </div>
@@ -274,7 +274,7 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
             <ContributorsModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                contributors={contribuidores}
+                contributors={contributors}
             />
         </div>
     );

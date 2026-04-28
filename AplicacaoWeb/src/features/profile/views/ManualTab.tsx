@@ -6,12 +6,12 @@ import { ChevronRight } from 'lucide-react';
 import { useManuals } from '../hooks/useManuals';
 
 interface ManualTabProps {
-    idPublico: string;
+    idPublic: string;
 }
 
-export const ManualTab: React.FC<ManualTabProps> = ({ idPublico }) => {
+export const ManualTab: React.FC<ManualTabProps> = ({ idPublic }) => {
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-        useManuals(idPublico);
+        useManuals(idPublic);
 
     if (isLoading) {
         return (

@@ -1,6 +1,6 @@
 export const postService = {
-    getPostByIdPublico: async (tipo: string, idPublico: string) => {
-        const res = await fetch(`/api/post/${tipo}/${idPublico}`);
+    getPostByIdPublic: async (tipo: string, idPublic: string) => {
+        const res = await fetch(`/api/post/${tipo}/${idPublic}`);
         if (!res.ok) {
             throw new Error('Postagem não encontrada');
         }

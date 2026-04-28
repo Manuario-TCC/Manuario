@@ -9,7 +9,7 @@ export const manualService = {
 
     getRegrasByManualId: async (id: string, page: number, search: string) => {
         const response = await fetch(
-            `/api/manual/${id}/regras?page=${page}&limit=10&search=${search}`,
+            `/api/manual/${id}/rules?page=${page}&limit=10&search=${search}`,
         );
         if (!response.ok) {
             throw new Error('Erro ao buscar as regras');
@@ -29,13 +29,13 @@ export const manualService = {
         return res.json();
     },
 
-    hideRule: async (manualId: string, regraId: string) => {
+    hideRule: async (manualId: string, ruleId: string) => {
         const res = await fetch(`/api/manual/${manualId}/hide-rule`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ regraId }),
+            body: JSON.stringify({ ruleId }),
         });
 
         if (!res.ok) {
@@ -45,8 +45,8 @@ export const manualService = {
         return res.json();
     },
 
-    deleteRegra: async (regraId: string) => {
-        const res = await fetch(`/api/regra/${regraId}`, {
+    deleteRegra: async (ruleId: string) => {
+        const res = await fetch(`/api/rules/${ruleId}`, {
             method: 'DELETE',
         });
 

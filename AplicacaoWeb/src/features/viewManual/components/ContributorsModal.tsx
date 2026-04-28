@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Users, X } from 'lucide-react';
 
 interface Contributor {
-    idPublico: string;
+    idPublic: string;
     name: string;
     img?: string;
 }
@@ -37,13 +37,13 @@ export function ContributorsModal({ isOpen, onClose, contributors }: Contributor
                 <div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                     {contributors.map((user) => {
                         const avatarImg = user.img
-                            ? `/upload/${user.idPublico}/user/${user.img}`
+                            ? `/upload/${user.idPublic}/user/${user.img}`
                             : '/img/iconePadrao.jpg';
 
                         return (
                             <Link
-                                key={user.idPublico}
-                                href={`/perfil/${user.idPublico}`}
+                                key={user.idPublic}
+                                href={`/perfil/${user.idPublic}`}
                                 className="flex items-center gap-4 p-3 rounded-xl bg-background hover:bg-gray"
                             >
                                 <div className="w-12 h-12 rounded-full overflow-hidden relative bg-gray shrink-0 border-2 border-gray">

@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/src/database/prisma';
 
-export async function GET(req: Request, { params }: { params: Promise<{ idPublico: string }> }) {
-    const { idPublico } = await params;
+export async function GET(req: Request, { params }: { params: Promise<{ idPublic: string }> }) {
+    const { idPublic } = await params;
     const { searchParams } = new URL(req.url);
 
     const limit = parseInt(searchParams.get('limit') || '10', 10);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
 
     try {
-        const whereCondition = { user: { idPublico: idPublico } };
+        const whereCondition = { user: { idPublic: idPublic } };
 
         const items = await prisma.manual.findMany({
             where: whereCondition,

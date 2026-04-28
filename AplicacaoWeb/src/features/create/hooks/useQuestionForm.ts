@@ -16,7 +16,7 @@ export function useQuestionForm(editId?: string | null) {
     const isEditing = !!editId;
 
     useEffect(() => {
-        if (isEditing && editId && user?.idPublico) {
+        if (isEditing && editId && user?.idPublic) {
             setIsLoading(true);
 
             getDoubtById(editId)
@@ -28,9 +28,9 @@ export function useQuestionForm(editId?: string | null) {
                     return res.json();
                 })
                 .then((fetchedData) => {
-                    const ownerPublicId = fetchedData.user?.idPublico;
+                    const ownerPublicId = fetchedData.user?.idPublic;
 
-                    if (ownerPublicId !== user.idPublico) {
+                    if (ownerPublicId !== user.idPublic) {
                         router.push('/404');
                     } else {
                         setData({
@@ -47,7 +47,7 @@ export function useQuestionForm(editId?: string | null) {
                     setIsLoading(false);
                 });
         }
-    }, [editId, isEditing, user?.idPublico, router]);
+    }, [editId, isEditing, user?.idPublic, router]);
 
     const isValid = useMemo(() => {
         return (
@@ -95,7 +95,7 @@ export function useQuestionForm(editId?: string | null) {
                 title: data.title,
                 game: data.game,
                 description: finalContent,
-                userId: user.idPublico,
+                userId: user.idPublic,
             };
 
             let response;

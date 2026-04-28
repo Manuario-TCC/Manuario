@@ -23,7 +23,7 @@ export function useRuleForm(editId?: string | null) {
     const isEditing = !!editId;
 
     useEffect(() => {
-        if (isEditing && editId && user?.idPublico) {
+        if (isEditing && editId && user?.idPublic) {
             setIsFetchingInitialData(true);
             setIsLoading(true);
 
@@ -33,7 +33,7 @@ export function useRuleForm(editId?: string | null) {
                     return res.json();
                 })
                 .then((fetchedData) => {
-                    if (fetchedData.user?.idPublico !== user.idPublico) {
+                    if (fetchedData.user?.idPublic !== user.idPublic) {
                         router.push('/404');
                     } else {
                         const manualIdFromDb =
@@ -57,7 +57,7 @@ export function useRuleForm(editId?: string | null) {
                     setIsLoading(false);
                 });
         }
-    }, [editId, isEditing, user?.idPublico, router]);
+    }, [editId, isEditing, user?.idPublic, router]);
 
     useEffect(() => {
         fetchUserManuals()
@@ -110,7 +110,7 @@ export function useRuleForm(editId?: string | null) {
                 description: finalContent,
                 manualId: data.manualId,
                 isHouseRule: data.type !== 'oficial',
-                userId: user.idPublico,
+                userId: user.idPublic,
                 status,
             };
 
@@ -130,7 +130,7 @@ export function useRuleForm(editId?: string | null) {
             );
 
             const idPublicRule = responseData.idPublic || editId;
-            router.push(`/post/regra/${idPublicRule}`);
+            router.push(`/post/rules/${idPublicRule}`);
         } catch (error) {
             customAlert.error('Erro!', 'Ocorreu um erro ao salvar no banco.');
         } finally {

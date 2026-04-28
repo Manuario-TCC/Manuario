@@ -13,30 +13,30 @@ interface Regra {
     name: string;
     description: string;
     userId: string;
-    manualOrigemId?: string;
+    originManualId?: string;
     user?: {
-        idPublico: string;
+        idPublic: string;
     };
 }
 
 interface RuleCardProps {
-    regra?: Regra;
+    rules?: Regra;
     loading?: boolean;
     manualId?: string;
     manualUserId?: string;
 }
 
-export function RuleCard({ regra, loading, manualId, manualUserId }: RuleCardProps) {
+export function RuleCard({ rules, loading, manualId, manualUserId }: RuleCardProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { user } = useSession();
 
     const isAutorDaRegra = Boolean(
-        user?.idPublico && regra?.user?.idPublico && user.idPublico === regra.user.idPublico,
+        user?.idPublic && rules?.user?.idPublic && user.idPublic === rules.user.idPublic,
     );
 
     const isDonoDoManual = Boolean(
-        user?.idPublico && manualUserId && user.idPublico === manualUserId,
+        user?.idPublic && manualUserId && user.idPublic === manualUserId,
     );
 
     const podeEditarOuDeletar = isAutorDaRegra || isDonoDoManual;
@@ -56,7 +56,7 @@ export function RuleCard({ regra, loading, manualId, manualUserId }: RuleCardPro
         );
     }
 
-    if (!regra) return null;
+    if (!rules) return null;
 
     return (
         <div
@@ -67,8 +67,8 @@ export function RuleCard({ regra, loading, manualId, manualUserId }: RuleCardPro
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <div className="flex flex-col gap-0.5 flex-1">
-                    <h3 className="text-text font-medium">{regra.name}</h3>
-                    {regra.manualOrigemId && (
+                    <h3 className="text-text font-medium">{rules.name}</h3>
+                    {rules.originManualId && (
                         <span className="text-[10px] text-purple-500 font-bold uppercase tracking-wider">
                             Regra Clonada
                         </span>
@@ -92,7 +92,7 @@ export function RuleCard({ regra, loading, manualId, manualUserId }: RuleCardPro
                                 {isMenuOpen && (
                                     <div className="absolute right-0 top-full mt-1 w-40 bg-gray border border-gray rounded-md shadow-lg z-[100] py-1">
                                         <Link
-                                            href={`/post/regra/${regra.idPublic}`}
+                                            href={`/post/rules/${rules.idPublic}`}
                                             className="flex items-center gap-2 px-4 py-2 text-sm text-sub-text rounded-lg hover:bg-background hover:text-text transition-colors"
                                         >
                                             <Eye size={16} /> Ver post
@@ -101,7 +101,7 @@ export function RuleCard({ regra, loading, manualId, manualUserId }: RuleCardPro
                                         <button
                                             onClick={() => {
                                                 setIsMenuOpen(false);
-                                                handleEdit(regra);
+                                                handleEdit(rules);
                                             }}
                                             className="w-full flex items-center gap-2 px-4 py-2 text-sm rounded-lg text-sub-text hover:bg-background hover:text-text text-left cursor-pointer transition-colors"
                                         >
@@ -111,7 +111,7 @@ export function RuleCard({ regra, loading, manualId, manualUserId }: RuleCardPro
                                         <button
                                             onClick={() => {
                                                 setIsMenuOpen(false);
-                                                handleDelete(regra.id);
+                                                handleDelete(rules.id);
                                             }}
                                             className="w-full flex items-center gap-2 px-4 py-2 text-sm rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 text-left cursor-pointer transition-colors"
                                         >
@@ -122,7 +122,7 @@ export function RuleCard({ regra, loading, manualId, manualUserId }: RuleCardPro
                             </div>
                         ) : (
                             <Link
-                                href={`/post/regra/${regra.idPublic}`}
+                                href={`/post/rules/${rules.idPublic}`}
                                 className="p-2 hover:bg-gray rounded-full text-sub-text hover:text-text transition-colors"
                                 title="Ver Post"
                             >
@@ -139,7 +139,7 @@ export function RuleCard({ regra, loading, manualId, manualUserId }: RuleCardPro
 
             {isOpen && (
                 <div className="p-8 bg-card border-t border-gray/20">
-                    <MarkdownViewer content={regra.description} />
+                    <MarkdownViewer content={rules.description} />
                 </div>
             )}
         </div>

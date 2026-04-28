@@ -14,7 +14,7 @@ export function ContributorSelect({ data, setData }: any) {
     const getAvatarUrl = (user: any) => {
         if (user.img) {
             if (user.img.startsWith('http') || user.img.startsWith('/')) return user.img;
-            return `/upload/${user.idPublico}/user/${user.img}`;
+            return `/upload/${user.idPublic}/user/${user.img}`;
         }
         return '/img/iconePadrao.jpg';
     };
@@ -31,7 +31,7 @@ export function ContributorSelect({ data, setData }: any) {
             {data.contributors.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4">
                     {data.contributors.map((c: any, index: number) => {
-                        const uniqueKey = c.id || c.idPublico || `contributor-${index}`;
+                        const uniqueKey = c.id || c.idPublic || `contributor-${index}`;
 
                         return (
                             <span
@@ -45,7 +45,7 @@ export function ContributorSelect({ data, setData }: any) {
                                 />
                                 {c.name}
                                 <button
-                                    onClick={() => removeContributor(c.id || c.idPublico)}
+                                    onClick={() => removeContributor(c.id || c.idPublic)}
                                     className="hover:text-red-500 ml-1 transition-colors cursor-pointer"
                                 >
                                     <X size={14} />
@@ -74,7 +74,7 @@ export function ContributorSelect({ data, setData }: any) {
                 {searchResults.length > 0 && (
                     <div className="absolute z-50 w-full mt-2 bg-background border border-card-border rounded-xl shadow-lg overflow-hidden flex flex-col max-h-60 overflow-y-auto">
                         {searchResults.map((user: any, index: number) => {
-                            const searchKey = user.id || user.idPublico || `search-${index}`;
+                            const searchKey = user.id || user.idPublic || `search-${index}`;
 
                             return (
                                 <button

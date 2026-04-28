@@ -3,30 +3,30 @@ import { prisma } from '@/src/database/prisma';
 
 export async function GET(
     req: Request,
-    { params }: { params: Promise<{ tipo: string; idPublico: string }> },
+    { params }: { params: Promise<{ type: string; idPublic: string }> },
 ) {
-    const { tipo, idPublico } = await params;
+    const { type, idPublic } = await params;
 
     try {
         let post = null;
 
-        const whereCondition = { idPublic: idPublico };
+        const whereCondition = { idPublic: idPublic };
 
-        if (tipo === 'duvida') {
-            post = await prisma.duvida.findUnique({
+        if (type === 'question' || type === 'duvida') {
+            post = await prisma.question.findUnique({
                 where: whereCondition,
                 include: { user: true },
             });
-        } else if (tipo === 'regra') {
-            post = await prisma.regra.findUnique({
+        } else if (type === 'rule' || type === 'regra' || type === 'rules') {
+            post = await prisma.rule.findUnique({
                 where: whereCondition,
                 include: {
                     user: true,
-                    manuais: true,
+                    manuals: true,
                 },
             });
-        } else if (tipo === 'ia') {
-            post = await prisma.postIA.findUnique({
+        } else if (type === 'ia') {
+            post = await prisma.aIPost.findUnique({
                 where: whereCondition,
                 include: { user: true },
             });

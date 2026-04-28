@@ -30,10 +30,10 @@ export async function POST(req: Request) {
 
         // Array de Contribuidores
         const contributorsStr = formData.get('contributors') as string;
-        let contribuidorIds: string[] = [];
+        let contributorIds: string[] = [];
         if (contributorsStr) {
             try {
-                contribuidorIds = JSON.parse(contributorsStr);
+                contributorIds = JSON.parse(contributorsStr);
             } catch (e) {
                 console.error('Erro ao ler contribuidores', e);
             }
@@ -90,16 +90,16 @@ export async function POST(req: Request) {
                 idPublic: manualIdPublic,
                 name: title,
                 game: game,
-                genero: genre || 'Geral',
-                sistema: system,
-                tipo: type,
-                edicao: edition,
-                idade: ageRating,
-                descricao: description,
-                tempoJogo: isNaN(playtime) ? 1 : playtime,
+                genre: genre || 'Geral',
+                system: system,
+                type: type,
+                edition: edition,
+                ageRange: ageRating,
+                description: description,
+                playTime: isNaN(playtime) ? 1 : playtime,
                 minPlayers: isNaN(minPlayers) ? 1 : minPlayers,
                 maxPlayers: isNaN(maxPlayers) ? 1 : maxPlayers,
-                contribuidorIds: contribuidorIds,
+                contributorIds: contributorIds,
                 imgBanner: bannerName,
                 imgLogo: logoName,
                 userId: userId,

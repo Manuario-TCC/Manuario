@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { manualService } from '../services/manualService';
 
 export function useManualRegras(manualId: string) {
-    const [regras, setRegras] = useState<any[]>([]);
+    const [rules, setRules] = useState<any[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -15,7 +15,7 @@ export function useManualRegras(manualId: string) {
             setLoadingRegras(true);
             try {
                 const data = await manualService.getRegrasByManualId(manualId, 1, searchQuery);
-                setRegras(data.regras);
+                setRules(data.rules);
                 setHasMore(data.hasMore);
                 setPage(1);
             } catch (err) {
@@ -40,7 +40,7 @@ export function useManualRegras(manualId: string) {
 
         try {
             const data = await manualService.getRegrasByManualId(manualId, nextPage, searchQuery);
-            setRegras((prev) => [...prev, ...data.regras]);
+            setRules((prev) => [...prev, ...data.rules]);
             setHasMore(data.hasMore);
             setPage(nextPage);
         } catch (err) {
@@ -51,7 +51,7 @@ export function useManualRegras(manualId: string) {
     };
 
     return {
-        regras,
+        rules,
         searchQuery,
         setSearchQuery,
         hasMore,

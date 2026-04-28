@@ -26,7 +26,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
             name: { contains: search, mode: 'insensitive' as const },
         };
 
-        const regras = await prisma.regra.findMany({
+        const rules = await prisma.rule.findMany({
             where: whereClause,
             select: {
                 id: true,
@@ -35,19 +35,19 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 description: true,
                 userId: true,
                 user: {
-                    select: { idPublico: true },
+                    select: { idPublic: true },
                 },
-                manualOrigemId: true,
+                originManualId: true,
             },
             skip,
             take: limit,
             orderBy: { createdAt: 'desc' },
         });
 
-        const total = await prisma.regra.count({ where: whereClause });
+        const total = await prisma.rule.count({ where: whereClause });
 
         return NextResponse.json(
-            { regras, total, hasMore: skip + regras.length < total },
+            { rules, total, hasMore: skip + rules.length < total },
             { status: 200 },
         );
     } catch (error) {

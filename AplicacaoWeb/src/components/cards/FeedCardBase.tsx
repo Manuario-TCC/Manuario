@@ -10,7 +10,7 @@ interface FeedCardBaseProps {
 }
 
 export default function FeedCardBase({ post, postUrl, children }: FeedCardBaseProps) {
-    const userIdUrl = post.user?.idPublico || post.user?.id;
+    const userIdUrl = post.user?.idPublic || post.user?.id;
     const userAvatarUrl = post.user?.img
         ? `/upload/${userIdUrl}/user/${post.user.img}`
         : '/img/iconePadrao.jpg';

@@ -20,8 +20,8 @@ const PostSkeleton = () => (
     </div>
 );
 
-export default function ViewPostFeature({ tipo, idPublico }: { tipo: string; idPublico: string }) {
-    const { post, loading, error } = useViewPost(tipo, idPublico);
+export default function ViewPostFeature({ tipo, idPublic }: { tipo: string; idPublic: string }) {
+    const { post, loading, error } = useViewPost(tipo, idPublic);
 
     if (loading) {
         return (
@@ -40,8 +40,12 @@ export default function ViewPostFeature({ tipo, idPublico }: { tipo: string; idP
     return (
         <div className="flex flex-col items-start w-full py-8 px-4">
             <div className="w-full max-w-5xl">
-                {tipo === 'duvida' && <DuvidaCard post={post} isFullView={true} />}
-                {tipo === 'regra' && <RegraCard post={post} isFullView={true} />}
+                {(tipo === 'duvida' || tipo === 'question') && (
+                    <DuvidaCard post={post} isFullView={true} />
+                )}
+                {(tipo === 'regra' || tipo === 'rule' || tipo === 'rules') && (
+                    <RegraCard post={post} isFullView={true} />
+                )}
             </div>
 
             <div className="w-full max-w-3xl">

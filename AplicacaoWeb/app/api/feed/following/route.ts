@@ -30,31 +30,31 @@ export async function GET(request: NextRequest) {
         // Busca regras e duvidas
         const takeCount = limit + offset;
 
-        const [regras, duvidas] = await Promise.all([
-            prisma.regra.findMany({
+        const [rules, questions] = await Promise.all([
+            prisma.rule.findMany({
                 where: {
                     userId: { in: followedIds },
                     status: { not: 'CLONADO' },
                 },
                 include: {
-                    user: { select: { name: true, img: true, idPublico: true } },
-                    manuais: true,
+                    user: { select: { name: true, img: true, idPublic: true } },
+                    manuals: true,
                 },
                 orderBy: { createdAt: 'desc' },
                 take: takeCount,
             }),
 
-            prisma.duvida.findMany({
+            prisma.question.findMany({
                 where: { userId: { in: followedIds } },
-                include: { user: { select: { name: true, img: true, idPublico: true } } },
+                include: { user: { select: { name: true, img: true, idPublic: true } } },
                 orderBy: { createdAt: 'desc' },
                 take: takeCount,
             }),
         ]);
 
         // Formata
-        const regrasFormatadas = regras.map((r) => ({ ...r, type: 'regra' }));
-        const duvidasFormatadas = duvidas.map((d) => ({ ...d, type: 'duvida' }));
+        const regrasFormatadas = rules.map((r) => ({ ...r, type: 'regra' }));
+        const duvidasFormatadas = questions.map((d) => ({ ...d, type: 'duvida' }));
 
         const combined = [...regrasFormatadas, ...duvidasFormatadas].sort((a, b) => {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();

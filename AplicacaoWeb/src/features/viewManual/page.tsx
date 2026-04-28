@@ -8,7 +8,7 @@ import { Search } from 'lucide-react';
 
 export default function ViewManualFeature({ id }: { id: string }) {
     const { manual, loading, error } = useManual(id);
-    const { regras, searchQuery, setSearchQuery, hasMore, loadingRegras, loadMore } =
+    const { rules, searchQuery, setSearchQuery, hasMore, loadingRegras, loadMore } =
         useManualRegras(id);
 
     if (error && !loading) {
@@ -43,31 +43,31 @@ export default function ViewManualFeature({ id }: { id: string }) {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                    {loading || (loadingRegras && regras.length === 0) ? (
+                    {loading || (loadingRegras && rules?.length === 0) ? (
                         <>
                             <RuleCard loading />
                             <RuleCard loading />
                             <RuleCard loading />
                         </>
                     ) : (
-                        regras.map((regra) => (
+                        rules?.map((rule) => (
                             <RuleCard
-                                key={regra.idPublic}
-                                regra={regra}
+                                key={rule.idPublic}
+                                rules={rule}
                                 manualId={manual?.id}
-                                manualUserId={manual?.user?.idPublico}
+                                manualUserId={manual?.user?.idPublic}
                             />
                         ))
                     )}
 
-                    {!loading && !loadingRegras && regras.length === 0 && (
+                    {!loading && !loadingRegras && (!rules || rules.length === 0) && (
                         <div className="text-center py-10 text-sub-text">
                             Nenhuma regra encontrada.
                         </div>
                     )}
                 </div>
 
-                {hasMore && regras.length > 0 && (
+                {hasMore && rules && rules.length > 0 && (
                     <div className="mt-6 flex justify-center">
                         <button
                             onClick={loadMore}

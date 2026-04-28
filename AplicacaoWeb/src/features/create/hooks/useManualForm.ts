@@ -6,7 +6,7 @@ import { customAlert } from '@/src/components/customAlert';
 
 export interface Contributor {
     id: string;
-    idPublico?: string;
+    idPublic?: string;
     name: string;
     email: string;
     img?: string;
@@ -57,7 +57,7 @@ export function useManualForm(editId?: string | null) {
 
     // Buscar dados no modo edição
     useEffect(() => {
-        if (isEditing && editId && user?.idPublico) {
+        if (isEditing && editId && user?.idPublic) {
             setIsLoading(true);
             getManualById(editId)
                 .then(async (res) => {
@@ -66,7 +66,7 @@ export function useManualForm(editId?: string | null) {
                 })
                 .then((fetchedData) => {
                     // Verifica se o usuário é o dono do manual
-                    if (fetchedData.user?.idPublico !== user.idPublico) {
+                    if (fetchedData.user?.idPublic !== user.idPublic) {
                         router.push('/404');
                     } else {
                         const getImageUrl = (imgName: string | null) => {
@@ -81,22 +81,22 @@ export function useManualForm(editId?: string | null) {
                             ...prev,
                             title: fetchedData.name || '',
                             game: fetchedData.game || '',
-                            genre: fetchedData.genero || '',
-                            system: fetchedData.sistema || '',
+                            genre: fetchedData.genre || '',
+                            system: fetchedData.system || '',
                             banner: getImageUrl(fetchedData.imgBanner),
                             logo: getImageUrl(fetchedData.imgLogo),
-                            playtime: fetchedData.tempoJogo || '',
-                            type: fetchedData.tipo || '',
-                            edition: fetchedData.edicao || '',
+                            playtime: fetchedData.playTime || '',
+                            type: fetchedData.type || '',
+                            edition: fetchedData.edition || '',
                             minPlayers: fetchedData.minPlayers || '',
                             maxPlayers: fetchedData.maxPlayers || '',
-                            ageRating: fetchedData.idade || '',
-                            description: fetchedData.descricao || '',
+                            ageRating: fetchedData.ageRange || '',
+                            description: fetchedData.description || '',
 
-                            contributors: fetchedData.contribuidores
-                                ? fetchedData.contribuidores.map((c: any) => ({
+                            contributors: fetchedData.contributors
+                                ? fetchedData.contributors.map((c: any) => ({
                                       id: c.id,
-                                      idPublico: c.idPublico,
+                                      idPublic: c.idPublic,
                                       name: c.name,
                                       email: c.email,
                                       img: c.img,
@@ -108,7 +108,7 @@ export function useManualForm(editId?: string | null) {
                 .catch(() => router.push('/404'))
                 .finally(() => setIsLoading(false));
         }
-    }, [editId, isEditing, user?.idPublico, router]);
+    }, [editId, isEditing, user?.idPublic, router]);
 
     const isValid = useMemo(() => {
         return (

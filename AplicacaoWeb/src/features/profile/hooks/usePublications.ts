@@ -8,13 +8,13 @@ export interface PublicationsResponse {
     nextOffset?: number | null;
 }
 
-export function usePublications(idPublico: string, activeTab: SubTabType) {
+export function usePublications(idPublic: string, activeTab: SubTabType) {
     const limit = 10;
 
     return useInfiniteQuery<PublicationsResponse, Error>({
-        queryKey: ['user-posts', idPublico, activeTab],
+        queryKey: ['user-posts', idPublic, activeTab],
         queryFn: ({ pageParam }) =>
-            publicationsService.getUserPosts(idPublico, activeTab, limit, pageParam as number),
+            publicationsService.getUserPosts(idPublic, activeTab, limit, pageParam as number),
         initialPageParam: 0,
         getNextPageParam: (lastPage) => lastPage.nextOffset ?? undefined,
         enabled: activeTab !== 'ia',
