@@ -29,7 +29,7 @@ const navItems: NavItem[] = [
     {
         name: 'Buscar',
         icon: Search,
-        href: '/procurar',
+        href: '/search',
     },
     {
         name: 'Publicar',
