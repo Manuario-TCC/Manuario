@@ -5,6 +5,20 @@ import { useFeed } from './hooks/useFeed';
 import DuvidaCard from '../../components/cards/DuvidaCard';
 import RegraCard from '../../components/cards/RegraCard';
 
+const PostSkeleton = () => (
+    <div className="flex w-full animate-pulse flex-col p-4 border border-card-border rounded-xl bg-background shadow-sm mb-4">
+        <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-full bg-card-border/50" />
+            <div className="flex flex-col gap-2">
+                <div className="h-4 w-32 rounded bg-card-border/50" />
+                <div className="h-3 w-24 rounded bg-card-border/50" />
+            </div>
+        </div>
+        <div className="h-6 w-1/3 rounded bg-card-border/50 mb-3" />
+        <div className="h-16 w-full rounded bg-card-border/50" />
+    </div>
+);
+
 export default function FeedPage() {
     const { posts, loading, loadPosts, hasMore } = useFeed();
     const observer = useRef<IntersectionObserver | null>(null);
@@ -52,8 +66,9 @@ export default function FeedPage() {
             </div>
 
             {loading && (
-                <div className="text-center text-sub-text py-8 font-semibold">
-                    Carregando postagens...
+                <div className="flex flex-col gap-2 w-full mt-4">
+                    <PostSkeleton />
+                    <PostSkeleton />
                 </div>
             )}
 

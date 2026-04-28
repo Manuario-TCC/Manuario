@@ -16,7 +16,6 @@ import {
     Clock,
     Users,
     Pencil,
-    X,
     Share2,
     GitFork,
 } from 'lucide-react';
@@ -32,6 +31,8 @@ interface ManualHeaderProps {
 
 export function ManualHeader({ manual, loading }: ManualHeaderProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    //const loading = true;
 
     const { user } = useSession();
     const { handleFork, isForking } = useManualActions();
@@ -70,7 +71,7 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
             <div className="relative w-full animate-pulse">
                 <div className="h-[15.6rem] md:h-[21.8rem] w-full bg-gray/50" />
 
-                <div className="max-w-4xl mx-auto px-4 relative">
+                <div className="w-full px-6 md:px-12 relative">
                     <div className="flex flex-col md:flex-row gap-6 -mt-20 md:-mt-24 items-start">
                         <div className="w-40 h-40 md:w-48 md:h-48 bg-zinc-900 rounded-xl overflow-hidden shrink-0 shadow-2xl relative">
                             <div className="w-full h-full bg-gray" />
@@ -172,7 +173,7 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                         <div className="w-full">
                             <hr className="border-gray/60" />
 
-                            <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between py-4 gap-6">
+                            <div className="flex flex-row md:flex-row max-md:flex-col items-start max-md:items-center justify-between py-4 gap-6">
                                 <div className="flex flex-wrap justify-center md:justify-start items-center gap-x-6 gap-y-4 flex-1">
                                     {manual?.game && (
                                         <SimpleInfoItem
@@ -234,14 +235,13 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                                     )}
                                 </div>
 
-                                <div className="flex gap-2.5 shrink-0 mt-2 lg:mt-0 items-center">
+                                <div className="flex gap-2.5 shrink-0 mt-0 max-md:mt-2 items-center justify-start max-md:justify-center">
                                     <button className="p-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer">
                                         <Eye className="w-[1.25rem] h-[1.25rem]" />
                                     </button>
 
                                     {canClone && (
                                         <button
-                                            // Agora você passa só o manual.id, pois o backend acha o usuário sozinho!
                                             onClick={() => handleFork(manual.id)}
                                             disabled={isForking}
                                             title="Clonar Manual para minha conta"

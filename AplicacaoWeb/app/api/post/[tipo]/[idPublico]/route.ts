@@ -10,15 +10,25 @@ export async function GET(
     try {
         let post = null;
 
+        const whereCondition = { idPublic: idPublico };
+
         if (tipo === 'duvida') {
             post = await prisma.duvida.findUnique({
-                where: { idPublic: idPublico },
+                where: whereCondition,
                 include: { user: true },
             });
         } else if (tipo === 'regra') {
             post = await prisma.regra.findUnique({
-                where: { idPublic: idPublico },
-                include: { user: true, manual: true },
+                where: whereCondition,
+                include: {
+                    user: true,
+                    manuais: true,
+                },
+            });
+        } else if (tipo === 'ia') {
+            post = await prisma.postIA.findUnique({
+                where: whereCondition,
+                include: { user: true },
             });
         }
 
@@ -29,6 +39,6 @@ export async function GET(
         return NextResponse.json(post);
     } catch (error) {
         console.error('Erro ao buscar post:', error);
-        return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
+        return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 });
     }
 }

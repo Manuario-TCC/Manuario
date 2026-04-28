@@ -32,7 +32,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
             data: {
                 name: body.name || body.title,
                 description: body.description,
-                manualId: body.manualId,
+                manualIds: body.manualId ? [body.manualId] : undefined,
                 isHouseRule: body.isHouseRule,
                 status: body.status,
             },

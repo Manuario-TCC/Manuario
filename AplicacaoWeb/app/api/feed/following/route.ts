@@ -14,7 +14,6 @@ export async function GET(request: NextRequest) {
         const limit = parseInt(searchParams.get('limit') || '10');
         const offset = parseInt(searchParams.get('offset') || '0');
 
-        // Busca os IDs de todos os usuários que o usuário logado segue
         const following = await prisma.follow.findMany({
             where: { followerId: userId },
             select: { followedId: true },
@@ -28,13 +27,19 @@ export async function GET(request: NextRequest) {
             return NextResponse.json([]);
         }
 
-        // Busca Regras e Dúvidas
+        // Busca regras e duvidas
         const takeCount = limit + offset;
 
         const [regras, duvidas] = await Promise.all([
             prisma.regra.findMany({
-                where: { userId: { in: followedIds } },
-                include: { user: { select: { name: true, img: true, idPublico: true } } },
+                where: {
+                    userId: { in: followedIds },
+                    status: { not: 'CLONADO' },
+                },
+                include: {
+                    user: { select: { name: true, img: true, idPublico: true } },
+                    manuais: true,
+                },
                 orderBy: { createdAt: 'desc' },
                 take: takeCount,
             }),
@@ -55,7 +60,6 @@ export async function GET(request: NextRequest) {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
 
-        // Paginação
         const paginatedFeed = combined.slice(offset, offset + limit);
 
         return NextResponse.json(paginatedFeed);

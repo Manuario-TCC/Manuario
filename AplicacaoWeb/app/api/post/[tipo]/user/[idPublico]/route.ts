@@ -15,28 +15,35 @@ export async function GET(
         let items = [];
         let totalItems = 0;
 
-        const whereCondition = { user: { idPublico: idPublico } };
+        const baseWhereCondition = { user: { idPublico: idPublico } };
 
         if (tipo === 'duvida') {
             items = await prisma.duvida.findMany({
-                where: whereCondition,
+                where: baseWhereCondition,
                 orderBy: { createdAt: 'desc' },
                 skip: offset,
                 take: limit,
                 include: { user: true },
             });
 
-            totalItems = await prisma.duvida.count({ where: whereCondition });
+            totalItems = await prisma.duvida.count({ where: baseWhereCondition });
         } else if (tipo === 'regra') {
+            const regraWhereCondition = {
+                ...baseWhereCondition,
+                status: {
+                    not: 'CLONADO',
+                },
+            };
+
             items = await prisma.regra.findMany({
-                where: whereCondition,
+                where: regraWhereCondition,
                 orderBy: { createdAt: 'desc' },
                 skip: offset,
                 take: limit,
-                include: { user: true, manual: true },
+                include: { user: true, manuais: true },
             });
 
-            totalItems = await prisma.regra.count({ where: whereCondition });
+            totalItems = await prisma.regra.count({ where: regraWhereCondition });
         } else if (tipo === 'ia') {
             items = [];
             totalItems = 0;

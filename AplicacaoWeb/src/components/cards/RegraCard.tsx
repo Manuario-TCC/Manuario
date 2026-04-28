@@ -10,17 +10,19 @@ interface RegraCardProps {
 
 export default function RegraCard({ post, isFullView = false }: RegraCardProps) {
     const postUrl = `/post/regra/${post.idPublic}`;
-    const manualUrl = `/manual/${post.manual?.idPublic}`;
+    const manualRelacionado = post.manuais && post.manuais.length > 0 ? post.manuais[0] : null;
 
-    const manualLogoUrl = post.manual?.imgLogo
-        ? `/upload/manual/${post.manual.idPublic}/img/${post.manual.imgLogo}`
+    const manualUrl = manualRelacionado ? `/manual/${manualRelacionado.idPublic}` : '#';
+
+    const manualLogoUrl = manualRelacionado?.imgLogo
+        ? `/upload/manual/${manualRelacionado.idPublic}/img/${manualRelacionado.imgLogo}`
         : '/img/iconePadrao.jpg';
 
     return (
         <FeedCardBase post={post} postUrl={postUrl}>
             <div className="mb-2 mt-2">
                 <span className="bg-primary text-text text-sm font-bold px-4 py-1 rounded-[0.4rem] uppercase tracking-tight">
-                    {post.manual?.game || 'Regra'}
+                    {manualRelacionado?.game || 'Regra'}
                 </span>
             </div>
 

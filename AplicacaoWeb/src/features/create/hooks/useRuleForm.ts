@@ -36,9 +36,14 @@ export function useRuleForm(editId?: string | null) {
                     if (fetchedData.user?.idPublico !== user.idPublico) {
                         router.push('/404');
                     } else {
+                        const manualIdFromDb =
+                            fetchedData.manualIds && fetchedData.manualIds.length > 0
+                                ? fetchedData.manualIds[0]
+                                : '';
+
                         setData({
                             title: fetchedData.name,
-                            manualId: fetchedData.manualId,
+                            manualId: manualIdFromDb,
                             content: fetchedData.description,
                             type: fetchedData.isHouseRule ? 'da_casa' : 'oficial',
                         });
@@ -118,15 +123,14 @@ export function useRuleForm(editId?: string | null) {
 
             if (!response.ok) throw new Error('Erro no banco');
 
-            customAlert.success(
-                'Sucesso!',
+            const responseData = await response.json();
+
+            await customAlert.toastSuccess(
                 isEditing ? 'Sua regra foi atualizada.' : 'Sua regra foi salva com sucesso.',
             );
 
-            if (!isEditing) {
-                setData({ title: '', type: 'oficial', manualId: '', content: '' });
-                setPendingImages({});
-            }
+            const idPublicRule = responseData.idPublic || editId;
+            router.push(`/post/regra/${idPublicRule}`);
         } catch (error) {
             customAlert.error('Erro!', 'Ocorreu um erro ao salvar no banco.');
         } finally {

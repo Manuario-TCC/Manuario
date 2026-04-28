@@ -173,31 +173,16 @@ export function useManualForm(editId?: string | null) {
                 throw new Error(errorData.error || 'Erro ao salvar o manual');
             }
 
-            customAlert.success(
-                'Sucesso!',
+            const responseData = await response.json();
+
+            await customAlert.toastSuccess(
                 isEditing ? 'Seu manual foi atualizado.' : 'Seu manual foi criado.',
             );
 
-            if (!isEditing) {
-                setData({
-                    title: '',
-                    game: '',
-                    genre: '',
-                    system: '',
-                    banner: null,
-                    logo: null,
-                    playtime: '',
-                    type: '',
-                    edition: '',
-                    minPlayers: '',
-                    maxPlayers: '',
-                    ageRating: '',
-                    description: '',
-                    contributors: [],
-                });
-            }
+            const redirectId = isEditing ? editId : responseData.manual.idPublic;
+            router.push(`/manual/${redirectId}`);
 
-            return await response.json();
+            return responseData;
         } catch (err: any) {
             setError(err.message || 'Ocorreu um erro inesperado');
             throw err;
