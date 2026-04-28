@@ -6,12 +6,10 @@ export async function GET(request: Request) {
     const q = searchParams.get('q');
     const type = searchParams.get('type') || 'manual';
 
-    if (!q) {
-        return NextResponse.json([]);
-    }
+    if (!q) return NextResponse.json([]);
 
     try {
-        let results: any = [];
+        let results = [];
 
         if (type === 'manual') {
             results = await prisma.manual.findMany({
@@ -27,7 +25,6 @@ export async function GET(request: Request) {
                     name: true,
                     imgLogo: true,
                     game: true,
-                    clonedFromId: true,
                 },
             });
         } else if (type === 'regras') {
@@ -56,7 +53,6 @@ export async function GET(request: Request) {
                 select: {
                     idPublic: true,
                     name: true,
-                    email: true,
                     img: true,
                 },
             });
@@ -64,7 +60,7 @@ export async function GET(request: Request) {
 
         return NextResponse.json(results);
     } catch (error) {
-        console.error('Erro na busca global:', error);
-        return NextResponse.json({ error: 'Erro ao realizar a busca' }, { status: 500 });
+        console.error('Erro na busca:', error);
+        return NextResponse.json({ error: 'Erro ao buscar' }, { status: 500 });
     }
 }
