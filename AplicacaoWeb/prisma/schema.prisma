@@ -8,64 +8,64 @@ datasource db {
 }
 
 model User {
-    id          String        @id @default(auto()) @map("_id") @db.ObjectId
-    idPublico   String        @unique @default(uuid())
-    name        String
-    email       String        @unique
-    password    String
-    createdAt   DateTime      @default(now())
-    updatedAt   DateTime      @updatedAt
-    img         String?
-    banner      String?
-    manuais     Manual[]
-    regras      Regra[]
-    duvidas     Duvida[]
-    postsIA     PostIA[]
-    comentarios Comentario[]
-    salvos      TrechoSalvo[]
+    id            String         @id @default(auto()) @map("_id") @db.ObjectId
+    idPublic      String         @unique @default(uuid())
+    name          String
+    email         String         @unique
+    password      String
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
+    img           String?
+    banner        String?
+    manuals       Manual[]
+    rules         Rule[]
+    questions     Question[]
+    aiPosts       AIPost[]
+    comments      Comment[]
+    savedSnippets SavedSnippet[]
 
-    seguindo   Follow[] @relation("FollowingRelation")
-    seguidores Follow[] @relation("FollowersRelation")
+    following Follow[] @relation("FollowingRelation")
+    followers Follow[] @relation("FollowersRelation")
 
-    manualContribuidoIds String[] @db.ObjectId
-    manuaisContribuidos  Manual[] @relation("ManualContribuidores", fields: [manualContribuidoIds], references: [id])
+    contributedManualIds String[] @db.ObjectId
+    contributedManuals   Manual[] @relation("ManualContributors", fields: [contributedManualIds], references: [id])
 }
 
 model Manual {
-    id         String  @id @default(auto()) @map("_id") @db.ObjectId
-    idPublic   String  @unique @default(uuid())
-    name       String
-    game       String
-    genero     String
-    tempoJogo  String?
-    minPlayers Int
-    maxPlayers Int
-    descricao  String
-    idade      String
-    edicao     String
-    tipo       String
-    sistema    String?
-    imgBanner  String?
-    imgLogo    String?
-    isOficial  Boolean @default(false)
+    id          String  @id @default(auto()) @map("_id") @db.ObjectId
+    idPublic    String  @unique @default(uuid())
+    name        String
+    game        String
+    genre       String
+    playTime    Int
+    minPlayers  Int
+    maxPlayers  Int
+    description String
+    ageRange    String
+    edition     String
+    type        String
+    system      String?
+    imgBanner   String?
+    imgLogo     String?
+    isOfficial  Boolean @default(false)
 
-    contribuidorIds String[] @db.ObjectId
-    contribuidores  User[]   @relation("ManualContribuidores", fields: [contribuidorIds], references: [id])
+    contributorIds String[] @db.ObjectId
+    contributors   User[]   @relation("ManualContributors", fields: [contributorIds], references: [id])
 
     userId String @db.ObjectId
     user   User   @relation(fields: [userId], references: [id])
 
-    clonadoDeId     String?  @db.ObjectId
-    historicoClones String[] @db.ObjectId
+    clonedFromId String?  @db.ObjectId
+    cloneHistory String[] @db.ObjectId
 
-    regraIds String[] @db.ObjectId
-    regras   Regra[]  @relation(fields: [regraIds], references: [id])
+    ruleIds String[] @db.ObjectId
+    rules   Rule[]   @relation(fields: [ruleIds], references: [id])
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
-model Regra {
+model Rule {
     id          String  @id @default(auto()) @map("_id") @db.ObjectId
     idPublic    String  @unique @default(uuid())
     name        String
@@ -78,50 +78,54 @@ model Regra {
     user   User   @relation(fields: [userId], references: [id])
 
     manualIds String[] @db.ObjectId
-    manuais   Manual[] @relation(fields: [manualIds], references: [id])
+    manuals   Manual[] @relation(fields: [manualIds], references: [id])
 
-    manualOrigemId String? @db.ObjectId
+    originManualId String? @db.ObjectId
+    overrideId     String? @db.ObjectId
 
-    comentarios Comentario[]
+    comments Comment[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
-model Duvida {
-    id          String       @id @default(auto()) @map("_id") @db.ObjectId
-    idPublic    String       @unique @default(uuid())
+model Question {
+    id          String @id @default(auto()) @map("_id") @db.ObjectId
+    idPublic    String @unique @default(uuid())
     name        String
     game        String
     description String
-    likeCount   Int          @default(0)
-    userId      String       @db.ObjectId
-    user        User         @relation(fields: [userId], references: [id])
-    comentarios Comentario[]
-    createdAt   DateTime     @default(now())
-    updatedAt   DateTime     @updatedAt
+    likeCount   Int    @default(0)
+
+    userId String @db.ObjectId
+    user   User   @relation(fields: [userId], references: [id])
+
+    comments Comment[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
-model PostIA {
+model AIPost {
     id         String  @id @default(auto()) @map("_id") @db.ObjectId
     idPublic   String  @unique @default(uuid())
     title      String?
     promptUser String
-    respostaIA String
+    aiResponse String
     likeCount  Int     @default(0)
 
     userId String @db.ObjectId
     user   User   @relation(fields: [userId], references: [id])
 
-    comentarios Comentario[]
+    comments Comment[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
-model TrechoSalvo {
-    id         String @id @default(auto()) @map("_id") @db.ObjectId
-    textoSalvo String
+model SavedSnippet {
+    id        String @id @default(auto()) @map("_id") @db.ObjectId
+    savedText String
 
     userId String @db.ObjectId
     user   User   @relation(fields: [userId], references: [id])
@@ -129,27 +133,27 @@ model TrechoSalvo {
     createdAt DateTime @default(now())
 }
 
-model Comentario {
-    id           String   @id @default(auto()) @map("_id") @db.ObjectId
-    texto        String
-    criadoEm     DateTime @default(now())
-    atualizadoEm DateTime @updatedAt
+model Comment {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    text      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
-    autorId String @db.ObjectId
-    autor   User   @relation(fields: [autorId], references: [id])
+    authorId String @db.ObjectId
+    author   User   @relation(fields: [authorId], references: [id])
 
-    regraId String? @db.ObjectId
-    regra   Regra?  @relation(fields: [regraId], references: [id], onDelete: Cascade)
+    ruleId String? @db.ObjectId
+    rule   Rule?   @relation(fields: [ruleId], references: [id], onDelete: Cascade)
 
-    duvidaId String? @db.ObjectId
-    duvida   Duvida? @relation(fields: [duvidaId], references: [id], onDelete: Cascade)
+    questionId String?   @db.ObjectId
+    question   Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
-    postIAId String? @db.ObjectId
-    postIA   PostIA? @relation(fields: [postIAId], references: [id], onDelete: Cascade)
+    aiPostId String? @db.ObjectId
+    aiPost   AIPost? @relation(fields: [aiPostId], references: [id], onDelete: Cascade)
 
-    parentId  String?      @db.ObjectId
-    parent    Comentario?  @relation("ComentarioRespostas", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-    respostas Comentario[] @relation("ComentarioRespostas")
+    parentId String?   @db.ObjectId
+    parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    replies  Comment[] @relation("CommentReplies")
 }
 
 model Follow {

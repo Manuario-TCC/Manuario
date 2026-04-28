@@ -4,18 +4,26 @@ import { prisma } from '@/src/database/prisma';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { publicationId, title, manualId, description, userId, isHouseRule } = body;
+        const { publicationId, title, name, manualId, description, userId, isHouseRule } = body;
 
-        const novaRegra = await prisma.regra.create({
+        const nomeDaRegra = title || name;
+        if (!nomeDaRegra) {
+            return NextResponse.json(
+                { error: 'O título/nome da regra é obrigatório.' },
+                { status: 400 },
+            );
+        }
+
+        const novaRegra = await prisma.rule.create({
             data: {
                 idPublic: publicationId,
-                name: title,
+                name: nomeDaRegra,
                 description: description,
                 isHouseRule: isHouseRule || false,
                 user: {
-                    connect: { idPublico: userId },
+                    connect: { idPublic: userId },
                 },
-                manual: {
+                manuals: {
                     connect: { id: manualId },
                 },
             },

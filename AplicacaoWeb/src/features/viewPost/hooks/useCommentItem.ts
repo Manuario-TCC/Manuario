@@ -1,6 +1,8 @@
+// aplicacao_web/src/features/viewPost/hooks/useCommentItem.ts
 import { useState, useMemo, useCallback } from 'react';
 import { useSession } from '@/src/hooks/useSession';
 import { commentService } from '../services/commentService';
+import { customAlert } from '@/src/components/customAlert'; // Importando o seu componente
 
 export const useCommentItem = (comment: any, onSuccess: () => void) => {
     const { user: currentUser } = useSession();
@@ -9,7 +11,7 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
     const [showReplies, setShowReplies] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
-    const [editValue, setEditValue] = useState(comment.texto);
+    const [editValue, setEditValue] = useState(comment.text);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const toggleReplyInput = useCallback(() => setShowReplyInput((prev) => !prev), []);
@@ -24,30 +26,34 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
 
     const isAuthor = useMemo(() => {
         if (!currentUser || !comment) return false;
-        if (currentUser.idPublico && comment.autor?.idPublico) {
-            if (currentUser.idPublico === comment.autor.idPublico) return true;
+        if (currentUser.idPublic && comment.author?.idPublic) {
+            if (currentUser.idPublic === comment.author.idPublic) return true;
         }
 
         const currentId = String(currentUser.id || '');
-        const authorId = String(comment.autorId || comment.autor?.id || '');
+        const authorId = String(comment.authorId || comment.author?.id || '');
 
         return currentId === authorId && currentId !== '';
     }, [currentUser, comment]);
 
     const startEditing = () => {
         setIsEditing(true);
-        setEditValue(comment.texto);
+        setEditValue(comment.text);
         setIsMenuOpen(false);
     };
 
     const handleUpdate = async () => {
-        if (!editValue.trim() || editValue === comment.texto) {
+        if (!editValue.trim() || editValue === comment.text) {
             setIsEditing(false);
             return;
         }
         try {
             setIsSubmitting(true);
             await commentService.updateComment(comment.id, editValue);
+
+            comment.text = editValue;
+            comment.updatedAt = new Date().toISOString();
+
             setIsEditing(false);
             onSuccess();
         } catch (error) {
@@ -58,12 +64,23 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
     };
 
     const handleDelete = async () => {
-        if (!confirm('Tem certeza que deseja excluir este comentário?')) return;
-        try {
-            await commentService.deleteComment(comment.id);
-            onSuccess();
-        } catch (error) {
-            console.error(error);
+        const result = await customAlert.confirmDelete(
+            'Excluir Comentário',
+            'Tem certeza que deseja excluir? Esta ação é permanente.',
+        );
+
+        if (result.isConfirmed) {
+            try {
+                setIsSubmitting(true);
+                await commentService.deleteComment(comment.id);
+                onSuccess();
+                customAlert.toastSuccess('Excluído com sucesso');
+            } catch (error) {
+                console.error(error);
+                customAlert.toastError('Erro ao excluir comentário');
+            } finally {
+                setIsSubmitting(false);
+            }
         }
     };
 

@@ -23,7 +23,7 @@ export function useRuleForm(editId?: string | null) {
     const isEditing = !!editId;
 
     useEffect(() => {
-        if (isEditing && editId && user?.idPublico) {
+        if (isEditing && editId && user?.idPublic) {
             setIsFetchingInitialData(true);
             setIsLoading(true);
 
@@ -33,12 +33,17 @@ export function useRuleForm(editId?: string | null) {
                     return res.json();
                 })
                 .then((fetchedData) => {
-                    if (fetchedData.user?.idPublico !== user.idPublico) {
+                    if (fetchedData.user?.idPublic !== user.idPublic) {
                         router.push('/404');
                     } else {
+                        const manualIdFromDb =
+                            fetchedData.manualIds && fetchedData.manualIds.length > 0
+                                ? fetchedData.manualIds[0]
+                                : '';
+
                         setData({
                             title: fetchedData.name,
-                            manualId: fetchedData.manualId,
+                            manualId: manualIdFromDb,
                             content: fetchedData.description,
                             type: fetchedData.isHouseRule ? 'da_casa' : 'oficial',
                         });
@@ -52,7 +57,7 @@ export function useRuleForm(editId?: string | null) {
                     setIsLoading(false);
                 });
         }
-    }, [editId, isEditing, user?.idPublico, router]);
+    }, [editId, isEditing, user?.idPublic, router]);
 
     useEffect(() => {
         fetchUserManuals()
@@ -105,7 +110,7 @@ export function useRuleForm(editId?: string | null) {
                 description: finalContent,
                 manualId: data.manualId,
                 isHouseRule: data.type !== 'oficial',
-                userId: user.idPublico,
+                userId: user.idPublic,
                 status,
             };
 
@@ -118,15 +123,14 @@ export function useRuleForm(editId?: string | null) {
 
             if (!response.ok) throw new Error('Erro no banco');
 
-            customAlert.success(
-                'Sucesso!',
+            const responseData = await response.json();
+
+            await customAlert.toastSuccess(
                 isEditing ? 'Sua regra foi atualizada.' : 'Sua regra foi salva com sucesso.',
             );
 
-            if (!isEditing) {
-                setData({ title: '', type: 'oficial', manualId: '', content: '' });
-                setPendingImages({});
-            }
+            const idPublicRule = responseData.idPublic || editId;
+            router.push(`/post/rules/${idPublicRule}`);
         } catch (error) {
             customAlert.error('Erro!', 'Ocorreu um erro ao salvar no banco.');
         } finally {

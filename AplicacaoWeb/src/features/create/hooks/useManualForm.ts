@@ -6,8 +6,10 @@ import { customAlert } from '@/src/components/customAlert';
 
 export interface Contributor {
     id: string;
+    idPublic?: string;
     name: string;
     email: string;
+    img?: string;
 }
 
 export interface CreateManualData {
@@ -55,7 +57,7 @@ export function useManualForm(editId?: string | null) {
 
     // Buscar dados no modo edição
     useEffect(() => {
-        if (isEditing && editId && user?.idPublico) {
+        if (isEditing && editId && user?.idPublic) {
             setIsLoading(true);
             getManualById(editId)
                 .then(async (res) => {
@@ -63,7 +65,8 @@ export function useManualForm(editId?: string | null) {
                     return res.json();
                 })
                 .then((fetchedData) => {
-                    if (fetchedData.user?.idPublico !== user.idPublico) {
+                    // Verifica se o usuário é o dono do manual
+                    if (fetchedData.user?.idPublic !== user.idPublic) {
                         router.push('/404');
                     } else {
                         const getImageUrl = (imgName: string | null) => {
@@ -71,33 +74,41 @@ export function useManualForm(editId?: string | null) {
                             if (imgName.startsWith('http') || imgName.startsWith('/')) {
                                 return imgName;
                             }
-                            return `/upload/manual/${user.idPublico}/img/${imgName}`;
+                            return `/upload/manual/${fetchedData.idPublic}/img/${imgName}`;
                         };
 
                         setData((prev) => ({
                             ...prev,
                             title: fetchedData.name || '',
                             game: fetchedData.game || '',
-                            genre: fetchedData.genero || '',
-                            system: fetchedData.sistema || '',
+                            genre: fetchedData.genre || '',
+                            system: fetchedData.system || '',
                             banner: getImageUrl(fetchedData.imgBanner),
                             logo: getImageUrl(fetchedData.imgLogo),
-
-                            playtime: fetchedData.playtime.toString() || '',
+                            playtime: fetchedData.playTime || '',
                             type: fetchedData.type || '',
                             edition: fetchedData.edition || '',
-                            minPlayers: fetchedData.minPlayers?.toString() || '',
-                            maxPlayers: fetchedData.maxPlayers?.toString() || '',
-                            ageRating: fetchedData.ageRating || '',
+                            minPlayers: fetchedData.minPlayers || '',
+                            maxPlayers: fetchedData.maxPlayers || '',
+                            ageRating: fetchedData.ageRange || '',
                             description: fetchedData.description || '',
-                            contributors: fetchedData.contributors || [],
+
+                            contributors: fetchedData.contributors
+                                ? fetchedData.contributors.map((c: any) => ({
+                                      id: c.id,
+                                      idPublic: c.idPublic,
+                                      name: c.name,
+                                      email: c.email,
+                                      img: c.img,
+                                  }))
+                                : [],
                         }));
                     }
                 })
                 .catch(() => router.push('/404'))
                 .finally(() => setIsLoading(false));
         }
-    }, [editId, isEditing, user?.idPublico, router]);
+    }, [editId, isEditing, user?.idPublic, router]);
 
     const isValid = useMemo(() => {
         return (
@@ -133,12 +144,24 @@ export function useManualForm(editId?: string | null) {
             const contributorIds = data.contributors.map((c) => c.id);
             formData.append('contributors', JSON.stringify(contributorIds));
 
-            if (data.genre) formData.append('genre', data.genre);
-            if (data.system) formData.append('system', data.system);
-            if (data.banner && data.banner instanceof File) formData.append('banner', data.banner);
-            if (data.logo && data.logo instanceof File) formData.append('logo', data.logo);
+            if (data.genre) {
+                formData.append('genre', data.genre);
+            }
+
+            if (data.system) {
+                formData.append('system', data.system);
+            }
+
+            if (data.banner && data.banner instanceof File) {
+                formData.append('banner', data.banner);
+            }
+
+            if (data.logo && data.logo instanceof File) {
+                formData.append('logo', data.logo);
+            }
 
             let response;
+
             if (isEditing && editId) {
                 response = await updateManualService(editId, formData);
             } else {
@@ -150,31 +173,16 @@ export function useManualForm(editId?: string | null) {
                 throw new Error(errorData.error || 'Erro ao salvar o manual');
             }
 
-            customAlert.success(
-                'Sucesso!',
+            const responseData = await response.json();
+
+            await customAlert.toastSuccess(
                 isEditing ? 'Seu manual foi atualizado.' : 'Seu manual foi criado.',
             );
 
-            if (!isEditing) {
-                setData({
-                    title: '',
-                    game: '',
-                    genre: '',
-                    system: '',
-                    banner: null,
-                    logo: null,
-                    playtime: '',
-                    type: '',
-                    edition: '',
-                    minPlayers: '',
-                    maxPlayers: '',
-                    ageRating: '',
-                    description: '',
-                    contributors: [],
-                });
-            }
+            const redirectId = isEditing ? editId : responseData.manual.idPublic;
+            router.push(`/manual/${redirectId}`);
 
-            return await response.json();
+            return responseData;
         } catch (err: any) {
             setError(err.message || 'Ocorreu um erro inesperado');
             throw err;
@@ -190,5 +198,6 @@ export function useManualForm(editId?: string | null) {
         handleSubmit,
         isLoading,
         error,
+        isEditing,
     };
 }

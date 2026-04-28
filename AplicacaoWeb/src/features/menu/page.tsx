@@ -102,7 +102,7 @@ export default function Menu() {
                     <span className="text-[0.625rem]">Criar</span>
                 </Link>
 
-                <Link href={`/perfil/${user?.idPublico}`} className={getMobileLinkClass('/perfil')}>
+                <Link href={`/perfil/${user?.idPublic}`} className={getMobileLinkClass('/perfil')}>
                     {user?.img ? (
                         <div
                             className={`relative size-7 rounded-full overflow-hidden bg-card border ${pathname?.startsWith('/perfil') ? 'border-text' : 'border-card-border'}`}

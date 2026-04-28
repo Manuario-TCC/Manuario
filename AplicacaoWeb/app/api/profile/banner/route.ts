@@ -18,12 +18,12 @@ export async function PATCH(req: Request) {
 
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            select: { idPublico: true, banner: true },
+            select: { idPublic: true, banner: true },
         });
 
         if (!user) return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
 
-        const uploadDir = path.join(process.cwd(), 'public', 'upload', user.idPublico, 'user');
+        const uploadDir = path.join(process.cwd(), 'public', 'upload', user.idPublic, 'user');
 
         // Deleta antigo
         if (user.banner) {
@@ -55,7 +55,7 @@ export async function PATCH(req: Request) {
 
         return NextResponse.json({
             message: 'Banner atualizado',
-            url: `/upload/${user.idPublico}/user/${fileName}`,
+            url: `/upload/${user.idPublic}/user/${fileName}`,
         });
     } catch (error) {
         console.error(error);

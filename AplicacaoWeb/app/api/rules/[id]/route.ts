@@ -5,10 +5,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     try {
         const { id } = await params;
 
-        const regra = await prisma.regra.findUnique({
+        const regra = await prisma.rule.findUnique({
             where: { idPublic: id },
             include: {
-                user: { select: { idPublico: true } },
+                user: { select: { idPublic: true } },
             },
         });
 
@@ -27,12 +27,12 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         const { id } = await params;
         const body = await req.json();
 
-        const regraAtualizada = await prisma.regra.update({
+        const regraAtualizada = await prisma.rule.update({
             where: { idPublic: id },
             data: {
                 name: body.name || body.title,
                 description: body.description,
-                manualId: body.manualId,
+                manualIds: body.manualId ? [body.manualId] : undefined,
                 isHouseRule: body.isHouseRule,
                 status: body.status,
             },

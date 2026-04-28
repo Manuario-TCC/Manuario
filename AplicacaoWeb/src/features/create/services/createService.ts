@@ -16,7 +16,7 @@ export interface CreateRulePayload {
 }
 
 export async function createRuleService(payload: CreateRulePayload) {
-    return fetch('/api/regra', {
+    return fetch('/api/rules', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ export interface CreateDoubtPayload {
 }
 
 export async function createDoubtService(payload: CreateDoubtPayload) {
-    return fetch('/api/duvida', {
+    return fetch('/api/question', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -48,11 +48,11 @@ export async function createDoubtService(payload: CreateDoubtPayload) {
 }
 
 export async function getDoubtById(id: string) {
-    return fetch(`/api/duvida/${id}`);
+    return fetch(`/api/question/${id}`);
 }
 
 export async function getRuleById(id: string) {
-    return fetch(`/api/regra/${id}`);
+    return fetch(`/api/rules/${id}`);
 }
 
 export async function getManualById(id: string) {
@@ -60,7 +60,7 @@ export async function getManualById(id: string) {
 }
 
 export async function updateDoubtService(id: string, payload: any) {
-    return fetch(`/api/duvida/${id}`, {
+    return fetch(`/api/question/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -68,7 +68,7 @@ export async function updateDoubtService(id: string, payload: any) {
 }
 
 export async function updateRuleService(id: string, payload: any) {
-    return fetch(`/api/regra/${id}`, {
+    return fetch(`/api/rules/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

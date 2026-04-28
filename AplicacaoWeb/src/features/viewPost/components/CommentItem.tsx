@@ -6,7 +6,7 @@ import CommentInput from './CommentInput';
 
 interface Props {
     comment: any;
-    onAddReply: (texto: string, parentId: string) => Promise<boolean>;
+    onAddReply: (text: string, parentId: string) => Promise<boolean>;
     onReplySuccess: () => void;
 }
 
@@ -30,16 +30,16 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
         handleDelete,
     } = useCommentItem(comment, onReplySuccess);
 
-    const userAvatarUrl = comment.autor?.img
-        ? `/upload/${comment.autor.idPublico}/user/${comment.autor.img}`
+    const userAvatarUrl = comment.author?.img
+        ? `/upload/${comment.author.idPublic}/user/${comment.author.img}`
         : '/img/iconePadrao.jpg';
 
     return (
         <div className="flex gap-3 mt-6">
-            <Link href={`/perfil/${comment.autor?.idPublico}`}>
+            <Link href={`/perfil/${comment.author?.idPublic}`}>
                 <img
                     src={userAvatarUrl}
-                    alt={comment.autor?.name}
+                    alt={comment.author?.name}
                     className="w-[1.8rem] h-[1.8rem] rounded-full object-cover border border-card-border shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
                 />
             </Link>
@@ -47,16 +47,16 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
             <div className="flex-1">
                 <div className="flex justify-between items-center mb-1">
                     <div className="flex items-center gap-2">
-                        <Link href={`/perfil/${comment.autor?.idPublico}`}>
+                        <Link href={`/perfil/${comment.author?.idPublic}`}>
                             <span className="text-text font-bold text-sm cursor-pointer">
-                                {comment.autor?.name}
+                                {comment.author?.name}
                             </span>
                         </Link>
 
                         <span className="text-sub-text text-xs flex items-center gap-1">
                             <span className="text-lg leading-none">•</span>{' '}
-                            {formatTimeAgo(comment.criadoEm)}
-                            {comment.criadoEm !== comment.atualizadoEm && (
+                            {formatTimeAgo(comment.createdAt)}
+                            {comment.createdAt !== comment.updatedAt && (
                                 <span className="text-[10px] ml-1">(editado)</span>
                             )}
                         </span>
@@ -120,7 +120,7 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                                     disabled={
                                         isSubmitting ||
                                         !editValue.trim() ||
-                                        editValue === comment.texto
+                                        editValue === comment.text
                                     }
                                     className="px-4 py-1.5 text-xs font-bold bg-primary text-white rounded-md hover:opacity-90 disabled:opacity-50 transition-opacity cursor-pointer"
                                 >
@@ -130,7 +130,7 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                         </div>
                     ) : (
                         <p className="text-text text-sm whitespace-pre-wrap leading-relaxed">
-                            {comment.texto}
+                            {comment.text}
                         </p>
                     )}
                 </div>
@@ -146,14 +146,14 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                         >
                             <MessageCircle size={16} /> Responder
                         </button>
-                        {comment.respostas?.length > 0 && (
+                        {comment.replies?.length > 0 && (
                             <button
                                 onClick={toggleReplies}
                                 className="hover:text-secondary transition-all cursor-pointer"
                             >
                                 {showReplies
                                     ? 'Ocultar respostas'
-                                    : `Ver ${comment.respostas.length} respostas`}
+                                    : `Ver ${comment.replies.length} respostas`}
                             </button>
                         )}
                     </div>
@@ -171,9 +171,9 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                     </div>
                 )}
 
-                {showReplies && comment.respostas?.length > 0 && (
+                {showReplies && comment.replies?.length > 0 && (
                     <div className="mt-4 border-l border-card-border pl-4">
-                        {comment.respostas.map((res: any) => (
+                        {comment.replies.map((res: any) => (
                             <CommentItem
                                 key={res.id}
                                 comment={res}

@@ -9,7 +9,7 @@ export const commentService = {
     },
 
     createComment: async (data: {
-        texto: string;
+        text: string;
         postId: string;
         postType: string;
         parentId?: string | null;
@@ -27,11 +27,11 @@ export const commentService = {
         return res.json();
     },
 
-    updateComment: async (id: string, texto: string) => {
+    updateComment: async (id: string, text: string) => {
         const res = await fetch(`/api/comments/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ texto }),
+            body: JSON.stringify({ text }),
         });
 
         if (!res.ok) {

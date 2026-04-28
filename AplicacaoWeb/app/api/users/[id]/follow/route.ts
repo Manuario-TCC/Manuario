@@ -6,7 +6,7 @@ import * as jwt from 'jsonwebtoken';
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const resolvedParams = await params;
-        const idPublicoParams = resolvedParams.id;
+        const idPublicParams = resolvedParams.id;
         const cookieStore = await cookies();
         const token = cookieStore.get('manuario_token')?.value;
 
@@ -27,7 +27,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
         // Quem vai seguir
         const userToFollow = await prisma.user.findUnique({
-            where: { idPublico: idPublicoParams },
+            where: { idPublic: idPublicParams },
             select: { id: true },
         });
 
@@ -66,7 +66,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
                 data: { followerId: followerId, followedId: followedId },
             });
 
-            return NextResponse.json({ message: 'Seguindo', isFollowing: true }, { status: 200 });
+            return NextResponse.json({ message: 'following', isFollowing: true }, { status: 200 });
         }
     } catch (error) {
         console.error('Erro na API de follow:', error);

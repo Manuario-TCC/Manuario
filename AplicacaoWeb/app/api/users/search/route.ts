@@ -19,7 +19,7 @@ export async function GET(request: Request) {
             },
             select: {
                 id: true,
-                idPublico: true,
+                idPublic: true,
                 name: true,
                 email: true,
                 img: true,

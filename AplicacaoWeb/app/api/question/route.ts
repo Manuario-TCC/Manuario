@@ -6,14 +6,14 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { publicationId, title, game, description, userId } = body;
 
-        const novaDuvida = await prisma.duvida.create({
+        const novaDuvida = await prisma.question.create({
             data: {
                 idPublic: publicationId,
                 name: title,
                 game: game,
                 description: description,
                 user: {
-                    connect: { idPublico: userId },
+                    connect: { idPublic: userId },
                 },
             },
         });

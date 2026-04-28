@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { profileService } from '../services/profileService';
 
-export function useProfile(idPublico: string) {
+export function useProfile(idPublic: string) {
     const queryClient = useQueryClient();
 
     const {
@@ -9,21 +9,21 @@ export function useProfile(idPublico: string) {
         isLoading,
         error,
     } = useQuery({
-        queryKey: ['profile', idPublico],
-        queryFn: () => profileService.getProfile(idPublico),
+        queryKey: ['profile', idPublic],
+        queryFn: () => profileService.getProfile(idPublic),
         retry: (failureCount, err) => err.message !== 'NOT_FOUND' && failureCount < 2,
     });
 
     const followMutation = useMutation({
         mutationFn: async () => {
-            return profileService.toggleFollow(idPublico);
+            return profileService.toggleFollow(idPublic);
         },
         onMutate: async () => {
-            await queryClient.cancelQueries({ queryKey: ['profile', idPublico] });
-            const previousProfile = queryClient.getQueryData(['profile', idPublico]);
+            await queryClient.cancelQueries({ queryKey: ['profile', idPublic] });
+            const previousProfile = queryClient.getQueryData(['profile', idPublic]);
 
             // Atualiza o cache
-            queryClient.setQueryData(['profile', idPublico], (old: any) => {
+            queryClient.setQueryData(['profile', idPublic], (old: any) => {
                 if (!old) return old;
 
                 const isNowFollowing = !old.isFollowing;
@@ -39,11 +39,11 @@ export function useProfile(idPublico: string) {
         onError: (err, variables, context) => {
             console.error('Erro ao seguir/deixar de seguir:', err);
             if (context?.previousProfile) {
-                queryClient.setQueryData(['profile', idPublico], context.previousProfile);
+                queryClient.setQueryData(['profile', idPublic], context.previousProfile);
             }
         },
         onSettled: () => {
-            queryClient.invalidateQueries({ queryKey: ['profile', idPublico] });
+            queryClient.invalidateQueries({ queryKey: ['profile', idPublic] });
         },
     });
 

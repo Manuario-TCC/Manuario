@@ -18,14 +18,14 @@ export async function PATCH(req: Request) {
 
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            select: { idPublico: true, img: true },
+            select: { idPublic: true, img: true },
         });
 
         if (!user) {
             return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
         }
 
-        const uploadDir = path.join(process.cwd(), 'public', 'upload', user.idPublico, 'user');
+        const uploadDir = path.join(process.cwd(), 'public', 'upload', user.idPublic, 'user');
 
         // Deleta img antiga
         if (user.img) {
@@ -58,7 +58,7 @@ export async function PATCH(req: Request) {
 
         return NextResponse.json({
             message: 'Avatar atualizado',
-            url: `/upload/${user.idPublico}/user/${fileName}`,
+            url: `/upload/${user.idPublic}/user/${fileName}`,
         });
     } catch (error) {
         console.error(error);

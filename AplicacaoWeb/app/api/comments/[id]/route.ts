@@ -6,20 +6,22 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const { id } = await params;
     try {
         const session = await getServerSession();
-        if (!session?.user?.id)
+        if (!session?.user?.id) {
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
 
-        const { texto } = await req.json();
+        const body = await req.json();
+        const content = body.text || body.texto;
 
-        const comentario = await prisma.comentario.findUnique({ where: { id } });
+        const comentario = await prisma.comment.findUnique({ where: { id } });
 
-        if (!comentario || comentario.autorId !== session.user.id) {
+        if (!comentario || comentario.authorId !== session.user.id) {
             return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
         }
 
-        const atualizado = await prisma.comentario.update({
+        const atualizado = await prisma.comment.update({
             where: { id },
-            data: { texto },
+            data: { text: content },
         });
 
         return NextResponse.json(atualizado);
@@ -36,13 +38,13 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
         if (!session?.user?.id)
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
 
-        const comentario = await prisma.comentario.findUnique({ where: { id } });
+        const comentario = await prisma.comment.findUnique({ where: { id } });
 
-        if (!comentario || comentario.autorId !== session.user.id) {
+        if (!comentario || comentario.authorId !== session.user.id) {
             return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
         }
 
-        await prisma.comentario.delete({ where: { id } });
+        await prisma.comment.delete({ where: { id } });
 
         return NextResponse.json({ message: 'Excluído com sucesso' });
     } catch (error) {

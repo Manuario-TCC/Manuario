@@ -22,14 +22,14 @@ export async function POST(req: Request) {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Id pulbico
-        const shortIdPublico = randomUUID().split('-')[0];
+        const shortIdPublic = randomUUID().split('-')[0];
 
         const user = await prisma.user.create({
             data: {
                 name,
                 email,
                 password: hashedPassword,
-                idPublico: shortIdPublico,
+                idPublic: shortIdPublic,
             },
         });
 

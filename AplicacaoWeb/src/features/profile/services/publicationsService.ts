@@ -1,7 +1,7 @@
 export const publicationsService = {
-    getUserPosts: async (idPublico: string, type: string, limit: number, offset: number) => {
+    getUserPosts: async (idPublic: string, type: string, limit: number, offset: number) => {
         const response = await fetch(
-            `/api/post/${type}/user/${idPublico}?limit=${limit}&offset=${offset}`,
+            `/api/post/${type}/user/${idPublic}?limit=${limit}&offset=${offset}`,
         );
 
         if (!response.ok) {

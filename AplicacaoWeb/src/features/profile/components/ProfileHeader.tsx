@@ -18,7 +18,7 @@ interface ProfileHeaderProps {
         email: string;
         avatarUrl?: string | null;
         bannerUrl?: string | null;
-        idPublico: string;
+        idPublic: string;
     };
     stats: {
         followers: number;
@@ -120,7 +120,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 </div>
             </div>
 
-            <ProfileTabs idPublico={initialData.idPublico} isOwnProfile={isOwnProfile} />
+            <ProfileTabs idPublic={initialData.idPublic} isOwnProfile={isOwnProfile} />
 
             {avatar.isAvatarEditorOpen && (
                 <ProfileImageEditor

@@ -3,7 +3,7 @@ import CommentInput from './CommentInput';
 import CommentItem from './CommentItem';
 
 export default function CommentSection({ postId, postType }: any) {
-    const { comentarios, loading, addComment, fetchComments } = useComments(postId, postType);
+    const { comments, loading, addComment, fetchComments } = useComments(postId, postType);
 
     return (
         <div className="bg-card rounded-xl p-6 w-full max-w-[40rem] shadow-sm">
@@ -15,8 +15,8 @@ export default function CommentSection({ postId, postType }: any) {
                         <p className="text-muted-foreground text-xs text-center py-4">
                             Carregando...
                         </p>
-                    ) : comentarios.length > 0 ? (
-                        comentarios.map((comment) => (
+                    ) : comments.length > 0 ? (
+                        comments.map((comment) => (
                             <CommentItem
                                 key={comment.id}
                                 comment={comment}

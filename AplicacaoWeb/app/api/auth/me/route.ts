@@ -13,7 +13,7 @@ export async function GET() {
         const dbUser = await prisma.user.findUnique({
             where: { id: userId },
             select: {
-                idPublico: true,
+                idPublic: true,
                 name: true,
                 email: true,
                 img: true,
@@ -28,10 +28,10 @@ export async function GET() {
         const user = {
             ...dbUser,
             img: dbUser.img
-                ? `/upload/${dbUser.idPublico}/user/${dbUser.img}`
+                ? `/upload/${dbUser.idPublic}/user/${dbUser.img}`
                 : '/img/iconePadrao.jpg',
             banner: dbUser.banner
-                ? `/upload/${dbUser.idPublico}/user/${dbUser.banner}`
+                ? `/upload/${dbUser.idPublic}/user/${dbUser.banner}`
                 : '/img/bannerPadrao.png',
         };
 
