@@ -39,3 +39,18 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         return NextResponse.json({ error: 'Erro ao atualizar dúvida' }, { status: 500 });
     }
 }
+
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    try {
+        const { id } = await params;
+
+        await prisma.question.update({
+            where: { idPublic: id },
+            data: { isDisabled: true },
+        });
+
+        return NextResponse.json({ message: 'Dúvida excluída com sucesso.' });
+    } catch (error) {
+        return NextResponse.json({ error: 'Erro ao excluir dúvida' }, { status: 500 });
+    }
+}

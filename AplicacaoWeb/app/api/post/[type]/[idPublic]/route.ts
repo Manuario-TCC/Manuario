@@ -10,16 +10,20 @@ export async function GET(
     try {
         let post = null;
 
-        const whereCondition = { idPublic: idPublic };
-
         if (type === 'question' || type === 'duvida') {
-            post = await prisma.question.findUnique({
-                where: whereCondition,
+            post = await prisma.question.findFirst({
+                where: {
+                    idPublic: idPublic,
+                    isDisabled: false,
+                },
                 include: { user: true },
             });
         } else if (type === 'rule' || type === 'regra' || type === 'rules') {
-            post = await prisma.rule.findUnique({
-                where: whereCondition,
+            post = await prisma.rule.findFirst({
+                where: {
+                    idPublic: idPublic,
+                    isDisabled: false,
+                },
                 include: {
                     user: true,
                     manuals: true,
@@ -27,7 +31,9 @@ export async function GET(
             });
         } else if (type === 'ia') {
             post = await prisma.aIPost.findUnique({
-                where: whereCondition,
+                where: {
+                    idPublic: idPublic,
+                },
                 include: { user: true },
             });
         }

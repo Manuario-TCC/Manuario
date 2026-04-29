@@ -9,7 +9,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ idPublic
     const offset = parseInt(searchParams.get('offset') || '0', 10);
 
     try {
-        const whereCondition = { user: { idPublic: idPublic } };
+        const whereCondition = {
+            user: {
+                idPublic: idPublic,
+            },
+            isDisabled: false,
+        };
 
         const items = await prisma.manual.findMany({
             where: whereCondition,

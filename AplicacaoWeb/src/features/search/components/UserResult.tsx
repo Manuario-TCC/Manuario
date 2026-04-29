@@ -8,7 +8,7 @@ export default function UserResult({ user }: { user: any }) {
     return (
         <Link
             href={`/perfil/${user.idPublic}`}
-            className="bg-card border border-card-border rounded-2xl p-4 flex items-center gap-4 mb-3 hover:bg-gray transition-colors"
+            className="bg-card border border-card-border rounded-2xl p-4 flex items-center gap-4 hover:bg-gray transition-colors"
         >
             <img
                 src={avatarUrl}

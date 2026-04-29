@@ -35,9 +35,16 @@ export async function GET(request: NextRequest) {
                 where: {
                     userId: { in: followedIds },
                     status: { not: 'CLONADO' },
+                    isDisabled: false,
                 },
                 include: {
-                    user: { select: { name: true, img: true, idPublic: true } },
+                    user: {
+                        select: {
+                            name: true,
+                            img: true,
+                            idPublic: true,
+                        },
+                    },
                     manuals: true,
                 },
                 orderBy: { createdAt: 'desc' },
@@ -45,8 +52,21 @@ export async function GET(request: NextRequest) {
             }),
 
             prisma.question.findMany({
-                where: { userId: { in: followedIds } },
-                include: { user: { select: { name: true, img: true, idPublic: true } } },
+                where: {
+                    userId: {
+                        in: followedIds,
+                    },
+                    isDisabled: false,
+                },
+                include: {
+                    user: {
+                        select: {
+                            name: true,
+                            img: true,
+                            idPublic: true,
+                        },
+                    },
+                },
                 orderBy: { createdAt: 'desc' },
                 take: takeCount,
             }),

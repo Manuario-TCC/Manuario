@@ -43,3 +43,19 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         return NextResponse.json({ error: 'Erro ao atualizar regra' }, { status: 500 });
     }
 }
+
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    try {
+        const resolvedParams = await params;
+        const id = resolvedParams.id;
+
+        await prisma.rule.update({
+            where: { idPublic: id },
+            data: { isDisabled: true },
+        });
+
+        return NextResponse.json({ message: 'Regra excluída com sucesso.' });
+    } catch (error) {
+        return NextResponse.json({ error: 'Erro ao excluir regra' }, { status: 500 });
+    }
+}

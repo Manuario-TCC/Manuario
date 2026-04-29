@@ -29,6 +29,8 @@ model User {
 
     contributedManualIds String[] @db.ObjectId
     contributedManuals   Manual[] @relation("ManualContributors", fields: [contributedManualIds], references: [id])
+
+    isDisabled Boolean @default(false)
 }
 
 model Manual {
@@ -63,6 +65,8 @@ model Manual {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    isDisabled Boolean @default(false)
 }
 
 model Rule {
@@ -87,6 +91,8 @@ model Rule {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    isDisabled Boolean @default(false)
 }
 
 model Question {
@@ -104,6 +110,8 @@ model Question {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    isDisabled Boolean @default(false)
 }
 
 model AIPost {
@@ -154,6 +162,8 @@ model Comment {
     parentId String?   @db.ObjectId
     parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
     replies  Comment[] @relation("CommentReplies")
+
+    isDisabled Boolean @default(false)
 }
 
 model Follow {

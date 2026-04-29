@@ -1,6 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createManualService, updateManualService, getManualById } from '../services/createService';
+import {
+    createManualService,
+    updateManualService,
+    getManualById,
+    deleteManualService,
+} from '../services/manualService';
 import { useSession } from '@/src/hooks/useSession';
 import { customAlert } from '@/src/components/customAlert';
 
@@ -191,6 +196,30 @@ export function useManualForm(editId?: string | null) {
         }
     };
 
+    const handleDelete = async () => {
+        if (!editId) return;
+
+        const confirm = await customAlert.confirmDelete(
+            'Excluir Manual?',
+            'Tem certeza que deseja excluir este manual?',
+        );
+
+        if (confirm.isConfirmed) {
+            setIsLoading(true);
+            try {
+                await deleteManualService(editId);
+                await customAlert.toastSuccess('Manual excluído com sucesso!');
+                router.push('/feed');
+            } catch (error) {
+                customAlert.toastError
+                    ? await customAlert.toastError('Não foi possível excluir o manual.')
+                    : customAlert.error('Erro', 'Não foi possível excluir o manual.');
+            } finally {
+                setIsLoading(false);
+            }
+        }
+    };
+
     return {
         data,
         setData,
@@ -199,5 +228,6 @@ export function useManualForm(editId?: string | null) {
         isLoading,
         error,
         isEditing,
+        handleDelete,
     };
 }
