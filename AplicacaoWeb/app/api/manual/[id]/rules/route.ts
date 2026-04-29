@@ -13,7 +13,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         const skip = (page - 1) * limit;
 
         const manual = await prisma.manual.findUnique({
-            where: { idPublic: manualIdPublic },
+            where: {
+                idPublic: manualIdPublic,
+                isDisabled: false,
+            },
             select: { id: true },
         });
 
@@ -23,7 +26,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
         const whereClause = {
             manualIds: { has: manual.id },
-            name: { contains: search, mode: 'insensitive' as const },
+            name: {
+                contains: search,
+                mode: 'insensitive' as const,
+            },
         };
 
         const rules = await prisma.rule.findMany({

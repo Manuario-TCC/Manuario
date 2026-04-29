@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { Bookmark, Send, ShieldCheck, Home } from 'lucide-react';
+import { Bookmark, Send, ShieldCheck, Home, Trash2 } from 'lucide-react';
 import { CustomInput } from '../../../components/CustomInput';
 import Select from 'react-select';
 
@@ -14,6 +14,7 @@ export function RuleForm({
     setData,
     isValid,
     handleSubmit,
+    handleDelete,
     isLoading,
     isFetchingInitialData,
     isEditing,
@@ -180,6 +181,20 @@ export function RuleForm({
             </div>
 
             <div className="mt-2 flex justify-end gap-4">
+                {isEditing ? (
+                    <button
+                        type="button"
+                        disabled={isLoading}
+                        onClick={handleDelete}
+                        className="flex cursor-pointer items-center gap-2 rounded-xl border border-red-500/50 bg-red-500/10 px-5 py-2 text-sm font-bold text-red-500 transition-all hover:bg-red-500 hover:text-white disabled:opacity-50"
+                    >
+                        <Trash2 className="h-4 w-4" />
+                        Excluir
+                    </button>
+                ) : (
+                    <div />
+                )}
+
                 <button
                     type="button"
                     disabled={isLoading}

@@ -9,10 +9,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         const id = resolvedParams.id;
 
         const manual = await prisma.manual.findUnique({
-            where: { idPublic: id },
+            where: {
+                idPublic: id,
+                isDisabled: false,
+            },
             include: {
                 user: {
-                    select: { idPublic: true, name: true, img: true },
+                    select: {
+                        idPublic: true,
+                        name: true,
+                        img: true,
+                    },
                 },
                 contributors: {
                     select: {
@@ -173,5 +180,60 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     } catch (error) {
         console.error('Erro ao atualizar manual:', error);
         return NextResponse.json({ error: 'Erro ao atualizar manual' }, { status: 500 });
+    }
+}
+
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    try {
+        const resolvedParams = await params;
+        const id = resolvedParams.id;
+
+        const manual = await prisma.manual.findUnique({
+            where: { idPublic: id },
+        });
+
+        if (!manual) {
+            return NextResponse.json({ error: 'Manual não encontrado' }, { status: 404 });
+        }
+
+        // Em manual CLONADO desabilita ele e as regras dele automaticamente
+        if (manual.clonedFromId) {
+            await prisma.$transaction([
+                prisma.rule.updateMany({
+                    where: { manualIds: { has: manual.id } },
+                    data: { isDisabled: true },
+                }),
+                prisma.manual.update({
+                    where: { idPublic: id },
+                    data: { isDisabled: true },
+                }),
+            ]);
+            return NextResponse.json({ message: 'Manual clonado e regras excluídos com sucesso.' });
+        }
+
+        // EM manual ORIGINAL verifica se tem regras ativas
+        const activeRulesCount = await prisma.rule.count({
+            where: { manualIds: { has: manual.id }, isDisabled: false },
+        });
+
+        if (activeRulesCount > 0) {
+            return NextResponse.json(
+                {
+                    error: 'Existem regras vinculadas a este manual. Por favor, exclua todas as regras antes de excluir o manual por segurança.',
+                },
+                { status: 400 },
+            );
+        }
+
+        // desabilita o manual
+        await prisma.manual.update({
+            where: { idPublic: id },
+            data: { isDisabled: true },
+        });
+
+        return NextResponse.json({ message: 'Manual excluído com sucesso.' });
+    } catch (error) {
+        console.error('Erro ao excluir manual:', error);
+        return NextResponse.json({ error: 'Erro interno ao excluir manual.' }, { status: 500 });
     }
 }

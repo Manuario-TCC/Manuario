@@ -6,6 +6,6 @@ export const useSearch = (query: string, type: string) => {
         queryKey: ['search', query, type],
         queryFn: () => fetchSearchResults(query, type),
         enabled: query.trim().length > 0,
-        staleTime: 1000 * 60 * 5,
+        staleTime: 0,
     });
 };

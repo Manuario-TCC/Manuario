@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/src/database/prisma';
 
+export const revalidate = 0;
+
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get('q');
@@ -18,6 +20,7 @@ export async function GET(request: Request) {
                         contains: q,
                         mode: 'insensitive',
                     },
+                    isDisabled: false,
                 },
                 take: 5,
                 select: {
@@ -34,6 +37,10 @@ export async function GET(request: Request) {
                         contains: q,
                         mode: 'insensitive',
                     },
+                    status: {
+                        not: 'CLONADO',
+                    },
+                    isDisabled: false,
                 },
                 take: 5,
                 include: {

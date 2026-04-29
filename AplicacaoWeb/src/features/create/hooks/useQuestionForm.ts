@@ -1,6 +1,11 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createDoubtService, updateDoubtService, getDoubtById } from '../services/createService';
+import {
+    createDoubtService,
+    updateDoubtService,
+    getDoubtById,
+    deleteQuestionService,
+} from '../services/questionService';
 import { useSession } from '@/src/hooks/useSession';
 import { customAlert } from '@/src/components/customAlert';
 
@@ -112,16 +117,37 @@ export function useQuestionForm(editId?: string | null) {
             const message = isEditing
                 ? 'Sua dúvida foi atualizada!'
                 : 'Sua dúvida foi enviada com sucesso.';
-            customAlert.success('Sucesso!', message);
+            customAlert.toastSuccess(message);
 
-            if (!isEditing) {
-                setData({ title: '', game: '', description: '' });
-                setPendingImages({});
-            }
+            router.push('/feed');
         } catch (error) {
             customAlert.error('Erro', 'Não foi possível salvar a dúvida no momento.');
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!editId) return;
+
+        const confirm = await customAlert.confirmDelete(
+            'Excluir Dúvida?',
+            'Tem certeza que deseja excluir esta dúvida?',
+        );
+
+        if (confirm.isConfirmed) {
+            setIsLoading(true);
+            try {
+                await deleteQuestionService(editId);
+                await customAlert.toastSuccess('Dúvida excluída com sucesso!');
+                router.push('/feed');
+            } catch (error) {
+                customAlert.toastError
+                    ? await customAlert.toastError('Não foi possível excluir a dúvida.')
+                    : customAlert.error('Erro', 'Não foi possível excluir a dúvida.');
+            } finally {
+                setIsLoading(false);
+            }
         }
     };
 
@@ -130,6 +156,7 @@ export function useQuestionForm(editId?: string | null) {
         setData,
         isValid,
         handleSubmit,
+        handleDelete,
         isLoading,
         publicationId,
         handleImageAdded,

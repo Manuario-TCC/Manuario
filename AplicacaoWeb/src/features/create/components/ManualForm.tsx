@@ -1,17 +1,17 @@
-import React from 'react';
 import Select from 'react-select';
 import { CustomInput } from '../../../components/CustomInput';
 import { ImageUpload } from './ImageUpload';
 import { NumberStepper } from './NumberStepper';
 import { ContributorSelect } from './ContributorSelect';
 import { customStyles } from './selectStyles';
-import { ImagePlus, CirclePlus, Loader2 } from 'lucide-react';
+import { ImagePlus, CirclePlus, Loader2, Trash2, Pencil } from 'lucide-react';
 
 export function ManualForm({
     data,
     setData,
     isValid,
     handleSubmit,
+    handleDelete,
     isLoading,
     error,
     isEditing,
@@ -185,7 +185,21 @@ export function ManualForm({
 
             {error && <p className="text-red-500 text-sm font-medium text-center">{error}</p>}
 
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-end mt-4 gap-2">
+                {isEditing ? (
+                    <button
+                        type="button"
+                        onClick={handleDelete}
+                        disabled={isLoading}
+                        className="flex items-center gap-2 bg-red-500/10 py-3 px-6 text-sm rounded-full font-bold text-red-500 transition-all hover:bg-red-500 hover:text-text disabled:opacity-50 cursor-pointer"
+                    >
+                        <Trash2 className="w-5 h-5" />
+                        Excluir
+                    </button>
+                ) : (
+                    <div />
+                )}
+
                 <button
                     disabled={!isValid || isLoading}
                     onClick={onSubmit}
@@ -193,9 +207,12 @@ export function ManualForm({
                 >
                     {isLoading ? (
                         <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : isEditing ? (
+                        <Pencil className="w-5 h-5" />
                     ) : (
                         <CirclePlus className="w-5 h-5" />
                     )}
+
                     {isLoading
                         ? isEditing
                             ? 'Salvando...'

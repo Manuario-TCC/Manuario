@@ -3,9 +3,11 @@ import { useRouter } from 'next/navigation';
 import {
     createRuleService,
     updateRuleService,
-    fetchUserManuals,
     getRuleById,
-} from '../services/createService';
+    deleteRuleService,
+} from '../services/rulesService';
+import { fetchUserManuals } from '../services/manualService';
+
 import { useSession } from '@/src/hooks/useSession';
 import { customAlert } from '@/src/components/customAlert';
 
@@ -138,6 +140,31 @@ export function useRuleForm(editId?: string | null) {
         }
     };
 
+    const handleDelete = async () => {
+        if (!editId) return;
+
+        const confirm = await customAlert.confirmDelete(
+            'Excluir Regra?',
+            'Tem certeza que deseja excluir esta regra?',
+        );
+
+        if (confirm.isConfirmed) {
+            setIsLoading(true);
+            try {
+                await deleteRuleService(editId);
+
+                await customAlert.toastSuccess('Regra excluída com sucesso!');
+                router.push('/feed');
+            } catch (error) {
+                customAlert.toastError
+                    ? await customAlert.toastError('Não foi possível excluir a regra.')
+                    : customAlert.error('Erro', 'Não foi possível excluir a regra.');
+            } finally {
+                setIsLoading(false);
+            }
+        }
+    };
+
     return {
         data,
         setData,
@@ -148,6 +175,7 @@ export function useRuleForm(editId?: string | null) {
         isFetchingInitialData,
         manuals,
         handleImageAdded,
+        handleDelete,
         isEditing,
     };
 }

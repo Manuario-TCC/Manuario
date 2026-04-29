@@ -15,7 +15,12 @@ export async function GET(
         let items = [];
         let totalItems = 0;
 
-        const baseWhereCondition = { user: { idPublic: idPublic } };
+        const baseWhereCondition = {
+            user: {
+                idPublic: idPublic,
+            },
+            isDisabled: false,
+        };
 
         if (type === 'duvida') {
             items = await prisma.question.findMany({
@@ -33,6 +38,7 @@ export async function GET(
                 status: {
                     not: 'CLONADO',
                 },
+                isDisabled: false,
             };
 
             items = await prisma.rule.findMany({
@@ -40,7 +46,10 @@ export async function GET(
                 orderBy: { createdAt: 'desc' },
                 skip: offset,
                 take: limit,
-                include: { user: true, manuals: true },
+                include: {
+                    user: true,
+                    manuals: true,
+                },
             });
 
             totalItems = await prisma.rule.count({ where: regraWhereCondition });

@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import { Send } from 'lucide-react';
+import { Send, Trash2, Loader2, Pencil } from 'lucide-react';
 import { CustomInput } from '../../../components/CustomInput';
 import { customAlert } from '../../../components/customAlert';
 
@@ -13,6 +13,7 @@ export function QuestionForm({
     setData,
     isValid,
     handleSubmit,
+    handleDelete,
     isLoading,
     isEditing,
     handleImageAdded,
@@ -61,13 +62,34 @@ export function QuestionForm({
             </div>
 
             <div className="mt-2 flex justify-end gap-4">
+                {isEditing ? (
+                    <button
+                        type="button"
+                        onClick={handleDelete}
+                        disabled={isLoading}
+                        className="flex items-center gap-2 rounded-xl border border-red-500/50 bg-red-500/10 px-5 py-2 text-sm font-bold text-red-500 transition-all hover:bg-red-500 hover:text-text disabled:opacity-50 cursor-pointer"
+                    >
+                        <Trash2 className="h-4 w-4" />
+                        Excluir
+                    </button>
+                ) : (
+                    <div />
+                )}
+
                 <button
                     type="button"
                     onClick={onSubmitClick}
                     disabled={isLoading}
                     className="flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-bold text-white transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                    <Send className="h-4 w-4" />
+                    {isLoading ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : isEditing ? (
+                        <Pencil className="w-5 h-5" />
+                    ) : (
+                        <Send className="h-4 w-4" />
+                    )}
+
                     {isLoading ? 'Carregando...' : isEditing ? 'Editar Dúvida' : 'Postar Dúvida'}
                 </button>
             </div>
