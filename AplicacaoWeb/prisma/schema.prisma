@@ -30,6 +30,15 @@ model User {
     contributedManualIds String[] @db.ObjectId
     contributedManuals   Manual[] @relation("ManualContributors", fields: [contributedManualIds], references: [id])
 
+    likedRuleIds String[] @db.ObjectId
+    likedRules   Rule[]   @relation("RuleLikes", fields: [likedRuleIds], references: [id])
+
+    likedQuestionIds String[]   @db.ObjectId
+    likedQuestions   Question[] @relation("QuestionLikes", fields: [likedQuestionIds], references: [id])
+
+    likedCommentIds String[]  @db.ObjectId
+    likedComments   Comment[] @relation("CommentLikes", fields: [likedCommentIds], references: [id])
+
     isDisabled Boolean @default(false)
 }
 
@@ -92,6 +101,9 @@ model Rule {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
+    likedByIds String[] @db.ObjectId
+    likedBy    User[]   @relation("RuleLikes", fields: [likedByIds], references: [id])
+
     isDisabled Boolean @default(false)
 }
 
@@ -110,6 +122,9 @@ model Question {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    likedByIds String[] @db.ObjectId
+    likedBy    User[]   @relation("QuestionLikes", fields: [likedByIds], references: [id])
 
     isDisabled Boolean @default(false)
 }
@@ -162,6 +177,12 @@ model Comment {
     parentId String?   @db.ObjectId
     parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
     replies  Comment[] @relation("CommentReplies")
+
+    likeCount  Int      @default(0)
+    likedByIds String[] @db.ObjectId
+    likedBy    User[]   @relation("CommentLikes", fields: [likedByIds], references: [id])
+
+    isEdited Boolean @default(false)
 
     isDisabled Boolean @default(false)
 }

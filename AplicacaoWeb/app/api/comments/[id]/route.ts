@@ -21,7 +21,10 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
         const atualizado = await prisma.comment.update({
             where: { id },
-            data: { text: content },
+            data: {
+                text: content,
+                isEdited: true,
+            },
         });
 
         return NextResponse.json(atualizado);

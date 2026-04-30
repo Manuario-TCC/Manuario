@@ -28,6 +28,11 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
         startEditing,
         handleUpdate,
         handleDelete,
+        isLiked,
+        likeCount,
+        isLoadingLike,
+        handleToggleLike,
+        isEdited,
     } = useCommentItem(comment, onReplySuccess);
 
     const userAvatarUrl = comment.author?.img
@@ -56,9 +61,7 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                         <span className="text-sub-text text-xs flex items-center gap-1">
                             <span className="text-lg leading-none">•</span>{' '}
                             {formatTimeAgo(comment.createdAt)}
-                            {comment.createdAt !== comment.updatedAt && (
-                                <span className="text-[10px] ml-1">(editado)</span>
-                            )}
+                            {isEdited && <span className="text-xs ml-1">(editado)</span>}
                         </span>
                     </div>
 
@@ -103,7 +106,7 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                             <textarea
                                 value={editValue}
                                 onChange={(e) => setEditValue(e.target.value)}
-                                className="w-full bg-transparent text-text p-3 border border-border rounded-md focus:outline-none focus:border-primary text-sm min-h-[80px] resize-y"
+                                className="w-full bg-transparent text-text p-3 border border-border rounded-md focus:outline-none focus:border-primary text-sm min-h-[5rem] resize-y"
                                 disabled={isSubmitting}
                                 autoFocus
                             />
@@ -137,8 +140,15 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
 
                 {!isEditing && (
                     <div className="flex items-center gap-4 text-xs text-sub-text font-bold">
-                        <button className="flex items-center gap-1.5 hover:text-red-500 transition-all cursor-pointer">
-                            <Heart size={16} /> 2
+                        <button
+                            onClick={handleToggleLike}
+                            disabled={isLoadingLike}
+                            className={`flex items-center gap-1.5 transition-all cursor-pointer ${
+                                isLiked ? 'text-red-500' : 'hover:text-red-500'
+                            }`}
+                        >
+                            <Heart size={16} fill={isLiked ? 'currentColor' : 'none'} />
+                            {likeCount}
                         </button>
                         <button
                             onClick={toggleReplyInput}

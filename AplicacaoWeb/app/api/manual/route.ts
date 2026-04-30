@@ -62,7 +62,7 @@ export async function POST(req: Request) {
 
         await mkdir(uploadDir, { recursive: true });
 
-        // Salvar a imagem do Banner
+        // Salvar a img do Banner
         let bannerName = null;
         if (bannerFile && bannerFile.size > 0) {
             const bytes = await bannerFile.arrayBuffer();
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
             await writeFile(filePath, buffer);
         }
 
-        // Salvar a imagem do Logo
+        // Salvar a img do Logo
         let logoName = null;
         if (logoFile && logoFile.size > 0) {
             const bytes = await logoFile.arrayBuffer();
@@ -84,7 +84,6 @@ export async function POST(req: Request) {
             await writeFile(filePath, buffer);
         }
 
-        // Salvar tudo no banco de dados
         const novoManual = await prisma.manual.create({
             data: {
                 idPublic: manualIdPublic,

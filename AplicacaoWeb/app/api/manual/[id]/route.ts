@@ -122,32 +122,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
             updateData.maxPlayers = maxPlayers;
         }
 
-        const manualExistente = await prisma.manual.findUnique({
-            where: { idPublic: id },
-            select: {
-                user: {
-                    select: { idPublic: true },
-                },
-            },
-        });
-
-        if (!manualExistente || !manualExistente.user) {
-            return NextResponse.json({ error: 'Manual não encontrado.' }, { status: 404 });
-        }
-
-        const userIdPublic = manualExistente.user.idPublic;
-
         const bannerFile = formData.get('banner') as File | null;
         const logoFile = formData.get('logo') as File | null;
 
-        const uploadDir = path.join(
-            process.cwd(),
-            'public',
-            'upload',
-            'manual',
-            userIdPublic,
-            'img',
-        );
+        const uploadDir = path.join(process.cwd(), 'public', 'upload', 'manual', id, 'img');
 
         if ((bannerFile && bannerFile.size > 0) || (logoFile && logoFile.size > 0)) {
             await mkdir(uploadDir, { recursive: true });

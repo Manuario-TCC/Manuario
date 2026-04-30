@@ -20,14 +20,12 @@ export async function GET(request: NextRequest) {
         });
 
         const followedIds = following.map((f) => f.followedId);
-
         followedIds.push(userId);
 
         if (followedIds.length === 0) {
             return NextResponse.json([]);
         }
 
-        // Busca regras e duvidas
         const takeCount = limit + offset;
 
         const [rules, questions] = await Promise.all([
@@ -46,6 +44,9 @@ export async function GET(request: NextRequest) {
                         },
                     },
                     manuals: true,
+                    _count: {
+                        select: { comments: true },
+                    },
                 },
                 orderBy: { createdAt: 'desc' },
                 take: takeCount,
@@ -53,9 +54,7 @@ export async function GET(request: NextRequest) {
 
             prisma.question.findMany({
                 where: {
-                    userId: {
-                        in: followedIds,
-                    },
+                    userId: { in: followedIds },
                     isDisabled: false,
                 },
                 include: {
@@ -66,15 +65,29 @@ export async function GET(request: NextRequest) {
                             idPublic: true,
                         },
                     },
+
+                    _count: {
+                        select: { comments: true },
+                    },
                 },
                 orderBy: { createdAt: 'desc' },
                 take: takeCount,
             }),
         ]);
 
-        // Formata
-        const regrasFormatadas = rules.map((r) => ({ ...r, type: 'regra' }));
-        const duvidasFormatadas = questions.map((d) => ({ ...d, type: 'duvida' }));
+        const regrasFormatadas = rules.map((r) => ({
+            ...r,
+            type: 'regra',
+            hasLiked: r.likedByIds ? r.likedByIds.includes(userId) : false,
+            commentCount: r._count?.comments || 0,
+        }));
+
+        const duvidasFormatadas = questions.map((d) => ({
+            ...d,
+            type: 'duvida',
+            hasLiked: d.likedByIds ? d.likedByIds.includes(userId) : false,
+            commentCount: d._count?.comments || 0,
+        }));
 
         const combined = [...regrasFormatadas, ...duvidasFormatadas].sort((a, b) => {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();

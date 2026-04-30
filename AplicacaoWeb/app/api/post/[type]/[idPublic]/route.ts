@@ -1,50 +1,52 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/src/database/prisma';
+import { getAuthUserId } from '@/src/utils/auth';
 
 export async function GET(
-    req: Request,
+    request: Request,
     { params }: { params: Promise<{ type: string; idPublic: string }> },
 ) {
-    const { type, idPublic } = await params;
-
     try {
-        let post = null;
+        const { type, idPublic } = await params;
 
-        if (type === 'question' || type === 'duvida') {
-            post = await prisma.question.findFirst({
-                where: {
-                    idPublic: idPublic,
-                    isDisabled: false,
-                },
-                include: { user: true },
-            });
-        } else if (type === 'rule' || type === 'regra' || type === 'rules') {
-            post = await prisma.rule.findFirst({
-                where: {
-                    idPublic: idPublic,
-                    isDisabled: false,
-                },
-                include: {
-                    user: true,
-                    manuals: true,
-                },
-            });
-        } else if (type === 'ia') {
-            post = await prisma.aIPost.findUnique({
-                where: {
-                    idPublic: idPublic,
-                },
-                include: { user: true },
-            });
+        const userId = await getAuthUserId();
+
+        const isRule = ['regra', 'rule', 'rules'].includes(type.toLowerCase());
+        const isQuestion = ['duvida', 'question', 'questions'].includes(type.toLowerCase());
+
+        const model = isRule ? prisma.rule : isQuestion ? prisma.question : null;
+
+        if (!model) {
+            return NextResponse.json({ error: 'Tipo de postagem inválido' }, { status: 400 });
         }
+
+        const post = await (model as any).findUnique({
+            where: { idPublic },
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        img: true,
+                        idPublic: true,
+                    },
+                },
+                ...(isRule ? { manuals: true } : {}),
+            },
+        });
 
         if (!post) {
-            return NextResponse.json({ error: 'Post não encontrado' }, { status: 404 });
+            return NextResponse.json({ error: 'Postagem não encontrada' }, { status: 404 });
         }
 
-        return NextResponse.json(post);
+        const formattedPost = {
+            ...post,
+            type: isRule ? 'regra' : 'duvida',
+            hasLiked: userId && post.likedByIds ? post.likedByIds.includes(userId) : false,
+        };
+
+        return NextResponse.json(formattedPost);
     } catch (error) {
-        console.error('Erro ao buscar post:', error);
-        return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 });
+        console.error('Erro ao buscar postagem:', error);
+        return NextResponse.json({ error: 'Erro interno no servidor' }, { status: 500 });
     }
 }
