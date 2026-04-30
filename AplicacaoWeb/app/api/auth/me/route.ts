@@ -20,6 +20,8 @@ export async function GET() {
                 banner: true,
                 bio: true,
                 links: true,
+                isSuperAdmin: true,
+                isAdmin: true,
             },
         });
 

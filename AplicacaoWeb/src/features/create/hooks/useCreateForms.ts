@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createManualService } from '../services/createService';
+import { createManualService } from '../services/manualService';
 
 export interface CreateManualData {
     title: string;
