@@ -7,6 +7,11 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+type ProfileLink {
+    name String
+    url  String
+}
+
 model User {
     id            String         @id @default(auto()) @map("_id") @db.ObjectId
     idPublic      String         @unique @default(uuid())
@@ -39,7 +44,12 @@ model User {
     likedCommentIds String[]  @db.ObjectId
     likedComments   Comment[] @relation("CommentLikes", fields: [likedCommentIds], references: [id])
 
-    isDisabled Boolean @default(false)
+    bio   String?       @db.String
+    links ProfileLink[]
+
+    isSuperAdmin Boolean @default(false)
+    isAdmin      Boolean @default(false)
+    isDisabled   Boolean @default(false)
 }
 
 model Manual {
@@ -199,4 +209,13 @@ model Follow {
     createdAt DateTime @default(now())
 
     @@unique([followerId, followedId])
+}
+
+model AdminLog {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    action    String
+    reason    String
+    targetId  String
+    adminId   String
+    createdAt DateTime @default(now())
 }

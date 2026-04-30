@@ -1,5 +1,11 @@
 export const profileEditService = {
-    updateProfile: async (data: { name?: string; email?: string; password?: string }) => {
+    updateProfile: async (data: {
+        name?: string;
+        email?: string;
+        password?: string;
+        bio?: string;
+        links?: { name: string; url: string }[];
+    }) => {
         const res = await fetch('/api/profile/update', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },

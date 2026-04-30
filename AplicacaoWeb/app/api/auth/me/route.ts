@@ -18,6 +18,10 @@ export async function GET() {
                 email: true,
                 img: true,
                 banner: true,
+                bio: true,
+                links: true,
+                isSuperAdmin: true,
+                isAdmin: true,
             },
         });
 

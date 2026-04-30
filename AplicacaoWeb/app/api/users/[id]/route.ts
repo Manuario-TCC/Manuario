@@ -17,6 +17,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 email: true,
                 img: true,
                 banner: true,
+                bio: true,
+                links: true,
+                isAdmin: true,
+                isSuperAdmin: true,
                 _count: {
                     select: {
                         followers: true,
@@ -60,6 +64,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         }
 
         const profileData = {
+            id: dbUser.id,
             publicId: dbUser.idPublic,
             name: dbUser.name,
             ...(isOwnProfile && { email: dbUser.email }),
@@ -70,10 +75,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 ? `/upload/${dbUser.idPublic}/user/${dbUser.banner}`
                 : '/img/bannerPadrao.png',
 
+            bio: dbUser.bio,
+            links: dbUser.links,
+            isAdmin: dbUser.isAdmin,
+            isSuperAdmin: dbUser.isSuperAdmin,
+
             followers: dbUser._count.followers,
             following: dbUser._count.following,
             rules: dbUser._count.rules,
-
             isOwnProfile,
             isFollowing,
         };
