@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/src/database/prisma';
+import { getAuthUserId } from '@/src/utils/auth';
 
 export async function GET(
     req: Request,
@@ -12,7 +13,9 @@ export async function GET(
     const offset = parseInt(searchParams.get('offset') || '0', 10);
 
     try {
-        let items = [];
+        const currentUserId = await getAuthUserId();
+
+        let rawItems = [];
         let totalItems = 0;
 
         const baseWhereCondition = {
@@ -23,12 +26,20 @@ export async function GET(
         };
 
         if (type === 'duvida') {
-            items = await prisma.question.findMany({
+            rawItems = await prisma.question.findMany({
                 where: baseWhereCondition,
                 orderBy: { createdAt: 'desc' },
                 skip: offset,
                 take: limit,
-                include: { user: true },
+                include: {
+                    user: {
+                        select: {
+                            name: true,
+                            img: true,
+                            idPublic: true,
+                        },
+                    },
+                },
             });
 
             totalItems = await prisma.question.count({ where: baseWhereCondition });
@@ -41,24 +52,37 @@ export async function GET(
                 isDisabled: false,
             };
 
-            items = await prisma.rule.findMany({
+            rawItems = await prisma.rule.findMany({
                 where: regraWhereCondition,
                 orderBy: { createdAt: 'desc' },
                 skip: offset,
                 take: limit,
                 include: {
-                    user: true,
+                    user: {
+                        select: {
+                            name: true,
+                            img: true,
+                            idPublic: true,
+                        },
+                    },
                     manuals: true,
                 },
             });
 
             totalItems = await prisma.rule.count({ where: regraWhereCondition });
         } else if (type === 'ia') {
-            items = [];
+            rawItems = [];
             totalItems = 0;
         } else {
             return NextResponse.json({ error: 'Tipo de postagem inválido' }, { status: 400 });
         }
+
+        const items = rawItems.map((item: any) => ({
+            ...item,
+            type: type === 'regra' ? 'regra' : 'duvida',
+            hasLiked:
+                currentUserId && item.likedByIds ? item.likedByIds.includes(currentUserId) : false,
+        }));
 
         const nextOffset = offset + items.length < totalItems ? offset + limit : null;
 

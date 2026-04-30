@@ -1,8 +1,8 @@
-// aplicacao_web/src/features/viewPost/hooks/useCommentItem.ts
 import { useState, useMemo, useCallback } from 'react';
 import { useSession } from '@/src/hooks/useSession';
 import { commentService } from '../services/commentService';
-import { customAlert } from '@/src/components/customAlert'; // Importando o seu componente
+import { customAlert } from '@/src/components/customAlert';
+import { useCommentLike } from './useCommentLike';
 
 export const useCommentItem = (comment: any, onSuccess: () => void) => {
     const { user: currentUser } = useSession();
@@ -13,6 +13,18 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editValue, setEditValue] = useState(comment.text);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const initialIsLiked = useMemo(() => {
+        return comment?.isLiked || false;
+    }, [comment]);
+
+    const { isLiked, likeCount, handleToggleLike, isLoadingLike } = useCommentLike(
+        initialIsLiked,
+        comment.likeCount || 0,
+        comment.id,
+    );
+
+    const isEdited = comment.isEdited || false;
 
     const toggleReplyInput = useCallback(() => setShowReplyInput((prev) => !prev), []);
     const toggleReplies = useCallback(() => setShowReplies((prev) => !prev), []);
@@ -26,14 +38,9 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
 
     const isAuthor = useMemo(() => {
         if (!currentUser || !comment) return false;
-        if (currentUser.idPublic && comment.author?.idPublic) {
-            if (currentUser.idPublic === comment.author.idPublic) return true;
-        }
-
-        const currentId = String(currentUser.id || '');
-        const authorId = String(comment.authorId || comment.author?.id || '');
-
-        return currentId === authorId && currentId !== '';
+        return (
+            currentUser.idPublic === comment.author?.idPublic || currentUser.id === comment.authorId
+        );
     }, [currentUser, comment]);
 
     const startEditing = () => {
@@ -53,6 +60,7 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
 
             comment.text = editValue;
             comment.updatedAt = new Date().toISOString();
+            comment.isEdited = true;
 
             setIsEditing(false);
             onSuccess();
@@ -92,6 +100,9 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
         isEditing,
         editValue,
         isSubmitting,
+        isLiked,
+        likeCount,
+        isLoadingLike,
         setEditValue,
         setIsEditing,
         toggleReplyInput,
@@ -102,5 +113,7 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
         startEditing,
         handleUpdate,
         handleDelete,
+        handleToggleLike,
+        isEdited,
     };
 };

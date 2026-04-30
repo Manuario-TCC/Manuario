@@ -4,6 +4,9 @@ import { getServerSession } from '@/src/utils/auth';
 
 export async function GET(req: Request) {
     try {
+        const session = await getServerSession();
+        const currentUserId = session?.user?.id;
+
         const { searchParams } = new URL(req.url);
         const postId = searchParams.get('postId');
         const postType = searchParams.get('postType');
@@ -42,7 +45,14 @@ export async function GET(req: Request) {
                         },
                         replies: {
                             include: {
-                                author: true,
+                                author: {
+                                    select: {
+                                        id: true,
+                                        idPublic: true,
+                                        name: true,
+                                        img: true,
+                                    },
+                                },
                             },
                         },
                     },
@@ -51,7 +61,20 @@ export async function GET(req: Request) {
             },
         });
 
-        return NextResponse.json(comments);
+        const formatCommentsWithLikes = (commentList: any[]) => {
+            return commentList.map((comment) => ({
+                ...comment,
+                isLiked:
+                    currentUserId && Array.isArray(comment.likedByIds)
+                        ? comment.likedByIds.includes(currentUserId)
+                        : false,
+                replies: comment.replies ? formatCommentsWithLikes(comment.replies) : [],
+            }));
+        };
+
+        const formattedComments = formatCommentsWithLikes(comments);
+
+        return NextResponse.json(formattedComments);
     } catch (error) {
         console.error('Erro ao buscar comentários:', error);
         return NextResponse.json({ error: 'Erro ao buscar comentários' }, { status: 500 });
@@ -81,7 +104,8 @@ export async function POST(req: Request) {
         }
 
         const novoComentario = await prisma.comment.create({ data });
-        return NextResponse.json(novoComentario, { status: 201 });
+
+        return NextResponse.json({ ...novoComentario, isLiked: false }, { status: 201 });
     } catch (error) {
         console.error('Erro ao postar comentário:', error);
         return NextResponse.json({ error: 'Erro ao postar' }, { status: 500 });
