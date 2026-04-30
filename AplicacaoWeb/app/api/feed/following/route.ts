@@ -44,6 +44,9 @@ export async function GET(request: NextRequest) {
                         },
                     },
                     manuals: true,
+                    _count: {
+                        select: { comments: true },
+                    },
                 },
                 orderBy: { createdAt: 'desc' },
                 take: takeCount,
@@ -56,7 +59,15 @@ export async function GET(request: NextRequest) {
                 },
                 include: {
                     user: {
-                        select: { name: true, img: true, idPublic: true },
+                        select: {
+                            name: true,
+                            img: true,
+                            idPublic: true,
+                        },
+                    },
+
+                    _count: {
+                        select: { comments: true },
                     },
                 },
                 orderBy: { createdAt: 'desc' },
@@ -68,12 +79,14 @@ export async function GET(request: NextRequest) {
             ...r,
             type: 'regra',
             hasLiked: r.likedByIds ? r.likedByIds.includes(userId) : false,
+            commentCount: r._count?.comments || 0,
         }));
 
         const duvidasFormatadas = questions.map((d) => ({
             ...d,
             type: 'duvida',
             hasLiked: d.likedByIds ? d.likedByIds.includes(userId) : false,
+            commentCount: d._count?.comments || 0,
         }));
 
         const combined = [...regrasFormatadas, ...duvidasFormatadas].sort((a, b) => {

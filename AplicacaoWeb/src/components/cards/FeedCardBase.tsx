@@ -7,6 +7,8 @@ import { ReactNode } from 'react';
 import { useLike } from '../../hooks/useLike';
 import { useCardMenu } from '../../hooks/useCardMenu';
 
+import { useShare } from '@/src/hooks/useShare';
+
 interface FeedCardBaseProps {
     post: any;
     postUrl: string;
@@ -35,6 +37,8 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
         handleReport,
         loadingSession,
     } = useCardMenu(post);
+
+    const { sharePost } = useShare();
 
     return (
         <div className="bg-card border border-card-border rounded-xl p-5 mb-4 hover:border-gray transition-colors w-full shadow-md max-w-[40rem]">
@@ -120,8 +124,11 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
                     <span className="text-xs font-bold">{post.commentCount || 0}</span>
                 </Link>
 
-                <button className="flex items-center gap-1.5 text-sub-text ml-auto cursor-pointer hover:text-secondary transition-all">
-                    <Share2 size="1rem" />
+                <button
+                    onClick={() => sharePost(post.type, post.idPublic)}
+                    className="flex items-center gap-1.5 text-sub-text hover:text-primary cursor-pointer transition-colors"
+                >
+                    <Share2 size="1.25rem" />
                 </button>
             </div>
         </div>
