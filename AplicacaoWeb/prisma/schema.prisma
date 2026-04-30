@@ -7,6 +7,11 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+type ProfileLink {
+    name String
+    url  String
+}
+
 model User {
     id            String         @id @default(auto()) @map("_id") @db.ObjectId
     idPublic      String         @unique @default(uuid())
@@ -38,6 +43,9 @@ model User {
 
     likedCommentIds String[]  @db.ObjectId
     likedComments   Comment[] @relation("CommentLikes", fields: [likedCommentIds], references: [id])
+
+    bio   String?       @db.String
+    links ProfileLink[]
 
     isDisabled Boolean @default(false)
 }

@@ -1,8 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { profileEditService } from '../services/profileEditService';
+import { customAlert } from '@/src/components/customAlert';
 
-export const useProfileEdit = (initialName: string, initialEmail: string) => {
+export interface ProfileLink {
+    name: string;
+    url: string;
+}
+
+export const useProfileEdit = (
+    initialName: string,
+    initialEmail: string,
+    initialBio?: string,
+    initialLinks?: ProfileLink[],
+) => {
     const queryClient = useQueryClient();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -10,6 +21,8 @@ export const useProfileEdit = (initialName: string, initialEmail: string) => {
         name: initialName || '',
         email: initialEmail || '',
         password: '',
+        bio: initialBio || '',
+        links: initialLinks || [],
     });
 
     useEffect(() => {
@@ -17,8 +30,10 @@ export const useProfileEdit = (initialName: string, initialEmail: string) => {
             ...prev,
             name: initialName || '',
             email: initialEmail || '',
+            bio: initialBio || '',
+            links: initialLinks || [],
         }));
-    }, [initialName, initialEmail]);
+    }, [initialName, initialEmail, initialBio, initialLinks]);
 
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [bannerFile, setBannerFile] = useState<File | null>(null);
@@ -27,6 +42,28 @@ export const useProfileEdit = (initialName: string, initialEmail: string) => {
     const closeModal = () => {
         setIsModalOpen(false);
         setFormData((prev) => ({ ...prev, password: '' }));
+    };
+
+    const addLink = () => {
+        setFormData((prev) => ({
+            ...prev,
+            links: [...prev.links, { name: '', url: '' }],
+        }));
+    };
+
+    const updateLink = (index: number, field: 'name' | 'url', value: string) => {
+        setFormData((prev) => {
+            const newLinks = [...prev.links];
+            newLinks[index] = { ...newLinks[index], [field]: value };
+            return { ...prev, links: newLinks };
+        });
+    };
+
+    const removeLink = (index: number) => {
+        setFormData((prev) => ({
+            ...prev,
+            links: prev.links.filter((_, i) => i !== index),
+        }));
     };
 
     const mutation = useMutation({
@@ -54,13 +91,14 @@ export const useProfileEdit = (initialName: string, initialEmail: string) => {
         onSuccess: () => {
             closeModal();
             queryClient.invalidateQueries({ queryKey: ['user-me'] });
+            customAlert.toastSuccess('Perfil atualizado com sucesso!');
         },
         onError: (error: any) => {
             console.error('Erro ao salvar edições do perfil:', error.message);
         },
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
@@ -110,6 +148,9 @@ export const useProfileEdit = (initialName: string, initialEmail: string) => {
         openModal,
         closeModal,
         handleChange,
+        addLink,
+        updateLink,
+        removeLink,
         handleAvatarChange,
         handleBannerChange,
         handleSave,

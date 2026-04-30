@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useProfileBanner } from '../hooks/useProfileBanner';
 import { useProfileAvatar } from '../hooks/useProfileAvatar';
 import { useProfileEdit } from '../hooks/useProfileEdit';
@@ -11,6 +11,9 @@ import { ProfileUserInfo } from './ProfileUserInfo';
 import { ProfileTabs } from './ProfileTabs';
 import ProfileImageEditor from './ProfileImageEditor';
 import { ProfileEditModal } from './ProfileEditModal';
+import { ProfileLinksModal } from './ProfileLinksModal';
+
+import { Link2, Flag } from 'lucide-react';
 
 interface ProfileHeaderProps {
     initialData: {
@@ -19,6 +22,8 @@ interface ProfileHeaderProps {
         avatarUrl?: string | null;
         bannerUrl?: string | null;
         idPublic: string;
+        bio?: string;
+        links?: { name: string; url: string }[];
     };
     stats: {
         followers: number;
@@ -40,7 +45,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     const banner = useProfileBanner(initialData.bannerUrl || '/img/bannerPadrao.png', isOwnProfile);
     const avatar = useProfileAvatar(initialData.avatarUrl || '/img/iconePadrao.jpg', isOwnProfile);
 
-    const edit = useProfileEdit(initialData.name, initialData.email);
+    const edit = useProfileEdit(
+        initialData.name,
+        initialData.email,
+        initialData.bio,
+        initialData.links,
+    );
+
+    const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
 
     return (
         <div className="w-full flex flex-col min-h-screen">
@@ -74,26 +86,53 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                                     Editar Perfil
                                 </button>
                             ) : (
-                                <button
-                                    onClick={onFollowToggle}
-                                    className={`px-6 py-1.5 rounded-full font-semibold transition text-sm cursor-pointer ${
-                                        isFollowing
-                                            ? 'bg-transparent border border-text text-text hover:bg-card-border'
-                                            : 'bg-text text-text-inverted hover:bg-sub-text'
-                                    }`}
-                                >
-                                    {isFollowing ? 'Seguindo' : 'Seguir'}
-                                </button>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={onFollowToggle}
+                                        className={`px-6 py-1.5 rounded-full font-semibold transition text-sm cursor-pointer ${
+                                            isFollowing
+                                                ? 'bg-transparent border border-text text-text hover:bg-card-border'
+                                                : 'bg-text text-text-inverted hover:bg-sub-text'
+                                        }`}
+                                    >
+                                        {isFollowing ? 'Seguindo' : 'Seguir'}
+                                    </button>
+                                    <button
+                                        title="Denunciar conta"
+                                        className="p-1.5 rounded-full text-sub-text hover:text-red-500 hover:bg-red-500/10 transition cursor-pointer"
+                                        onClick={() => console.log('Abrir modal de denúncia')}
+                                    >
+                                        <Flag size={20} />
+                                    </button>
+                                </div>
                             )}
                         </div>
                     </div>
 
-                    <div className="flex-1 min-[900px]:pt-4">
+                    <div className="flex-1 min-md pt-4">
                         <ProfileUserInfo
-                            name={edit.formData.name}
+                            name={initialData.name}
                             isOwnProfile={isOwnProfile}
                             stats={stats}
                         />
+
+                        <div className="mt-4 flex flex-col gap-3">
+                            {edit.formData.bio && (
+                                <p className="text-sub-text text-sm max-w-lg break-words leading-relaxed">
+                                    {edit.formData.bio}
+                                </p>
+                            )}
+
+                            {edit.formData.links && edit.formData.links.length > 0 && (
+                                <button
+                                    onClick={() => setIsLinksModalOpen(true)}
+                                    className="flex items-center gap-2 text-sub-text hover:text-text text-sm font-bold w-fit transition-colors cursor-pointer"
+                                >
+                                    <Link2 size={16} />
+                                    Ver Links ({edit.formData.links.length})
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     <div className="hidden min-[900px]:block pt-4 flex-shrink-0">
@@ -105,16 +144,26 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                                 Editar Perfil
                             </button>
                         ) : (
-                            <button
-                                onClick={onFollowToggle}
-                                className={`px-6 py-2 rounded-full font-semibold transition text-sm cursor-pointer ${
-                                    isFollowing
-                                        ? 'bg-transparent border border-text text-text hover:bg-card-border'
-                                        : 'bg-text text-text-inverted hover:bg-sub-text'
-                                }`}
-                            >
-                                {isFollowing ? 'Seguindo' : 'Seguir'}
-                            </button>
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={onFollowToggle}
+                                    className={`px-6 py-2 rounded-full font-semibold transition text-sm cursor-pointer ${
+                                        isFollowing
+                                            ? 'bg-transparent border border-text text-text hover:bg-card-border'
+                                            : 'bg-text text-text-inverted hover:bg-sub-text'
+                                    }`}
+                                >
+                                    {isFollowing ? 'Seguindo' : 'Seguir'}
+                                </button>
+
+                                <button
+                                    title="Denunciar conta"
+                                    className="p-2 rounded-full text-sub-text hover:text-red-500 hover:bg-red-500/10 transition cursor-pointer"
+                                    onClick={() => console.log('Abrir modal de denúncia')}
+                                >
+                                    <Flag size={20} />
+                                </button>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -138,7 +187,17 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 onSave={edit.handleSave}
                 onDelete={edit.handleDeleteAccount}
                 isLoading={edit.isLoading}
+                addLink={edit.addLink}
+                updateLink={edit.updateLink}
+                removeLink={edit.removeLink}
             />
+
+            {isLinksModalOpen && (
+                <ProfileLinksModal
+                    links={initialData.links}
+                    onClose={() => setIsLinksModalOpen(false)}
+                />
+            )}
         </div>
     );
 };

@@ -17,6 +17,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 email: true,
                 img: true,
                 banner: true,
+                bio: true,
+                links: true,
                 _count: {
                     select: {
                         followers: true,
@@ -70,10 +72,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 ? `/upload/${dbUser.idPublic}/user/${dbUser.banner}`
                 : '/img/bannerPadrao.png',
 
+            bio: dbUser.bio,
+            links: dbUser.links,
+
             followers: dbUser._count.followers,
             following: dbUser._count.following,
             rules: dbUser._count.rules,
-
             isOwnProfile,
             isFollowing,
         };

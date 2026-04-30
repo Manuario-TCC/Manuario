@@ -10,9 +10,15 @@ export async function PATCH(req: Request) {
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
         }
 
-        const { name, email, password } = await req.json();
+        const { name, email, password, bio, links } = await req.json();
 
-        const updateData: { name?: string; email?: string; password?: string } = {};
+        const updateData: {
+            name?: string;
+            email?: string;
+            password?: string;
+            bio?: string;
+            links?: { name: string; url: string }[];
+        } = {};
 
         // Validação do Nome
         if (name !== undefined) {
@@ -43,6 +49,7 @@ export async function PATCH(req: Request) {
             updateData.email = email.trim();
         }
 
+        // Validação da Senha
         if (password) {
             if (password.length < 8) {
                 return NextResponse.json(
@@ -53,6 +60,22 @@ export async function PATCH(req: Request) {
 
             const hashedPassword = await bcrypt.hash(password, 10);
             updateData.password = hashedPassword;
+        }
+
+        // Validacao da Bio
+        if (bio !== undefined) {
+            if (bio.length > 150) {
+                return NextResponse.json(
+                    { error: 'A bio deve ter no máximo 150 caracteres.' },
+                    { status: 400 },
+                );
+            }
+            updateData.bio = bio;
+        }
+
+        // Atribuição dos Links
+        if (links !== undefined) {
+            updateData.links = links;
         }
 
         if (Object.keys(updateData).length === 0) {

@@ -23,6 +23,8 @@ export default function ProfilePage({ id }: ProfilePageProps) {
                     avatarUrl: profileData.avatarUrl,
                     bannerUrl: profileData.bannerUrl,
                     idPublic: profileData.publicId,
+                    bio: profileData.bio,
+                    links: profileData.links,
                 }}
                 stats={{
                     followers: profileData.followers,
