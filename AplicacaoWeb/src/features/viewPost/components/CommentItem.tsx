@@ -7,6 +7,8 @@ import {
     Trash2,
     Flag,
     ShieldAlert,
+    BadgeCheck,
+    ShieldCheck,
 } from 'lucide-react';
 import { formatTimeAgo } from '@/src/utils/formatTimeAgo';
 import { useCommentItem } from '../hooks/useCommentItem';
@@ -47,6 +49,7 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
         isLoadingLike,
         handleToggleLike,
         isEdited,
+        handleValidate,
     } = useCommentItem(comment, onReplySuccess);
 
     const userAvatarUrl = comment.author?.img
@@ -63,7 +66,7 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                 <img
                     src={userAvatarUrl}
                     alt={comment.author?.name}
-                    className="w-[1.8rem] h-[1.8rem] rounded-full object-cover border border-card-border shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
+                    className="w-[1.8rem] h-[1.8rem] rounded-full object-cover border border-card-border shrink-0 hover:opacity-80 transition-opacity cursor-pointer select-none"
                 />
             </Link>
 
@@ -82,7 +85,7 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                             size={14}
                         />
 
-                        <span className="text-sub-text text-xs flex items-center gap-1 ml-0.5">
+                        <span className="text-sub-text text-xs flex items-center gap-1 ml-0.5 select-none">
                             <span className="text-lg leading-none">•</span>{' '}
                             {formatTimeAgo(comment.createdAt)}
                             {isEdited && <span className="text-xs ml-1">(editado)</span>}
@@ -98,13 +101,28 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                         </button>
 
                         {isMenuOpen && (
-                            <div className="absolute right-0 top-7 w-40 bg-card border border-card-border rounded-md shadow-lg z-10 flex flex-col overflow-hidden">
+                            <div className="absolute right-0 top-7 w-42 bg-card border border-card-border rounded-md shadow-lg z-10 flex flex-col overflow-hidden">
                                 {isAuthor && (
                                     <button
                                         onClick={startEditing}
                                         className="flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-gray transition-colors w-full text-left cursor-pointer"
                                     >
                                         <Pencil size={14} /> Editar
+                                    </button>
+                                )}
+
+                                {isAdminOrSuperAdmin && (
+                                    <button
+                                        onClick={() => {
+                                            handleValidate();
+                                            toggleMenu();
+                                        }}
+                                        className="flex items-center gap-2 px-3 py-2 text-sm text-green-500 hover:bg-green-500/10 transition-colors w-full text-left cursor-pointer"
+                                    >
+                                        <ShieldCheck size={14} />
+                                        {comment.isValidated
+                                            ? 'Remover Validação'
+                                            : 'Validar Comentário'}
                                     </button>
                                 )}
 
@@ -133,6 +151,15 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                         )}
                     </div>
                 </div>
+
+                {comment.isValidated && (
+                    <div className="flex items-center gap-1.5 mb-2 px-2 py-1 bg-green-500/10 text-green-500 rounded-md w-fit">
+                        <BadgeCheck size={14} />
+                        <span className="text-[10px] uppercase tracking-wider font-bold">
+                            Validado pelos Moderadores
+                        </span>
+                    </div>
+                )}
 
                 <div className="mb-2">
                     {isEditing ? (
@@ -177,7 +204,7 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                         <button
                             onClick={handleToggleLike}
                             disabled={isLoadingLike}
-                            className={`flex items-center gap-1.5 transition-all cursor-pointer ${
+                            className={`flex items-center gap-1.5 transition-all select-none cursor-pointer ${
                                 isLiked ? 'text-red-500' : 'hover:text-red-500'
                             }`}
                         >
@@ -186,14 +213,14 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                         </button>
                         <button
                             onClick={toggleReplyInput}
-                            className="flex items-center gap-1.5 hover:text-secondary transition-all cursor-pointer"
+                            className="flex items-center gap-1.5 select-none hover:text-secondary transition-all cursor-pointer"
                         >
                             <MessageCircle size={16} /> Responder
                         </button>
                         {comment.replies?.length > 0 && (
                             <button
                                 onClick={toggleReplies}
-                                className="hover:text-secondary transition-all cursor-pointer"
+                                className="hover:text-secondary transition-all cursor-pointer select-none"
                             >
                                 {showReplies
                                     ? 'Ocultar respostas'

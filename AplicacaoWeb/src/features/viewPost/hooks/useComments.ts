@@ -40,6 +40,17 @@ export const useComments = (postId: string, postType: string) => {
         queryClient.invalidateQueries({ queryKey });
     };
 
+    const validateMutation = useMutation({
+        mutationFn: (id: string) => commentService.toggleCommentValidation(id, ''),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['post_comments'] });
+        },
+    });
+
+    const handleValidate = (commentId: string) => {
+        validateMutation.mutate(commentId);
+    };
+
     return {
         comments,
         loading: isLoading,

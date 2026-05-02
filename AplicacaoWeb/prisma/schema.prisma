@@ -194,6 +194,8 @@ model Comment {
 
     isEdited Boolean @default(false)
 
+    isValidated Boolean @default(false)
+
     isDisabled Boolean @default(false)
 }
 

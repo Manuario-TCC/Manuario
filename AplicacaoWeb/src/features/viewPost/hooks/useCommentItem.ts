@@ -124,8 +124,34 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
         disableMutation.mutate(reason);
     };
 
+    const validateMutation = useMutation({
+        mutationFn: () => commentService.toggleCommentValidation(comment.id, ''),
+
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['comments'] });
+            onSuccess();
+
+            if (comment.isValidated) {
+                customAlert.toastSuccess('Validação removida');
+            } else {
+                customAlert.toastSuccess('Comentário validado com sucesso');
+            }
+        },
+
+        onError: () => {
+            customAlert.toastError('Erro ao validar comentário');
+        },
+    });
+
+    const handleValidate = () => {
+        validateMutation.mutate();
+    };
+
     const isSubmitting =
-        updateMutation.isPending || deleteMutation.isPending || disableMutation.isPending;
+        updateMutation.isPending ||
+        deleteMutation.isPending ||
+        disableMutation.isPending ||
+        validateMutation.isPending;
 
     return {
         showReplyInput,
@@ -154,5 +180,6 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
         handleDisable,
         handleToggleLike,
         isEdited,
+        handleValidate,
     };
 };

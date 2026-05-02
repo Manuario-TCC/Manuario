@@ -66,4 +66,16 @@ export const commentService = {
 
         return response.json();
     },
+
+    toggleCommentValidation: async (id: string, reason: string) => {
+        const response = await fetch(`/api/comments/${id}/validate`, {
+            method: 'PATCH',
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao validar comentário');
+        }
+
+        return response.json();
+    },
 };

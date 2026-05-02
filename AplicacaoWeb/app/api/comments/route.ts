@@ -1,4 +1,3 @@
-// app/api/comments/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/src/database/prisma';
 import { getServerSession } from '@/src/utils/auth';
