@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useMemo } from 'react';
 import { useFeed } from './hooks/useFeed';
 import DuvidaCard from '../../components/cards/DuvidaCard';
 import RegraCard from '../../components/cards/RegraCard';
@@ -20,27 +20,30 @@ const PostSkeleton = () => (
 );
 
 export default function FeedPage() {
-    const { posts, loading, loadPosts, hasMore } = useFeed();
+    const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useFeed();
+
     const observer = useRef<IntersectionObserver | null>(null);
 
     const lastPostElementRef = useCallback(
         (node: HTMLDivElement | null) => {
-            if (loading) return;
+            if (isLoading || isFetchingNextPage) return;
 
             if (observer.current) observer.current.disconnect();
 
             observer.current = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting && hasMore) {
-                    loadPosts();
+                if (entries[0].isIntersecting && hasNextPage) {
+                    fetchNextPage();
                 }
             });
 
-            if (node) {
-                observer.current.observe(node);
-            }
+            if (node) observer.current.observe(node);
         },
-        [loading, hasMore, loadPosts],
+        [isLoading, isFetchingNextPage, hasNextPage, fetchNextPage],
     );
+
+    const posts = useMemo(() => {
+        return data?.pages.flatMap((page) => page) || [];
+    }, [data]);
 
     return (
         <div className="max-w-2xl mx-auto py-8 px-4 w-full flex flex-col items-center">
@@ -50,29 +53,26 @@ export default function FeedPage() {
                     const CardComponent = post.type === 'regra' ? RegraCard : DuvidaCard;
                     const postKey = `${post.type}-${post.id}-${index}`;
 
-                    if (isLast) {
-                        return (
-                            <div
-                                ref={lastPostElementRef}
-                                key={postKey}
-                                className="w-full flex justify-center"
-                            >
-                                <CardComponent post={post} />
-                            </div>
-                        );
-                    }
-                    return <CardComponent key={postKey} post={post} />;
+                    return (
+                        <div
+                            ref={isLast ? lastPostElementRef : null}
+                            key={postKey}
+                            className="w-full flex justify-center"
+                        >
+                            <CardComponent post={post} />
+                        </div>
+                    );
                 })}
             </div>
 
-            {loading && (
+            {(isLoading || isFetchingNextPage) && (
                 <div className="flex flex-col gap-2 w-full mt-4">
                     <PostSkeleton />
                     <PostSkeleton />
                 </div>
             )}
 
-            {!loading && !hasMore && posts.length > 0 && (
+            {!isLoading && !hasNextPage && posts.length > 0 && (
                 <div className="text-center text-sub-text py-10 text-sm">
                     Você chegou ao fim do feed.
                 </div>

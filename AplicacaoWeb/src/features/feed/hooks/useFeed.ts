@@ -1,46 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { feedService } from '../services/feedService';
 
+export const FEED_QUERY_KEY = ['feed', 'following'];
+
 export function useFeed() {
-    const [posts, setPosts] = useState<any[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [hasMore, setHasMore] = useState(true);
     const LIMIT = 10;
 
-    const loadPosts = async () => {
-        if (loading || !hasMore) return;
+    return useInfiniteQuery({
+        queryKey: FEED_QUERY_KEY,
+        queryFn: ({ pageParam = 0 }) => feedService.getFeed(LIMIT, pageParam as number),
+        initialPageParam: 0,
 
-        setLoading(true);
-
-        try {
-            const currentOffset = posts.length;
-            const data = await feedService.getFeed(LIMIT, currentOffset);
-
-            if (data.length < LIMIT) {
-                setHasMore(false);
+        getNextPageParam: (lastPage, allPages) => {
+            if (lastPage.length < LIMIT) {
+                return undefined;
             }
 
-            setPosts((prev) => {
-                const newPosts = data.filter(
-                    (item) => !prev.some((p) => p.id === item.id && p.type === item.type),
-                );
-                return [...prev, ...newPosts];
-            });
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        loadPosts();
-    }, []);
-
-    return {
-        posts,
-        loading,
-        loadPosts,
-        hasMore,
-    };
+            const totalItemsLoaded = allPages.flat().length;
+            return totalItemsLoaded;
+        },
+    });
 }

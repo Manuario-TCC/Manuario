@@ -9,7 +9,8 @@ interface RegraCardProps {
 }
 
 export default function RegraCard({ post, isFullView = false }: RegraCardProps) {
-    const postUrl = `/post/rule/${post.idPublic}`;
+    const postUrl = `/post/rules/${post.idPublic}`;
+
     const manualRelacionado = post.manuals && post.manuals.length > 0 ? post.manuals[0] : null;
 
     const manualUrl = manualRelacionado ? `/manual/${manualRelacionado.idPublic}` : '#';

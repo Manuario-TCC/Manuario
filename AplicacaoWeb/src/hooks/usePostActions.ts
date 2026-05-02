@@ -42,7 +42,8 @@ export function usePostActions(post: any) {
 
     const handleEdit = () => {
         setIsMenuOpen(false);
-        const tab = post.type === 'regra' ? 'regra' : 'duvida';
+        const tab = post.type === 'regra' || post.type === 'rules' ? 'regra' : 'duvida';
+
         router.push(`/create?tab=${tab}&id=${post.idPublic}`);
     };
 

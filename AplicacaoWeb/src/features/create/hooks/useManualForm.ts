@@ -1,11 +1,14 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+
 import {
     createManualService,
     updateManualService,
     getManualById,
     deleteManualService,
 } from '../services/manualService';
+
 import { useSession } from '@/src/hooks/useSession';
 import { customAlert } from '@/src/components/customAlert';
 
@@ -55,65 +58,70 @@ export function useManualForm(editId?: string | null) {
         contributors: [],
     });
 
-    const [isLoading, setIsLoading] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const isEditing = !!editId;
 
-    // Buscar dados no modo edição
+    const {
+        data: fetchedData,
+        isLoading: isFetchingManual,
+        isError,
+    } = useQuery({
+        queryKey: ['manual', editId],
+        queryFn: async () => {
+            const res = await getManualById(editId!);
+            if (!res.ok) throw new Error();
+            return res.json();
+        },
+        enabled: isEditing && !!editId && !!user?.idPublic,
+        retry: false,
+    });
+
     useEffect(() => {
-        if (isEditing && editId && user?.idPublic) {
-            setIsLoading(true);
-            getManualById(editId)
-                .then(async (res) => {
-                    if (!res.ok) throw new Error();
-                    return res.json();
-                })
-                .then((fetchedData) => {
-                    // Verifica se o usuário é o dono do manual
-                    if (fetchedData.user?.idPublic !== user.idPublic) {
-                        router.push('/404');
-                    } else {
-                        const getImageUrl = (imgName: string | null) => {
-                            if (!imgName) return null;
-                            if (imgName.startsWith('http') || imgName.startsWith('/')) {
-                                return imgName;
-                            }
-                            return `/upload/manual/${fetchedData.idPublic}/img/${imgName}`;
-                        };
+        if (!fetchedData || !user) return;
 
-                        setData((prev) => ({
-                            ...prev,
-                            title: fetchedData.name || '',
-                            game: fetchedData.game || '',
-                            genre: fetchedData.genre || '',
-                            system: fetchedData.system || '',
-                            banner: getImageUrl(fetchedData.imgBanner),
-                            logo: getImageUrl(fetchedData.imgLogo),
-                            playtime: fetchedData.playTime || '',
-                            type: fetchedData.type || '',
-                            edition: fetchedData.edition || '',
-                            minPlayers: fetchedData.minPlayers || '',
-                            maxPlayers: fetchedData.maxPlayers || '',
-                            ageRating: fetchedData.ageRange || '',
-                            description: fetchedData.description || '',
-
-                            contributors: fetchedData.contributors
-                                ? fetchedData.contributors.map((c: any) => ({
-                                      id: c.id,
-                                      idPublic: c.idPublic,
-                                      name: c.name,
-                                      email: c.email,
-                                      img: c.img,
-                                  }))
-                                : [],
-                        }));
-                    }
-                })
-                .catch(() => router.push('/404'))
-                .finally(() => setIsLoading(false));
+        if (fetchedData.user?.idPublic !== user.idPublic) {
+            router.push('/404');
+            return;
         }
-    }, [editId, isEditing, user?.idPublic, router]);
+
+        const getImageUrl = (imgName: string | null) => {
+            if (!imgName) return null;
+            if (imgName.startsWith('http') || imgName.startsWith('/')) {
+                return imgName;
+            }
+            return `/upload/manual/${fetchedData.idPublic}/img/${imgName}`;
+        };
+
+        setData((prev) => ({
+            ...prev,
+            title: fetchedData.name || '',
+            game: fetchedData.game || '',
+            genre: fetchedData.genre || '',
+            system: fetchedData.system || '',
+            banner: getImageUrl(fetchedData.imgBanner),
+            logo: getImageUrl(fetchedData.imgLogo),
+            playtime: fetchedData.playTime || '',
+            type: fetchedData.type || '',
+            edition: fetchedData.edition || '',
+            minPlayers: fetchedData.minPlayers || '',
+            maxPlayers: fetchedData.maxPlayers || '',
+            ageRating: fetchedData.ageRange || '',
+            description: fetchedData.description || '',
+            contributors: fetchedData.contributors
+                ? fetchedData.contributors.map((c: any) => ({
+                      id: c.id,
+                      idPublic: c.idPublic,
+                      name: c.name,
+                      email: c.email,
+                      img: c.img,
+                  }))
+                : [],
+        }));
+    }, [fetchedData, user, router]);
+
+    const isLoading = isFetchingManual || isSubmitting;
 
     const isValid = useMemo(() => {
         return (
@@ -131,7 +139,7 @@ export function useManualForm(editId?: string | null) {
     }, [data]);
 
     const handleSubmit = async () => {
-        setIsLoading(true);
+        setIsSubmitting(true);
         setError(null);
 
         try {
@@ -149,13 +157,8 @@ export function useManualForm(editId?: string | null) {
             const contributorIds = data.contributors.map((c) => c.id);
             formData.append('contributors', JSON.stringify(contributorIds));
 
-            if (data.genre) {
-                formData.append('genre', data.genre);
-            }
-
-            if (data.system) {
-                formData.append('system', data.system);
-            }
+            if (data.genre) formData.append('genre', data.genre);
+            if (data.system) formData.append('system', data.system);
 
             if (data.banner && data.banner instanceof File) {
                 formData.append('banner', data.banner);
@@ -192,7 +195,7 @@ export function useManualForm(editId?: string | null) {
             setError(err.message || 'Ocorreu um erro inesperado');
             throw err;
         } finally {
-            setIsLoading(false);
+            setIsSubmitting(false);
         }
     };
 
@@ -205,7 +208,7 @@ export function useManualForm(editId?: string | null) {
         );
 
         if (confirm.isConfirmed) {
-            setIsLoading(true);
+            setIsSubmitting(true);
             try {
                 await deleteManualService(editId);
                 await customAlert.toastSuccess('Manual excluído com sucesso!');
@@ -215,7 +218,7 @@ export function useManualForm(editId?: string | null) {
                     ? await customAlert.toastError('Não foi possível excluir o manual.')
                     : customAlert.error('Erro', 'Não foi possível excluir o manual.');
             } finally {
-                setIsLoading(false);
+                setIsSubmitting(false);
             }
         }
     };

@@ -15,7 +15,7 @@ import {
 import { ReactNode } from 'react';
 import { useLike } from '@/src/hooks/useLike';
 import { useShare } from '@/src/hooks/useShare';
-import { usePostActions } from '@/src/hooks/usePostActions'; // NOVO HOOK GLOBAL
+import { usePostActions } from '@/src/hooks/usePostActions';
 
 import { RoleBadge } from '@/src/components/RoleBadge';
 import { ReasonModal } from '@/src/components/ReasonModal';
@@ -27,7 +27,6 @@ interface FeedCardBaseProps {
 }
 
 export default function FeedCardBase({ post, postUrl, children }: FeedCardBaseProps) {
-    // Se o post estiver desativado, ele não renderiza na tela
     if (post.isDisabled) return null;
 
     const userIdUrl = post.user?.idPublic || post.user?.id;
@@ -44,7 +43,6 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
 
     const { sharePost } = useShare();
 
-    // SUBSTITUÍDO: Usando o hook global que acabamos de criar!
     const {
         isMenuOpen,
         setIsMenuOpen,
@@ -76,7 +74,7 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
                     <div className="flex items-center gap-1.5">
                         <Link
                             href={`/perfil/${userIdUrl}`}
-                            className="text-text font-bold text-base hover:underline"
+                            className="text-text font-bold text-base"
                         >
                             {post.user?.name}
                         </Link>
@@ -183,7 +181,6 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
                 </button>
             </div>
 
-            {/* Modal Global inserido no Card */}
             <ReasonModal
                 isOpen={isReasonModalOpen}
                 onClose={() => setIsReasonModalOpen(false)}

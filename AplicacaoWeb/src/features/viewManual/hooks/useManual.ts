@@ -1,36 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { manualService } from '../services/manualService';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export function useManual(id: string) {
-    const [manual, setManual] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const router = useRouter();
 
+    const {
+        data: manual = null,
+        isLoading: loading,
+        isError,
+    } = useQuery({
+        queryKey: ['manual', id],
+        queryFn: () => manualService.getManualById(id),
+        enabled: !!id,
+        retry: false,
+    });
+
     useEffect(() => {
-        if (!id) return;
+        if (!loading && (!manual || isError)) {
+            router.push('/404');
+        }
+    }, [manual, isError, loading, router]);
 
-        const loadManual = async () => {
-            try {
-                setLoading(true);
-                const data = await manualService.getManualById(id);
-
-                if (!data) {
-                    router.push('/404');
-                    return;
-                }
-
-                setManual(data);
-            } catch (err) {
-                router.push('/404');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadManual();
-    }, [id, router]);
-
-    return { manual, loading, error };
+    return {
+        manual,
+        loading,
+    };
 }

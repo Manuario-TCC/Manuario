@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { profileEditService } from '../services/profileEditService';
 import { customAlert } from '@/src/components/customAlert';
+import { useRouter } from 'next/navigation';
 
 export interface ProfileLink {
     name: string;
@@ -17,6 +18,7 @@ export const useProfileEdit = (
 ) => {
     const queryClient = useQueryClient();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const router = useRouter();
 
     const [formData, setFormData] = useState({
         name: initialName || '',
@@ -105,7 +107,7 @@ export const useProfileEdit = (
         },
         onSuccess: () => {
             customAlert.toastSuccess('Conta desativada com sucesso.');
-            window.location.href = '/signup';
+            router.push('/signup');
         },
         onError: (error: any) => {
             console.error('Erro ao desativar conta:', error.message);

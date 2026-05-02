@@ -1,3 +1,4 @@
+// app/api/comments/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/src/database/prisma';
 import { getServerSession } from '@/src/utils/auth';
@@ -11,13 +12,19 @@ export async function GET(req: Request) {
         const postId = searchParams.get('postId');
         const postType = searchParams.get('postType');
 
-        if (!postId) return NextResponse.json({ error: 'PostId não fornecido' }, { status: 400 });
+        if (!postId) {
+            return NextResponse.json({ error: 'PostId não fornecido' }, { status: 400 });
+        }
+
+        if (postType !== 'rules' && postType !== 'questions') {
+            return NextResponse.json({ error: 'Tipo de post inválido' }, { status: 400 });
+        }
 
         const where: any = { parentId: null };
 
-        if (postType === 'regra' || postType === 'rule' || postType === 'rules') {
+        if (postType === 'rules') {
             where.ruleId = postId;
-        } else if (postType === 'duvida' || postType === 'question') {
+        } else if (postType === 'questions') {
             where.questionId = postId;
         }
 
@@ -97,15 +104,19 @@ export async function POST(req: Request) {
 
         const { texto, text, postId, postType, parentId } = await req.json();
 
+        if (postType !== 'rules' && postType !== 'questions') {
+            return NextResponse.json({ error: 'Tipo de post inválido' }, { status: 400 });
+        }
+
         const data: any = {
             text: text || texto,
             authorId: session.user.id,
             parentId: parentId || null,
         };
 
-        if (postType === 'regra' || postType === 'rule' || postType === 'rules') {
+        if (postType === 'rules') {
             data.ruleId = postId;
-        } else {
+        } else if (postType === 'questions') {
             data.questionId = postId;
         }
 

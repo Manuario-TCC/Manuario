@@ -37,3 +37,14 @@ export const deleteRuleService = async (editId: string) => {
     }
     return response.json();
 };
+
+export async function uploadRuleImageService(formData: FormData) {
+    const res = await fetch('/api/upload/md', {
+        method: 'POST',
+        body: formData,
+    });
+    if (!res.ok) {
+        throw new Error('Erro no upload da imagem');
+    }
+    return res.json();
+}
