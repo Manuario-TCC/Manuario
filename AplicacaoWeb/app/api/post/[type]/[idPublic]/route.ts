@@ -21,13 +21,18 @@ export async function GET(
         }
 
         const post = await (model as any).findUnique({
-            where: { idPublic },
+            where: {
+                idPublic,
+                isDisabled: false,
+            },
             include: {
                 user: {
                     select: {
                         name: true,
                         img: true,
                         idPublic: true,
+                        isAdmin: true,
+                        isSuperAdmin: true,
                     },
                 },
                 ...(isRule ? { manuals: true } : {}),

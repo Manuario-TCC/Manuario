@@ -14,6 +14,8 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
     const [editValue, setEditValue] = useState(comment.text);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const [isReasonModalOpen, setIsReasonModalOpen] = useState(false);
+
     const initialIsLiked = useMemo(() => {
         return comment?.isLiked || false;
     }, [comment]);
@@ -43,6 +45,12 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
         );
     }, [currentUser, comment]);
 
+    const isAdminOrSuperAdmin = useMemo(() => {
+        if (!currentUser) return false;
+
+        return currentUser.isAdmin || currentUser.isSuperAdmin;
+    }, [currentUser]);
+
     const startEditing = () => {
         setIsEditing(true);
         setEditValue(comment.text);
@@ -66,6 +74,7 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
             onSuccess();
         } catch (error) {
             console.error(error);
+            customAlert.toastError('Erro ao atualizar comentário');
         } finally {
             setIsSubmitting(false);
         }
@@ -92,17 +101,37 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
         }
     };
 
+    const handleDisable = async (reason: string) => {
+        try {
+            setIsSubmitting(true);
+            await commentService.disableComment(comment.id, reason);
+
+            comment.isDisabled = true;
+            setIsReasonModalOpen(false);
+            onSuccess();
+            customAlert.toastSuccess('Comentário desativado com sucesso');
+        } catch (error) {
+            console.error(error);
+            customAlert.toastError('Erro ao desativar comentário');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return {
         showReplyInput,
         showReplies,
         isMenuOpen,
         isAuthor,
+        isAdminOrSuperAdmin,
         isEditing,
         editValue,
         isSubmitting,
         isLiked,
         likeCount,
         isLoadingLike,
+        isReasonModalOpen,
+        setIsReasonModalOpen,
         setEditValue,
         setIsEditing,
         toggleReplyInput,
@@ -113,6 +142,7 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
         startEditing,
         handleUpdate,
         handleDelete,
+        handleDisable,
         handleToggleLike,
         isEdited,
     };

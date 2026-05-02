@@ -7,11 +7,11 @@ export function useProfile(idPublic: string) {
     const {
         data: profileData,
         isLoading,
-        error,
+        isError,
     } = useQuery({
         queryKey: ['profile', idPublic],
         queryFn: () => profileService.getProfile(idPublic),
-        retry: (failureCount, err) => err.message !== 'NOT_FOUND' && failureCount < 2,
+        retry: false,
     });
 
     const followMutation = useMutation({
@@ -50,7 +50,7 @@ export function useProfile(idPublic: string) {
     return {
         profileData,
         isLoading,
-        isNotFound: error?.message === 'NOT_FOUND',
+        isError,
         handleFollowToggle: () => followMutation.mutate(),
         isFollowing: profileData?.isFollowing,
     };

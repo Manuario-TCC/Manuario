@@ -55,12 +55,15 @@ export async function GET(request: Request) {
                         contains: q,
                         mode: 'insensitive',
                     },
+                    isDisabled: false,
                 },
                 take: 5,
                 select: {
                     idPublic: true,
                     name: true,
                     img: true,
+                    isAdmin: true,
+                    isSuperAdmin: true,
                 },
             });
         }

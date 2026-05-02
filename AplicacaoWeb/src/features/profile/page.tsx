@@ -11,10 +11,12 @@ interface ProfilePageProps {
 }
 
 export default function ProfilePage({ id }: ProfilePageProps) {
-    const { profileData, isLoading, isNotFound, handleFollowToggle, isFollowing } = useProfile(id);
+    const { profileData, isLoading, isError, handleFollowToggle, isFollowing } = useProfile(id);
     const { user: currentUser } = useSession();
 
-    if (isNotFound) notFound();
+    if (isError) {
+        notFound();
+    }
 
     if (isLoading || !profileData) {
         return <ProfileSkeleton />;

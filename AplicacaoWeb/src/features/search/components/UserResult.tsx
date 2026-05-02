@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { RoleBadge } from '@/src/components/RoleBadge';
 
 export default function UserResult({ user }: { user: any }) {
     const avatarUrl = user.img
@@ -15,7 +16,12 @@ export default function UserResult({ user }: { user: any }) {
                 alt={user.name}
                 className="w-12 h-12 rounded-full object-cover border border-card-border"
             />
-            <h3 className="text-text font-bold">{user.name}</h3>
+
+            <div className="flex items-center gap-2">
+                <h3 className="text-text font-bold">{user.name}</h3>
+
+                <RoleBadge isAdmin={user.isAdmin} isSuperAdmin={user.isSuperAdmin} size={16} />
+            </div>
         </Link>
     );
 }

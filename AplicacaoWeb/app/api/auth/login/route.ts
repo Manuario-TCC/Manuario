@@ -23,6 +23,13 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Credenciais inválidas.' }, { status: 401 });
         }
 
+        if (user.isDisabled) {
+            return NextResponse.json(
+                { error: 'Sua conta foi desativada. Entre em contato com o suporte.' },
+                { status: 403 },
+            );
+        }
+
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {

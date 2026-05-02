@@ -32,8 +32,6 @@ interface ManualHeaderProps {
 export function ManualHeader({ manual, loading }: ManualHeaderProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    //const loading = true;
-
     const { user } = useSession();
     const { handleFork, isForking } = useManualActions();
 
@@ -146,6 +144,18 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                                 >
                                     {criador}
                                 </Link>
+                                {qtdContribuidores > 0 && (
+                                    <>
+                                        {' e '}
+                                        <button
+                                            onClick={() => setIsModalOpen(true)}
+                                            className="text-purple-500 font-bold hover:underline cursor-pointer transition-all"
+                                        >
+                                            +{qtdContribuidores}{' '}
+                                            {qtdContribuidores === 1 ? 'outro' : 'outros'}
+                                        </button>
+                                    </>
+                                )}
                                 {originalOwner && (
                                     <>
                                         {' | '}

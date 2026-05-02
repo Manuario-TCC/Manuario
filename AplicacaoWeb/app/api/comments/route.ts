@@ -31,6 +31,8 @@ export async function GET(req: Request) {
                         idPublic: true,
                         name: true,
                         img: true,
+                        isAdmin: true,
+                        isSuperAdmin: true,
                     },
                 },
                 replies: {
@@ -41,6 +43,8 @@ export async function GET(req: Request) {
                                 idPublic: true,
                                 name: true,
                                 img: true,
+                                isAdmin: true,
+                                isSuperAdmin: true,
                             },
                         },
                         replies: {
@@ -51,6 +55,8 @@ export async function GET(req: Request) {
                                         idPublic: true,
                                         name: true,
                                         img: true,
+                                        isAdmin: true,
+                                        isSuperAdmin: true,
                                     },
                                 },
                             },

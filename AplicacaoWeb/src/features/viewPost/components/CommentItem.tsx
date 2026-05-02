@@ -1,8 +1,18 @@
 import Link from 'next/link';
-import { MoreHorizontal, Heart, MessageCircle, Pencil, Trash2, Flag } from 'lucide-react';
+import {
+    MoreHorizontal,
+    Heart,
+    MessageCircle,
+    Pencil,
+    Trash2,
+    Flag,
+    ShieldAlert,
+} from 'lucide-react';
 import { formatTimeAgo } from '@/src/utils/formatTimeAgo';
 import { useCommentItem } from '../hooks/useCommentItem';
 import CommentInput from './CommentInput';
+import { RoleBadge } from '../../../components/RoleBadge';
+import { ReasonModal } from '../../../components/ReasonModal';
 
 interface Props {
     comment: any;
@@ -16,9 +26,12 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
         showReplies,
         isMenuOpen,
         isAuthor,
+        isAdminOrSuperAdmin,
         isEditing,
         editValue,
         isSubmitting,
+        isReasonModalOpen,
+        setIsReasonModalOpen,
         setEditValue,
         setIsEditing,
         toggleReplyInput,
@@ -28,6 +41,7 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
         startEditing,
         handleUpdate,
         handleDelete,
+        handleDisable,
         isLiked,
         likeCount,
         isLoadingLike,
@@ -38,6 +52,10 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
     const userAvatarUrl = comment.author?.img
         ? `/upload/${comment.author.idPublic}/user/${comment.author.img}`
         : '/img/iconePadrao.jpg';
+
+    if (comment.isDisabled) {
+        return null;
+    }
 
     return (
         <div className="flex gap-3 mt-6">
@@ -51,14 +69,20 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
 
             <div className="flex-1">
                 <div className="flex justify-between items-center mb-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                         <Link href={`/perfil/${comment.author?.idPublic}`}>
-                            <span className="text-text font-bold text-sm cursor-pointer">
+                            <span className="text-text font-bold text-sm cursor-pointer hover:underline">
                                 {comment.author?.name}
                             </span>
                         </Link>
 
-                        <span className="text-sub-text text-xs flex items-center gap-1">
+                        <RoleBadge
+                            isAdmin={comment.author?.isAdmin}
+                            isSuperAdmin={comment.author?.isSuperAdmin}
+                            size={14}
+                        />
+
+                        <span className="text-sub-text text-xs flex items-center gap-1 ml-0.5">
                             <span className="text-lg leading-none">•</span>{' '}
                             {formatTimeAgo(comment.createdAt)}
                             {isEdited && <span className="text-xs ml-1">(editado)</span>}
@@ -74,24 +98,34 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                         </button>
 
                         {isMenuOpen && (
-                            <div className="absolute right-0 top-7 w-36 bg-card border border-card-border rounded-md shadow-lg z-10 flex flex-col overflow-hidden">
-                                {isAuthor ? (
-                                    <>
-                                        <button
-                                            onClick={startEditing}
-                                            className="flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-gray transition-colors w-full text-left cursor-pointer"
-                                        >
-                                            <Pencil size={14} /> Editar
-                                        </button>
-                                        <button
-                                            onClick={handleDelete}
-                                            className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-500/10 transition-colors w-full text-left cursor-pointer"
-                                        >
-                                            <Trash2 size={14} /> Excluir
-                                        </button>
-                                    </>
-                                ) : (
-                                    <button className="flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-gray transition-colors w-full text-left cursor-pointer">
+                            <div className="absolute right-0 top-7 w-40 bg-card border border-card-border rounded-md shadow-lg z-10 flex flex-col overflow-hidden">
+                                {isAuthor && (
+                                    <button
+                                        onClick={startEditing}
+                                        className="flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-gray transition-colors w-full text-left cursor-pointer"
+                                    >
+                                        <Pencil size={14} /> Editar
+                                    </button>
+                                )}
+
+                                {(isAuthor || isAdminOrSuperAdmin) && (
+                                    <button
+                                        onClick={() => {
+                                            if (isAuthor) {
+                                                handleDelete();
+                                            } else {
+                                                setIsReasonModalOpen(true);
+                                            }
+                                            toggleMenu();
+                                        }}
+                                        className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-500/10 transition-colors w-full text-left cursor-pointer"
+                                    >
+                                        <Trash2 size={14} /> Excluir
+                                    </button>
+                                )}
+
+                                {!isAuthor && (
+                                    <button className="flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-gray transition-colors w-full text-left cursor-pointer border-t border-card-border">
                                         <Flag size={14} /> Reportar
                                     </button>
                                 )}
@@ -194,6 +228,15 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                     </div>
                 )}
             </div>
+
+            <ReasonModal
+                isOpen={isReasonModalOpen}
+                onClose={() => setIsReasonModalOpen(false)}
+                onConfirm={handleDisable}
+                title="Desativar Comentário"
+                description="Por favor, informe o motivo detalhado para desativar este comentário. Essa ação será registrada nos logs da plataforma."
+                actionLabel={isSubmitting ? 'Desativando...' : 'Desativar Comentário'}
+            />
         </div>
     );
 }
