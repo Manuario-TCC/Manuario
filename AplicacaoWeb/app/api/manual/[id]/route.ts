@@ -19,6 +19,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
                         idPublic: true,
                         name: true,
                         img: true,
+                        isAdmin: true,
+                        isSuperAdmin: true,
                     },
                 },
                 contributors: {
@@ -28,6 +30,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
                         name: true,
                         email: true,
                         img: true,
+                        isAdmin: true,
+                        isSuperAdmin: true,
                     },
                 },
                 rules: true,

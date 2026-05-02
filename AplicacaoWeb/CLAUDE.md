@@ -9,7 +9,7 @@ Este é um codigo utiliza a arquitetura baseada em features (Feature-Sliced Desi
 - Next.js (App Router)
 - TypeScript
 - Tailwind CSS & Shadcn UI
-- Prisma (ORM) & MongoDB & Neo4j
+- Prisma (ORM) & MongoDB
 - n8n (Microsserviço de IA e orquestração)
 - Docker & RabbitMQ
 

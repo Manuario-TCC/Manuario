@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { likeService } from '../services/likeService';
+import { useState } from 'react';
 
 export function useLike(
     initialIsLiked: boolean,
@@ -9,34 +10,39 @@ export function useLike(
 ) {
     const [isLiked, setIsLiked] = useState(initialIsLiked);
     const [likeCount, setLikeCount] = useState(initialLikeCount);
-    const [isLoadingLike, setIsLoadingLike] = useState(false);
 
-    const handleToggleLike = async () => {
-        if (isLoadingLike) return;
-        setIsLoadingLike(true);
+    const toggleLikeMutation = useMutation({
+        mutationFn: () => likeService.toggleLike(postType, postIdPublic),
 
-        const previousIsLiked = isLiked;
-        const previousLikeCount = likeCount;
+        onMutate: async () => {
+            const previousIsLiked = isLiked;
+            const previousLikeCount = likeCount;
 
-        setIsLiked(!isLiked);
-        setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
+            setIsLiked(!isLiked);
+            setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
 
-        try {
-            await likeService.toggleLike(postType, postIdPublic);
-        } catch (error) {
-            setIsLiked(previousIsLiked);
-            setLikeCount(previousLikeCount);
+            return { previousIsLiked, previousLikeCount };
+        },
+
+        onError: (error, _, context) => {
+            if (context) {
+                setIsLiked(context.previousIsLiked);
+                setLikeCount(context.previousLikeCount);
+            }
 
             console.error('Erro ao curtir postagem:', error);
-        } finally {
-            setIsLoadingLike(false);
-        }
+        },
+    });
+
+    const handleToggleLike = () => {
+        if (toggleLikeMutation.isPending) return;
+        toggleLikeMutation.mutate();
     };
 
     return {
         isLiked,
         likeCount,
-        isLoadingLike,
+        isLoadingLike: toggleLikeMutation.isPending,
         handleToggleLike,
     };
 }

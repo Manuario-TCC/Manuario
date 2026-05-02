@@ -40,14 +40,9 @@ export default function ViewPostFeature({ tipo, idPublic }: { tipo: string; idPu
     return (
         <div className="flex flex-col items-start w-full py-8 px-4">
             <div className="w-full max-w-5xl">
-                {(tipo === 'duvida' || tipo === 'question') && (
-                    <DuvidaCard post={post} isFullView={true} />
-                )}
-                {(tipo === 'regra' || tipo === 'rule' || tipo === 'rules') && (
-                    <RegraCard post={post} isFullView={true} />
-                )}
+                {tipo === 'questions' && <DuvidaCard post={post} isFullView={true} />}
+                {tipo === 'rules' && <RegraCard post={post} isFullView={true} />}
             </div>
-
             <div className="w-full max-w-3xl">
                 <CommentSection postId={post.id} postType={tipo} />
             </div>

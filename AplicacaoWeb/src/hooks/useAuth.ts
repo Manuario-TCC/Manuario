@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import Swal from 'sweetalert2';
 import { authService } from '../services/authService';
+import { customAlert } from '@/src/components/customAlert';
 
 export function useAuth() {
     const pathname = usePathname();
@@ -43,27 +43,11 @@ export function useAuth() {
                 password,
             });
 
-            Swal.fire({
-                icon: 'success',
-                title: isLogin ? 'Login realizado!' : 'Conta criada!',
-                text: 'Redirecionando...',
-                background: '#1a1625',
-                color: '#ffffff',
-                confirmButtonColor: '#8b5cf6',
-                timer: 1500,
-                showConfirmButton: false,
-            }).then(() => {
-                window.location.href = '/chat';
-            });
+            customAlert.toastSuccess(isLogin ? 'Login realizado!' : 'Conta criada!');
+
+            router.push('/chat');
         } catch (error: any) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Acesso negado',
-                text: error.message,
-                background: '#1a1625',
-                color: '#ffffff',
-                confirmButtonColor: '#8b5cf6',
-            });
+            customAlert.error('Acesso negado', error.message);
         } finally {
             setIsLoading(false);
         }
@@ -77,6 +61,7 @@ export function useAuth() {
             router.refresh();
         } catch (error) {
             console.error('Erro durante o processo de logout:', error);
+            customAlert.toastError('Erro ao deslogar da conta');
         }
     };
 

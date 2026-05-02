@@ -26,6 +26,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
         const whereClause = {
             manualIds: { has: manual.id },
+            isDisabled: false,
             name: {
                 contains: search,
                 mode: 'insensitive' as const,

@@ -53,6 +53,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     const avatar = useProfileAvatar(initialData.avatarUrl || '/img/iconePadrao.jpg', isOwnProfile);
 
     const edit = useProfileEdit(
+        initialData.idPublic,
         initialData.name,
         initialData.email,
         initialData.bio,
@@ -97,9 +98,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                             onClick={() => handleToggleAdmin(initialData.id, isAdmin, setIsAdmin)}
                             disabled={isActionLoading}
                             className={`p-1.5 rounded-full transition cursor-pointer disabled:opacity-50 ${
-                                isAdmin
-                                    ? 'text-primary hover:bg-primary'
-                                    : 'text-sub-text hover:bg-primary'
+                                isAdmin ? 'text-sub-text hover:bg-primary' : 'text-sub-tex'
                             }`}
                         >
                             {isAdmin ? <ShieldCheck size={20} /> : <Shield size={20} />}

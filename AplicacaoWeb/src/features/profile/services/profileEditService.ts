@@ -60,11 +60,16 @@ export const profileEditService = {
         }
     },
 
-    deleteAccount: async () => {
-        const res = await fetch('/api/users/delete', { method: 'DELETE' });
+    deactivateAccount: async (publicId: string) => {
+        const response = await fetch(`/api/users/${publicId}`, {
+            method: 'DELETE',
+        });
 
-        if (!res.ok) {
-            throw new Error('Falha ao excluir conta');
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Erro ao desativar a conta');
         }
+
+        return response.json();
     },
 };

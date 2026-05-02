@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/src/database/prisma';
-import { randomUUID } from 'crypto'; // Importe a biblioteca nativa do Node
+import { randomUUID } from 'crypto';
+import { nanoid } from 'nanoid';
 
 export async function POST(req: Request) {
     try {
@@ -22,7 +23,7 @@ export async function POST(req: Request) {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Id pulbico
-        const shortIdPublic = randomUUID().split('-')[0];
+        const shortIdPublic = nanoid(10);
 
         const user = await prisma.user.create({
             data: {

@@ -41,6 +41,8 @@ export async function GET(request: NextRequest) {
                             name: true,
                             img: true,
                             idPublic: true,
+                            isAdmin: true,
+                            isSuperAdmin: true,
                         },
                     },
                     manuals: true,
@@ -63,6 +65,8 @@ export async function GET(request: NextRequest) {
                             name: true,
                             img: true,
                             idPublic: true,
+                            isAdmin: true,
+                            isSuperAdmin: true,
                         },
                     },
 

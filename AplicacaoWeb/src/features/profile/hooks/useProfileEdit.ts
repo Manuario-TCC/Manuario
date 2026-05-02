@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { profileEditService } from '../services/profileEditService';
 import { customAlert } from '@/src/components/customAlert';
+import { useRouter } from 'next/navigation';
 
 export interface ProfileLink {
     name: string;
@@ -9,6 +10,7 @@ export interface ProfileLink {
 }
 
 export const useProfileEdit = (
+    publicId: string,
     initialName: string,
     initialEmail: string,
     initialBio?: string,
@@ -16,6 +18,7 @@ export const useProfileEdit = (
 ) => {
     const queryClient = useQueryClient();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const router = useRouter();
 
     const [formData, setFormData] = useState({
         name: initialName || '',
@@ -98,6 +101,19 @@ export const useProfileEdit = (
         },
     });
 
+    const deactivateMutation = useMutation({
+        mutationFn: async () => {
+            await profileEditService.deactivateAccount(publicId);
+        },
+        onSuccess: () => {
+            customAlert.toastSuccess('Conta desativada com sucesso.');
+            router.push('/signup');
+        },
+        onError: (error: any) => {
+            console.error('Erro ao desativar conta:', error.message);
+        },
+    });
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -129,13 +145,14 @@ export const useProfileEdit = (
     };
 
     const handleDeleteAccount = async () => {
-        if (window.confirm('Tem certeza que deseja excluir sua conta? Esta ação é irreversível.')) {
-            try {
-                await profileEditService.deleteAccount();
-                window.location.href = '/signup';
-            } catch (error) {
-                console.error('Erro ao deletar conta:', error);
-            }
+        const result = await customAlert.confirmDelete(
+            'Desativar conta?',
+            'Tem certeza que deseja desativar sua conta? Seus posts, manuais e comentários serão ocultados.',
+            'Sim, desativar',
+        );
+
+        if (result.isConfirmed) {
+            deactivateMutation.mutate();
         }
     };
 
@@ -143,6 +160,7 @@ export const useProfileEdit = (
         isModalOpen,
         formData,
         isLoading: mutation.isPending,
+        isDeactivating: deactivateMutation.isPending,
         avatarFile,
         bannerFile,
         openModal,

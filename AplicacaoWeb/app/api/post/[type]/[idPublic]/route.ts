@@ -8,26 +8,28 @@ export async function GET(
 ) {
     try {
         const { type, idPublic } = await params;
-
         const userId = await getAuthUserId();
 
-        const isRule = ['regra', 'rule', 'rules'].includes(type.toLowerCase());
-        const isQuestion = ['duvida', 'question', 'questions'].includes(type.toLowerCase());
-
-        const model = isRule ? prisma.rule : isQuestion ? prisma.question : null;
-
-        if (!model) {
+        if (type !== 'rules' && type !== 'questions') {
             return NextResponse.json({ error: 'Tipo de postagem inválido' }, { status: 400 });
         }
 
+        const isRule = type === 'rules';
+        const model = isRule ? prisma.rule : prisma.question;
+
         const post = await (model as any).findUnique({
-            where: { idPublic },
+            where: {
+                idPublic,
+                isDisabled: false,
+            },
             include: {
                 user: {
                     select: {
                         name: true,
                         img: true,
                         idPublic: true,
+                        isAdmin: true,
+                        isSuperAdmin: true,
                     },
                 },
                 ...(isRule ? { manuals: true } : {}),
@@ -40,7 +42,7 @@ export async function GET(
 
         const formattedPost = {
             ...post,
-            type: isRule ? 'regra' : 'duvida',
+            type,
             hasLiked: userId && post.likedByIds ? post.likedByIds.includes(userId) : false,
         };
 

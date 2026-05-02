@@ -1,8 +1,20 @@
 import Link from 'next/link';
-import { MoreHorizontal, Heart, MessageCircle, Pencil, Trash2, Flag } from 'lucide-react';
+import {
+    MoreHorizontal,
+    Heart,
+    MessageCircle,
+    Pencil,
+    Trash2,
+    Flag,
+    ShieldAlert,
+    BadgeCheck,
+    ShieldCheck,
+} from 'lucide-react';
 import { formatTimeAgo } from '@/src/utils/formatTimeAgo';
 import { useCommentItem } from '../hooks/useCommentItem';
 import CommentInput from './CommentInput';
+import { RoleBadge } from '../../../components/RoleBadge';
+import { ReasonModal } from '../../../components/ReasonModal';
 
 interface Props {
     comment: any;
@@ -16,9 +28,12 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
         showReplies,
         isMenuOpen,
         isAuthor,
+        isAdminOrSuperAdmin,
         isEditing,
         editValue,
         isSubmitting,
+        isReasonModalOpen,
+        setIsReasonModalOpen,
         setEditValue,
         setIsEditing,
         toggleReplyInput,
@@ -28,16 +43,22 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
         startEditing,
         handleUpdate,
         handleDelete,
+        handleDisable,
         isLiked,
         likeCount,
         isLoadingLike,
         handleToggleLike,
         isEdited,
+        handleValidate,
     } = useCommentItem(comment, onReplySuccess);
 
     const userAvatarUrl = comment.author?.img
         ? `/upload/${comment.author.idPublic}/user/${comment.author.img}`
         : '/img/iconePadrao.jpg';
+
+    if (comment.isDisabled) {
+        return null;
+    }
 
     return (
         <div className="flex gap-3 mt-6">
@@ -45,20 +66,26 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                 <img
                     src={userAvatarUrl}
                     alt={comment.author?.name}
-                    className="w-[1.8rem] h-[1.8rem] rounded-full object-cover border border-card-border shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
+                    className="w-[1.8rem] h-[1.8rem] rounded-full object-cover border border-card-border shrink-0 hover:opacity-80 transition-opacity cursor-pointer select-none"
                 />
             </Link>
 
             <div className="flex-1">
                 <div className="flex justify-between items-center mb-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                         <Link href={`/perfil/${comment.author?.idPublic}`}>
-                            <span className="text-text font-bold text-sm cursor-pointer">
+                            <span className="text-text font-bold text-sm cursor-pointer hover:underline">
                                 {comment.author?.name}
                             </span>
                         </Link>
 
-                        <span className="text-sub-text text-xs flex items-center gap-1">
+                        <RoleBadge
+                            isAdmin={comment.author?.isAdmin}
+                            isSuperAdmin={comment.author?.isSuperAdmin}
+                            size={14}
+                        />
+
+                        <span className="text-sub-text text-xs flex items-center gap-1 ml-0.5 select-none">
                             <span className="text-lg leading-none">•</span>{' '}
                             {formatTimeAgo(comment.createdAt)}
                             {isEdited && <span className="text-xs ml-1">(editado)</span>}
@@ -74,24 +101,49 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                         </button>
 
                         {isMenuOpen && (
-                            <div className="absolute right-0 top-7 w-36 bg-card border border-card-border rounded-md shadow-lg z-10 flex flex-col overflow-hidden">
-                                {isAuthor ? (
-                                    <>
-                                        <button
-                                            onClick={startEditing}
-                                            className="flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-gray transition-colors w-full text-left cursor-pointer"
-                                        >
-                                            <Pencil size={14} /> Editar
-                                        </button>
-                                        <button
-                                            onClick={handleDelete}
-                                            className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-500/10 transition-colors w-full text-left cursor-pointer"
-                                        >
-                                            <Trash2 size={14} /> Excluir
-                                        </button>
-                                    </>
-                                ) : (
-                                    <button className="flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-gray transition-colors w-full text-left cursor-pointer">
+                            <div className="absolute right-0 top-7 w-42 bg-card border border-card-border rounded-md shadow-lg z-10 flex flex-col overflow-hidden">
+                                {isAuthor && (
+                                    <button
+                                        onClick={startEditing}
+                                        className="flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-gray transition-colors w-full text-left cursor-pointer"
+                                    >
+                                        <Pencil size={14} /> Editar
+                                    </button>
+                                )}
+
+                                {isAdminOrSuperAdmin && (
+                                    <button
+                                        onClick={() => {
+                                            handleValidate();
+                                            toggleMenu();
+                                        }}
+                                        className="flex items-center gap-2 px-3 py-2 text-sm text-green-500 hover:bg-green-500/10 transition-colors w-full text-left cursor-pointer"
+                                    >
+                                        <ShieldCheck size={14} />
+                                        {comment.isValidated
+                                            ? 'Remover Validação'
+                                            : 'Validar Comentário'}
+                                    </button>
+                                )}
+
+                                {(isAuthor || isAdminOrSuperAdmin) && (
+                                    <button
+                                        onClick={() => {
+                                            if (isAuthor) {
+                                                handleDelete();
+                                            } else {
+                                                setIsReasonModalOpen(true);
+                                            }
+                                            toggleMenu();
+                                        }}
+                                        className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-500/10 transition-colors w-full text-left cursor-pointer"
+                                    >
+                                        <Trash2 size={14} /> Excluir
+                                    </button>
+                                )}
+
+                                {!isAuthor && (
+                                    <button className="flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-gray transition-colors w-full text-left cursor-pointer border-t border-card-border">
                                         <Flag size={14} /> Reportar
                                     </button>
                                 )}
@@ -99,6 +151,15 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                         )}
                     </div>
                 </div>
+
+                {comment.isValidated && (
+                    <div className="flex items-center gap-1.5 mb-2 px-2 py-1 bg-green-500/10 text-green-500 rounded-md w-fit">
+                        <BadgeCheck size={14} />
+                        <span className="text-[10px] uppercase tracking-wider font-bold">
+                            Validado pelos Moderadores
+                        </span>
+                    </div>
+                )}
 
                 <div className="mb-2">
                     {isEditing ? (
@@ -143,7 +204,7 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                         <button
                             onClick={handleToggleLike}
                             disabled={isLoadingLike}
-                            className={`flex items-center gap-1.5 transition-all cursor-pointer ${
+                            className={`flex items-center gap-1.5 transition-all select-none cursor-pointer ${
                                 isLiked ? 'text-red-500' : 'hover:text-red-500'
                             }`}
                         >
@@ -152,14 +213,14 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                         </button>
                         <button
                             onClick={toggleReplyInput}
-                            className="flex items-center gap-1.5 hover:text-secondary transition-all cursor-pointer"
+                            className="flex items-center gap-1.5 select-none hover:text-secondary transition-all cursor-pointer"
                         >
                             <MessageCircle size={16} /> Responder
                         </button>
                         {comment.replies?.length > 0 && (
                             <button
                                 onClick={toggleReplies}
-                                className="hover:text-secondary transition-all cursor-pointer"
+                                className="hover:text-secondary transition-all cursor-pointer select-none"
                             >
                                 {showReplies
                                     ? 'Ocultar respostas'
@@ -194,6 +255,15 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                     </div>
                 )}
             </div>
+
+            <ReasonModal
+                isOpen={isReasonModalOpen}
+                onClose={() => setIsReasonModalOpen(false)}
+                onConfirm={handleDisable}
+                title="Desativar Comentário"
+                description="Por favor, informe o motivo detalhado para desativar este comentário. Essa ação será registrada nos logs da plataforma."
+                actionLabel={isSubmitting ? 'Desativando...' : 'Desativar Comentário'}
+            />
         </div>
     );
 }

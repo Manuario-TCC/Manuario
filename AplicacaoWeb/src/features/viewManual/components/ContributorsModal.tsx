@@ -3,11 +3,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Users, X } from 'lucide-react';
+import { RoleBadge } from '@/src/components/RoleBadge';
 
 interface Contributor {
     idPublic: string;
     name: string;
     img?: string;
+    isAdmin?: boolean;
+    isSuperAdmin?: boolean;
 }
 
 interface ContributorsModalProps {
@@ -21,16 +24,16 @@ export function ContributorsModal({ isOpen, onClose, contributors }: Contributor
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-            <div className="bg-card rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+            <div className="bg-card rounded-2xl w-full max-w-md p-6 shadow-2xl relative border border-card-border">
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 text-sub-text hover:text-white p-1.5 rounded-lg cursor-pointer"
+                    className="absolute top-4 right-4 text-sub-text hover:text-white p-1.5 rounded-lg cursor-pointer transition-colors"
                 >
                     <X className="w-[1.25rem] h-[1.25rem]" />
                 </button>
 
                 <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                    <Users className="w-[1.5rem] h-[1.5rem]" />
+                    <Users className="w-[1.5rem] h-[1.5rem] text-purple-500" />
                     Contribuidores
                 </h2>
 
@@ -44,9 +47,9 @@ export function ContributorsModal({ isOpen, onClose, contributors }: Contributor
                             <Link
                                 key={user.idPublic}
                                 href={`/perfil/${user.idPublic}`}
-                                className="flex items-center gap-4 p-3 rounded-xl bg-background hover:bg-gray"
+                                className="flex items-center gap-4 p-3 rounded-xl bg-background hover:bg-gray/50 border border-transparent hover:border-card-border transition-all"
                             >
-                                <div className="w-12 h-12 rounded-full overflow-hidden relative bg-gray shrink-0 border-2 border-gray">
+                                <div className="w-12 h-12 rounded-full overflow-hidden relative bg-gray shrink-0 border-2 border-card-border">
                                     <Image
                                         src={avatarImg}
                                         alt={user.name}
@@ -54,8 +57,14 @@ export function ContributorsModal({ isOpen, onClose, contributors }: Contributor
                                         className="object-cover"
                                     />
                                 </div>
-                                <div className="flex flex-col">
+                                <div className="flex items-center gap-2">
                                     <span className="text-text font-bold text-sm">{user.name}</span>
+
+                                    <RoleBadge
+                                        isAdmin={user.isAdmin}
+                                        isSuperAdmin={user.isSuperAdmin}
+                                        size={14}
+                                    />
                                 </div>
                             </Link>
                         );
