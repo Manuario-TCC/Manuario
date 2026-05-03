@@ -3,8 +3,9 @@ import { useState } from 'react';
 export const useCommentInput = (
     onSubmit: (texto: string) => Promise<boolean>,
     onSuccess?: () => void,
+    initialValue: string = '',
 ) => {
-    const [texto, setTexto] = useState('');
+    const [texto, setTexto] = useState(initialValue);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -26,5 +27,6 @@ export const useCommentInput = (
         setTexto,
         isSubmitting,
         handleSubmit,
+        initialValue,
     };
 };

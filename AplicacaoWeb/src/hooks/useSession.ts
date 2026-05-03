@@ -3,7 +3,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getMe } from '@/src/services/authService';
 import { useEffect } from 'react';
-import { socket } from '@/src/utils/socket';
+import { socket } from '@/src/services/socket';
 
 export function useSession() {
     const queryClient = useQueryClient();

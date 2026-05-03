@@ -15,19 +15,19 @@ export function FooterMenu({ user, loading, isOpen }: FooterMenuProps) {
     const { logout } = useAuth();
 
     const containerClasses = `relative flex items-center h-16 shrink-0 w-full transition-all duration-300 ${
-        isOpen ? 'px-2' : 'px-0 justify-center lg:justify-start lg:px-2'
+        isOpen ? 'px-2' : 'px-0 justify-center xl:justify-start xl:px-2'
     }`;
 
     const textContainerClasses = `flex flex-col justify-center overflow-hidden transition-all duration-300 ${
         isOpen
             ? 'opacity-100 ml-3 w-auto block'
-            : 'opacity-0 w-0 hidden ml-0 lg:opacity-100 lg:w-auto lg:ml-3 lg:block'
+            : 'opacity-0 w-0 hidden ml-0 xl:opacity-100 xl:w-auto xl:ml-3 xl:block'
     }`;
 
     const logoutBtnClasses = `absolute right-2 p-2 rounded-lg text-sub-text hover:text-red-500 hover:bg-gray shrink-0 z-20 cursor-pointer transition-all duration-300 ${
         isOpen
             ? 'opacity-100 pointer-events-auto block'
-            : 'opacity-0 hidden pointer-events-none lg:opacity-100 lg:pointer-events-auto lg:block'
+            : 'opacity-0 hidden pointer-events-none xl:opacity-100 xl:pointer-events-auto xl:block'
     }`;
 
     if (loading)
@@ -48,7 +48,7 @@ export function FooterMenu({ user, loading, isOpen }: FooterMenuProps) {
             <Link
                 href={`/perfil/${user.idPublic}`}
                 className={`flex items-center group z-10 w-full overflow-hidden transition-all duration-300 ${
-                    isOpen ? 'justify-start' : 'justify-center lg:justify-start'
+                    isOpen ? 'justify-start' : 'justify-center xl:justify-start'
                 }`}
             >
                 <div className="relative size-10 rounded-full overflow-hidden bg-card shrink-0 border border-card-border transition-colors group-hover:border-accent">

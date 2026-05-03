@@ -42,7 +42,8 @@ export function NavLinks({ isOpen, closeMenu }: NavLinksProps) {
     const pathname = usePathname();
 
     const handleMobileClick = () => {
-        if (window.innerWidth < 1024) {
+        if (window.innerWidth < 1280) {
+            // Atualizei aqui também para garantir o fechamento no mobile/tablet correto
             closeMenu();
         }
     };
@@ -53,7 +54,7 @@ export function NavLinks({ isOpen, closeMenu }: NavLinksProps) {
                 const isActive = pathname.startsWith(item.href);
 
                 const baseClasses = `flex items-center gap-3 py-2.5 rounded-lg transition-colors overflow-hidden group w-full text-left cursor-pointer z-10 ${
-                    isOpen ? 'px-4 justify-start' : 'justify-center px-0 lg:px-4 lg:justify-start'
+                    isOpen ? 'px-4 justify-start' : 'justify-center px-0 xl:px-4 xl:justify-start'
                 } ${
                     isActive
                         ? 'bg-gray text-text font-medium'
@@ -63,7 +64,7 @@ export function NavLinks({ isOpen, closeMenu }: NavLinksProps) {
                 const textClasses = `whitespace-nowrap text-base transition-all duration-300 ${
                     isOpen
                         ? 'opacity-100 block'
-                        : 'opacity-0 hidden w-0 lg:opacity-100 lg:block lg:w-auto'
+                        : 'opacity-0 hidden w-0 xl:opacity-100 xl:block xl:w-auto'
                 }`;
 
                 return (

@@ -27,35 +27,35 @@ export default function Menu() {
         <>
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black/60 z-40 block lg:hidden backdrop-blur-sm transition-opacity"
+                    className="fixed inset-0 bg-black/60 z-40 block xl:hidden backdrop-blur-sm transition-opacity"
                     onClick={closeMenu}
                 />
             )}
 
-            <div className="hidden sm:block lg:hidden w-20 shrink-0 transition-none" />
+            <div className="hidden sm:block xl:hidden w-20 shrink-0 transition-none" />
 
             <aside
                 className={`
                     top-0 left-0 h-screen bg-card border-r border-card-border z-50
                     transition-all duration-300 ease-in-out flex flex-col
-                    hidden sm:flex
-                    fixed lg:relative lg:shrink-0
+                    hidden sm:flex overflow-x-hidden
+                    fixed xl:relative xl:shrink-0
                     ${isOpen ? 'translate-x-0 w-[15rem] shadow-2xl' : '-translate-x-0 w-20'}
-                    lg:w-[15%] lg:min-w-[14rem] lg:max-w-[16rem] lg:translate-x-0 lg:shadow-none
+                    xl:w-[15%] xl:min-w-[14rem] xl:max-w-[16rem] xl:translate-x-0 xl:shadow-none
                 `}
             >
                 <div
                     className={`transition-all duration-300 flex items-center justify-between p-6 ${!isOpen ? 'justify-center p-4' : ''}`}
                 >
                     <div
-                        className={`text-xl font-bold whitespace-nowrap transition-all ${!isOpen ? 'opacity-0 hidden lg:block lg:opacity-100' : 'opacity-100 block'}`}
+                        className={`text-xl font-bold whitespace-nowrap transition-all ${!isOpen ? 'opacity-0 hidden xl:block xl:opacity-100' : 'opacity-100 block'}`}
                     >
                         Manuario
                     </div>
 
                     <button
                         onClick={toggleMenu}
-                        className={`text-sub-text hover:text-text p-2 focus:outline-none transition-colors cursor-pointer lg:hidden ${!isOpen ? 'mx-auto' : ''}`}
+                        className={`text-sub-text hover:text-text p-2 focus:outline-none transition-colors cursor-pointer xl:hidden ${!isOpen ? 'mx-auto' : ''}`}
                         aria-label="Alternar Menu"
                     >
                         <svg

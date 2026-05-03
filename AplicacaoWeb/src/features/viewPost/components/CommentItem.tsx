@@ -18,11 +18,19 @@ import { ReasonModal } from '../../../components/ReasonModal';
 
 interface Props {
     comment: any;
+    postId: string;
     onAddReply: (text: string, parentId: string) => Promise<boolean>;
     onReplySuccess: () => void;
+    mainCommentId?: string;
 }
 
-export default function CommentItem({ comment, onAddReply, onReplySuccess }: Props) {
+export default function CommentItem({
+    comment,
+    postId,
+    onAddReply,
+    onReplySuccess,
+    mainCommentId,
+}: Props) {
     const {
         showReplyInput,
         showReplies,
@@ -49,8 +57,9 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
         isLoadingLike,
         handleToggleLike,
         isEdited,
+        replyingTo,
         handleValidate,
-    } = useCommentItem(comment, onReplySuccess);
+    } = useCommentItem(comment, onReplySuccess, postId);
 
     const userAvatarUrl = comment.author?.img
         ? `/upload/${comment.author.idPublic}/user/${comment.author.img}`
@@ -59,6 +68,8 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
     if (comment.isDisabled) {
         return null;
     }
+
+    const targetParentId = mainCommentId || comment.id;
 
     return (
         <div className="flex gap-3 mt-6">
@@ -194,7 +205,17 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                         </div>
                     ) : (
                         <p className="text-text text-sm whitespace-pre-wrap leading-relaxed">
-                            {comment.text}
+                            {comment.text.split(' ').map((word: string, i: number) =>
+                                word.startsWith('@') ? (
+                                    <span key={i} className="text-primary font-medium mr-1">
+                                        {word}
+                                    </span>
+                                ) : (
+                                    <span key={i} className="mr-1">
+                                        {word}
+                                    </span>
+                                ),
+                            )}
                         </p>
                     )}
                 </div>
@@ -211,12 +232,14 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                             <Heart size={16} fill={isLiked ? 'currentColor' : 'none'} />
                             {likeCount}
                         </button>
+
                         <button
-                            onClick={toggleReplyInput}
+                            onClick={() => toggleReplyInput(comment.author?.name)}
                             className="flex items-center gap-1.5 select-none hover:text-secondary transition-all cursor-pointer"
                         >
                             <MessageCircle size={16} /> Responder
                         </button>
+
                         {comment.replies?.length > 0 && (
                             <button
                                 onClick={toggleReplies}
@@ -233,7 +256,8 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                 {showReplyInput && (
                     <div className="mt-4">
                         <CommentInput
-                            onSubmit={(t: string) => onAddReply(t, comment.id)}
+                            initialValue={replyingTo}
+                            onSubmit={(t: string) => onAddReply(t, targetParentId)}
                             onSuccess={() => {
                                 handleReplySuccess();
                                 onReplySuccess();
@@ -243,11 +267,17 @@ export default function CommentItem({ comment, onAddReply, onReplySuccess }: Pro
                 )}
 
                 {showReplies && comment.replies?.length > 0 && (
-                    <div className="mt-4 border-l border-card-border pl-4">
+                    <div
+                        className={
+                            !mainCommentId ? 'mt-4 border-l border-card-border pl-4' : 'mt-4'
+                        }
+                    >
                         {comment.replies.map((res: any) => (
                             <CommentItem
                                 key={res.id}
                                 comment={res}
+                                postId={postId}
+                                mainCommentId={targetParentId}
                                 onAddReply={onAddReply}
                                 onReplySuccess={onReplySuccess}
                             />
