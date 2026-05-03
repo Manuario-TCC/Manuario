@@ -9,6 +9,7 @@ interface PostSidebarProps {
     type: string;
     gameName: string;
     currentIdPublic: string;
+    loggedUserId?: string | null;
 }
 
 const RecommendationSkeleton = () => (

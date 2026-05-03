@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/src/database/prisma';
+import { getAuthUserId } from '@/src/utils/auth';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -12,6 +13,8 @@ export async function GET(request: Request) {
     }
 
     try {
+        const loggedUserId = await getAuthUserId();
+
         const baseSelect = {
             id: true,
             idPublic: true,
@@ -32,8 +35,15 @@ export async function GET(request: Request) {
         if (type === 'rules') {
             recommendations = await prisma.rule.findMany({
                 where: {
-                    manuals: { some: { game: gameName } },
-                    idPublic: { not: currentId || undefined },
+                    manuals: {
+                        some: {
+                            game: gameName,
+                        },
+                    },
+                    idPublic: {
+                        not: currentId || undefined,
+                    },
+                    userId: loggedUserId ? { not: loggedUserId } : undefined,
                     isDisabled: false,
                 },
                 select: {
@@ -51,25 +61,21 @@ export async function GET(request: Request) {
                 where: {
                     game: gameName,
                     idPublic: { not: currentId || undefined },
+                    userId: loggedUserId ? { not: loggedUserId } : undefined,
                     isDisabled: false,
                 },
                 select: baseSelect,
                 take: 30,
                 orderBy: { createdAt: 'desc' },
             });
-        } else {
-            return NextResponse.json({ error: 'Tipo inválido' }, { status: 400 });
         }
 
-        // Pontuação Trending Score
         const now = new Date().getTime();
 
         const scoredRecommendations = recommendations.map((item) => {
             const itemDate = new Date(item.createdAt).getTime();
             const daysOld = (now - itemDate) / (1000 * 60 * 60 * 24);
-
             const score = (item.likeCount || 0) - daysOld * 0.1;
-
             return { ...item, _score: score };
         });
 
@@ -77,7 +83,6 @@ export async function GET(request: Request) {
 
         const topCandidates = scoredRecommendations.slice(0, 15);
 
-        // Embaralha
         const finalRecommendations = topCandidates
             .sort(() => 0.5 - Math.random())
             .slice(0, 8)

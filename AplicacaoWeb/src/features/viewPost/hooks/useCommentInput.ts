@@ -27,6 +27,5 @@ export const useCommentInput = (
         setTexto,
         isSubmitting,
         handleSubmit,
-        initialValue,
     };
 };
