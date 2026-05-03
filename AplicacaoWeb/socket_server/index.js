@@ -1,9 +1,6 @@
 const { Server } = require('socket.io');
-const http = require('http');
 
-const server = http.createServer();
-
-const io = new Server(server, {
+const io = new Server(3001, {
     cors: {
         origin: '*',
         methods: ['GET', 'POST'],
@@ -11,12 +8,28 @@ const io = new Server(server, {
 });
 
 io.on('connection', (socket) => {
-    socket.on('profile_updated', (data) => {
-        io.emit('reload_profile_data', data);
-    });
-});
+    console.log('Novo usuário conectado:', socket.id);
 
-const PORT = 3001;
-server.listen(PORT, () => {
-    console.log(`Servidor Socket.IO rodando na porta ${PORT}`);
+    socket.on('join_post', (postId) => {
+        socket.join(postId);
+        console.log(`Usuário entrou na sala do post: ${postId}`);
+    });
+
+    socket.on('send_comment', (data) => {
+        const { postId, comment } = data;
+        socket.to(postId).emit('receive_comment', comment);
+    });
+
+    socket.on('action_comment', (data) => {
+        socket.to(data.postId).emit('action_comment', data);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Usuário desconectado:', socket.id);
+    });
+
+    socket.on('leave_post', (postId) => {
+        socket.leave(postId);
+        console.log(`Usuário saiu da sala do post: ${postId}`);
+    });
 });

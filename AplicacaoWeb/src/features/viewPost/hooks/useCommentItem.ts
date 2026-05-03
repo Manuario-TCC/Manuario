@@ -3,10 +3,10 @@ import { useSession } from '@/src/hooks/useSession';
 import { commentService } from '../services/commentService';
 import { customAlert } from '@/src/components/customAlert';
 import { useCommentLike } from './useCommentLike';
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { socket } from '../../../services/socket';
 
-export const useCommentItem = (comment: any, onSuccess: () => void) => {
+export const useCommentItem = (comment: any, onSuccess: () => void, postId: string) => {
     const { user: currentUser } = useSession();
     const queryClient = useQueryClient();
 
@@ -29,7 +29,6 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
 
     const isEdited = comment.isEdited || false;
 
-    const toggleReplyInput = useCallback(() => setShowReplyInput((prev) => !prev), []);
     const toggleReplies = useCallback(() => setShowReplies((prev) => !prev), []);
     const toggleMenu = useCallback(() => setIsMenuOpen((prev) => !prev), []);
     const closeMenu = useCallback(() => setIsMenuOpen(false), []);
@@ -39,8 +38,23 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
         setShowReplies(true);
     }, []);
 
+    const [replyingTo, setReplyingTo] = useState('');
+
+    const toggleReplyInput = useCallback(
+        (authorName?: string) => {
+            setShowReplyInput((prev) => !prev);
+            if (authorName && !showReplyInput) {
+                setReplyingTo(`@${authorName} `);
+            } else {
+                setReplyingTo('');
+            }
+        },
+        [showReplyInput],
+    );
+
     const isAuthor = useMemo(() => {
         if (!currentUser || !comment) return false;
+
         return (
             currentUser.idPublic === comment.author?.idPublic || currentUser.id === comment.authorId
         );
@@ -59,13 +73,18 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
 
     const updateMutation = useMutation({
         mutationFn: (newText: string) => commentService.updateComment(comment.id, newText),
-
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['comments'] });
             setIsEditing(false);
             onSuccess();
-        },
 
+            socket.emit('action_comment', {
+                type: 'edit',
+                postId: postId,
+                commentId: comment.id,
+                newText: editValue,
+            });
+        },
         onError: () => {
             customAlert.toastError('Erro ao atualizar comentário');
         },
@@ -76,19 +95,22 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
             setIsEditing(false);
             return;
         }
-
         updateMutation.mutate(editValue);
     };
 
     const deleteMutation = useMutation({
         mutationFn: () => commentService.deleteComment(comment.id),
-
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['comments'] });
             onSuccess();
             customAlert.toastSuccess('Excluído com sucesso');
-        },
 
+            socket.emit('action_comment', {
+                type: 'delete',
+                postId: postId,
+                commentId: comment.id,
+            });
+        },
         onError: () => {
             customAlert.toastError('Erro ao excluir comentário');
         },
@@ -107,14 +129,18 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
 
     const disableMutation = useMutation({
         mutationFn: (reason: string) => commentService.disableComment(comment.id, reason),
-
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['comments'] });
             setIsReasonModalOpen(false);
             onSuccess();
             customAlert.toastSuccess('Comentário desativado com sucesso');
-        },
 
+            socket.emit('action_comment', {
+                type: 'delete',
+                postId: postId,
+                commentId: comment.id,
+            });
+        },
         onError: () => {
             customAlert.toastError('Erro ao desativar comentário');
         },
@@ -126,7 +152,6 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
 
     const validateMutation = useMutation({
         mutationFn: () => commentService.toggleCommentValidation(comment.id, ''),
-
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['comments'] });
             onSuccess();
@@ -136,8 +161,14 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
             } else {
                 customAlert.toastSuccess('Comentário validado com sucesso');
             }
-        },
 
+            socket.emit('action_comment', {
+                type: 'validate',
+                postId: postId,
+                commentId: comment.id,
+                isValidated: !comment.isValidated,
+            });
+        },
         onError: () => {
             customAlert.toastError('Erro ao validar comentário');
         },
@@ -177,6 +208,7 @@ export const useCommentItem = (comment: any, onSuccess: () => void) => {
         startEditing,
         handleUpdate,
         handleDelete,
+        replyingTo,
         handleDisable,
         handleToggleLike,
         isEdited,

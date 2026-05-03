@@ -3,9 +3,13 @@ import { useSession } from '@/src/hooks/useSession';
 import { useCommentInput } from '../hooks/useCommentInput';
 import { SendHorizontal } from 'lucide-react';
 
-export default function CommentInput({ onSubmit, onSuccess }: any) {
+export default function CommentInput({ onSubmit, onSuccess, initialValue = '' }: any) {
     const { user } = useSession();
-    const { texto, setTexto, isSubmitting, handleSubmit } = useCommentInput(onSubmit, onSuccess);
+    const { texto, setTexto, isSubmitting, handleSubmit } = useCommentInput(
+        onSubmit,
+        onSuccess,
+        initialValue,
+    );
 
     return (
         <form onSubmit={handleSubmit} className="flex gap-4 items-center w-full">
@@ -25,6 +29,7 @@ export default function CommentInput({ onSubmit, onSuccess }: any) {
                     placeholder="Adicione um comentário..."
                     className="flex-1 bg-transparent text-foreground py-2.5 px-4 border border-border rounded-md focus:outline-none transition-colors text-sm border-card-border"
                     disabled={isSubmitting}
+                    autoFocus={!!initialValue}
                 />
 
                 <button

@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import Swal from 'sweetalert2';
 import { profileService } from '../services/profileService';
 
-import { socket } from '@/src/utils/socket';
+import { socket } from '@/src/services/socket';
 
 export const useProfileAvatar = (initialAvatarUrl: string, isOwnProfile: boolean) => {
     const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
