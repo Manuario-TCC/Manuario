@@ -28,6 +28,9 @@ export async function GET(request: Request) {
                     idPublic: true,
                 },
             },
+            _count: {
+                select: { comments: true },
+            },
         };
 
         let recommendations = [];
@@ -76,7 +79,12 @@ export async function GET(request: Request) {
             const itemDate = new Date(item.createdAt).getTime();
             const daysOld = (now - itemDate) / (1000 * 60 * 60 * 24);
             const score = (item.likeCount || 0) - daysOld * 0.1;
-            return { ...item, _score: score };
+
+            return {
+                ...item,
+                _score: score,
+                commentCount: item._count?.comments || 0,
+            };
         });
 
         scoredRecommendations.sort((a, b) => b._score - a._score);
@@ -86,7 +94,7 @@ export async function GET(request: Request) {
         const finalRecommendations = topCandidates
             .sort(() => 0.5 - Math.random())
             .slice(0, 8)
-            .map(({ _score, ...rest }) => rest);
+            .map(({ _score, _count, ...rest }) => rest);
 
         return NextResponse.json(finalRecommendations);
     } catch (error) {

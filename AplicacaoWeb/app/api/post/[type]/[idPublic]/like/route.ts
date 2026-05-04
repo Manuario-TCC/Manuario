@@ -15,7 +15,7 @@ export async function POST(
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
         }
 
-        const isRule = type === 'regra' || type === 'rule';
+        const isRule = type === 'rules';
         const model = isRule ? prisma.rule : prisma.question;
 
         const post = await (model as any).findUnique({

@@ -4,7 +4,7 @@ import { prisma } from '@/src/database/prisma';
 
 export async function PATCH(
     request: Request,
-    { params }: { params: Promise<{ type: string; idPublic: string }> }, // <-- P maiúsculo aqui
+    { params }: { params: Promise<{ type: string; idPublic: string }> },
 ) {
     try {
         const body = await request.json();
