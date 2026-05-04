@@ -41,10 +41,13 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 name: true,
                 description: true,
                 userId: true,
+                status: true,
                 user: {
                     select: { idPublic: true },
                 },
                 originManualId: true,
+                createdAt: true,
+                updatedAt: true,
             },
             skip,
             take: limit,

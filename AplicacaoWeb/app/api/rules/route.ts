@@ -4,9 +4,11 @@ import { prisma } from '@/src/database/prisma';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { publicationId, title, name, manualId, description, userId, isHouseRule } = body;
+        const { publicationId, title, name, manualId, description, userId, isHouseRule, status } =
+            body;
 
         const nomeDaRegra = title || name;
+
         if (!nomeDaRegra) {
             return NextResponse.json(
                 { error: 'O título/nome da regra é obrigatório.' },
@@ -20,6 +22,7 @@ export async function POST(request: Request) {
                 name: nomeDaRegra,
                 description: description,
                 isHouseRule: isHouseRule || false,
+                status: status === 'PRIVADO' ? 'PRIVADO' : 'PUBLICADO',
                 user: {
                     connect: { idPublic: userId },
                 },
