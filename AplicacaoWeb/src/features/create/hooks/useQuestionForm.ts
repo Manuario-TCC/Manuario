@@ -14,7 +14,7 @@ export function useQuestionForm(editId?: string | null) {
     const router = useRouter();
 
     const [data, setData] = useState({ title: '', game: '', description: '' });
-    const [publicationId] = useState(() => crypto.randomUUID());
+    const [publicationId] = useState(() => editId || crypto.randomUUID());
     const [isLoading, setIsLoading] = useState(false);
     const [pendingImages, setPendingImages] = useState<Record<string, File>>({});
 

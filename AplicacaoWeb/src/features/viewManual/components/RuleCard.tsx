@@ -13,7 +13,10 @@ interface Regra {
     name: string;
     description: string;
     userId: string;
+    status: string;
     originManualId?: string;
+    createdAt: string;
+    updatedAt: string;
     user?: {
         idPublic: string;
     };
@@ -47,6 +50,9 @@ export function RuleCard({ rules, loading, manualId, manualUserId }: RuleCardPro
         isAutorDaRegra,
     });
 
+    const isClonada = Boolean(rules?.originManualId);
+    const isEditada = rules?.createdAt !== rules?.updatedAt;
+
     if (loading) {
         return (
             <div className="bg-transparent border border-gray/80 rounded-lg p-4 h-[3.75rem] animate-pulse flex items-center justify-between">
@@ -68,9 +74,10 @@ export function RuleCard({ rules, loading, manualId, manualUserId }: RuleCardPro
             >
                 <div className="flex flex-col gap-0.5 flex-1">
                     <h3 className="text-text font-medium">{rules.name}</h3>
-                    {rules.originManualId && (
+
+                    {isClonada && (
                         <span className="text-[10px] text-purple-500 font-bold uppercase tracking-wider">
-                            Regra Clonada
+                            {isEditada ? 'Regra Clonada e Editada' : 'Regra Clonada'}
                         </span>
                     )}
                 </div>
@@ -91,12 +98,14 @@ export function RuleCard({ rules, loading, manualId, manualUserId }: RuleCardPro
 
                                 {isMenuOpen && (
                                     <div className="absolute right-0 top-full mt-1 w-40 bg-gray border border-gray rounded-md shadow-lg z-[100] py-1">
-                                        <Link
-                                            href={`/post/rules/${rules.idPublic}`}
-                                            className="flex items-center gap-2 px-4 py-2 text-sm text-sub-text rounded-lg hover:bg-background hover:text-text transition-colors"
-                                        >
-                                            <Eye size={16} /> Ver post
-                                        </Link>
+                                        {rules.status === 'PUBLICADO' && (
+                                            <Link
+                                                href={`/post/rules/${rules.idPublic}`}
+                                                className="flex items-center gap-2 px-4 py-2 text-sm text-sub-text rounded-lg hover:bg-background hover:text-text transition-colors"
+                                            >
+                                                <Eye size={16} /> Ver post
+                                            </Link>
+                                        )}
 
                                         <button
                                             onClick={() => {
@@ -111,7 +120,7 @@ export function RuleCard({ rules, loading, manualId, manualUserId }: RuleCardPro
                                         <button
                                             onClick={() => {
                                                 setIsMenuOpen(false);
-                                                handleDelete(rules.id);
+                                                handleDelete(rules);
                                             }}
                                             className="w-full flex items-center gap-2 px-4 py-2 text-sm rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 text-left cursor-pointer transition-colors"
                                         >
@@ -121,13 +130,15 @@ export function RuleCard({ rules, loading, manualId, manualUserId }: RuleCardPro
                                 )}
                             </div>
                         ) : (
-                            <Link
-                                href={`/post/rules/${rules.idPublic}`}
-                                className="p-2 hover:bg-gray rounded-full text-sub-text hover:text-text transition-colors"
-                                title="Ver Post"
-                            >
-                                <Eye size={18} />
-                            </Link>
+                            rules.status === 'PUBLICADO' && (
+                                <Link
+                                    href={`/post/rules/${rules.idPublic}`}
+                                    className="p-2 hover:bg-gray rounded-full text-sub-text hover:text-text transition-colors"
+                                    title="Ver Post"
+                                >
+                                    <Eye size={18} />
+                                </Link>
+                            )
                         )}
                     </div>
 

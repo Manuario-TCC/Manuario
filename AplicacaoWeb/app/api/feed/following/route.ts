@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
             prisma.rule.findMany({
                 where: {
                     userId: { in: followedIds },
-                    status: { not: 'CLONADO' },
+                    status: 'PUBLICADO',
                     isDisabled: false,
                 },
                 include: {

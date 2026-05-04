@@ -22,7 +22,7 @@ export function useRuleForm(editId?: string | null) {
 
     const isEditing = !!editId;
 
-    const [publicationId] = useState(() => crypto.randomUUID());
+    const [publicationId] = useState(() => editId || crypto.randomUUID());
     const [data, setData] = useState({
         title: '',
         type: 'oficial',
@@ -119,7 +119,7 @@ export function useRuleForm(editId?: string | null) {
             return response;
         },
 
-        onSuccess: async (response) => {
+        onSuccess: async (response, status) => {
             const responseData = await response.json();
 
             await customAlert.toastSuccess(
@@ -129,8 +129,12 @@ export function useRuleForm(editId?: string | null) {
             queryClient.invalidateQueries({ queryKey: FEED_QUERY_KEY });
             queryClient.invalidateQueries({ queryKey: ['user-posts'] });
 
-            const idPublicRule = responseData.idPublic || editId;
-            router.push(`/post/rules/${idPublicRule}`);
+            if (status === 'PRIVADO') {
+                router.push('/feed');
+            } else {
+                const idPublicRule = responseData.idPublic || editId;
+                router.push(`/post/rules/${idPublicRule}`);
+            }
         },
 
         onError: () => {

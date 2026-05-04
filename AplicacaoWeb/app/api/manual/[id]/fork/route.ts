@@ -13,10 +13,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         const resolvedParams = await params;
         const manualOriginalId = resolvedParams.id;
 
-        // Busca o manual e todas as regras
+        // Busca o manual e as regras
         const manualOriginal = await prisma.manual.findUnique({
             where: { id: manualOriginalId },
-            include: { rules: true },
+            include: {
+                rules: {
+                    where: { isDisabled: false },
+                },
+            },
         });
 
         if (!manualOriginal)
@@ -72,7 +76,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
             if (manualOriginal.imgBanner) {
                 const bannerSrc = path.join(originalFolder, manualOriginal.imgBanner);
                 const bannerDest = path.join(newFolder, manualOriginal.imgBanner);
-
                 if (existsSync(bannerSrc)) {
                     await fs.copyFile(bannerSrc, bannerDest);
                 }
@@ -82,30 +85,34 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
             if (manualOriginal.imgLogo) {
                 const logoSrc = path.join(originalFolder, manualOriginal.imgLogo);
                 const logoDest = path.join(newFolder, manualOriginal.imgLogo);
-
                 if (existsSync(logoSrc)) {
                     await fs.copyFile(logoSrc, logoDest);
                 }
             }
-        } catch (fsError) {}
+        } catch (fsError) {
+            console.error('Aviso: Falha ao copiar imagens do clone', fsError);
+        }
 
-        // AClona as Regras
+        // Clona as Regras uma a uma.
         if (manualOriginal.rules && manualOriginal.rules.length > 0) {
-            const regrasParaClonar = manualOriginal.rules.map((rules) => ({
-                idPublic: crypto.randomUUID(),
-                name: rules.name,
-                description: rules.description,
-                status: 'CLONADO',
-                isHouseRule: rules.isHouseRule,
-                userId: userId,
-                originManualId: rules.id,
-                manualIds: [novoManual.id],
-            }));
-
-            // Salva todas as regras no banco
-            await prisma.rule.createMany({
-                data: regrasParaClonar,
-            });
+            await Promise.all(
+                manualOriginal.rules.map((rule) =>
+                    prisma.rule.create({
+                        data: {
+                            idPublic: crypto.randomUUID(),
+                            name: rule.name,
+                            description: rule.description,
+                            status: 'CLONADO',
+                            isHouseRule: rule.isHouseRule,
+                            userId: userId,
+                            originManualId: rule.id,
+                            manuals: {
+                                connect: { id: novoManual.id },
+                            },
+                        },
+                    }),
+                ),
+            );
         }
 
         return NextResponse.json({ success: true, manualId: novoManual.idPublic }, { status: 201 });

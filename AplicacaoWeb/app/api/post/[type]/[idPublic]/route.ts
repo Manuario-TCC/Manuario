@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/src/database/prisma';
-import { getAuthUserId } from '@/src/utils/auth';
+import { getAuthUserId, getServerSession } from '@/src/utils/auth';
 
 export async function GET(
     request: Request,
@@ -10,17 +10,14 @@ export async function GET(
         const { type, idPublic } = await params;
         const userId = await getAuthUserId();
 
-        if (type !== 'rules' && type !== 'questions') {
-            return NextResponse.json({ error: 'Tipo de postagem inválido' }, { status: 400 });
-        }
-
-        const isRule = type === 'rules';
+        const isRule = type === 'rules' || type === 'regra' || type === 'rule';
         const model = isRule ? prisma.rule : prisma.question;
 
         const post = await (model as any).findUnique({
             where: {
                 idPublic,
                 isDisabled: false,
+                ...(isRule ? { status: 'PUBLICADO' } : {}),
             },
             include: {
                 user: {
@@ -37,7 +34,10 @@ export async function GET(
         });
 
         if (!post) {
-            return NextResponse.json({ error: 'Postagem não encontrada' }, { status: 404 });
+            return NextResponse.json(
+                { error: 'Postagem não encontrada ou privada' },
+                { status: 404 },
+            );
         }
 
         const formattedPost = {
@@ -49,6 +49,33 @@ export async function GET(
         return NextResponse.json(formattedPost);
     } catch (error) {
         console.error('Erro ao buscar postagem:', error);
+        return NextResponse.json({ error: 'Erro interno no servidor' }, { status: 500 });
+    }
+}
+
+export async function DELETE(
+    request: Request,
+    { params }: { params: Promise<{ type: string; idPublic: string }> },
+) {
+    try {
+        const { type, idPublic } = await params;
+        const session = await getServerSession();
+
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+
+        const isRule = type === 'rules' || type === 'regra' || type === 'rule';
+        const model = isRule ? prisma.rule : prisma.question;
+
+        await (model as any).update({
+            where: { idPublic },
+            data: { isDisabled: true },
+        });
+
+        return NextResponse.json({ message: 'Postagem excluída com sucesso.' });
+    } catch (error) {
+        console.error('Erro ao excluir postagem:', error);
         return NextResponse.json({ error: 'Erro interno no servidor' }, { status: 500 });
     }
 }

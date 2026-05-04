@@ -11,7 +11,10 @@ export async function GET() {
         }
 
         const manuals = await prisma.manual.findMany({
-            where: { userId: session.user.id },
+            where: {
+                userId: session.user.id,
+                isDisabled: false,
+            },
             select: { id: true, name: true },
         });
 

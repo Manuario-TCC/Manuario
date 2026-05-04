@@ -1,5 +1,6 @@
 import { useRouter } from 'next/navigation';
 import { manualService } from '../services/manualService';
+import { customAlert } from '@/src/components/customAlert';
 
 interface UseRuleActionsProps {
     manualId: string;
@@ -30,21 +31,23 @@ export const useRuleActions = ({
         }
     };
 
-    const handleDelete = async (ruleId: string) => {
-        const confirmou = confirm('Tem certeza que deseja remover esta regra?');
-        if (!confirmou) return;
+    const handleDelete = async (rule: any) => {
+        const confirmou = await customAlert.confirmDelete(
+            'Tem certeza que deseja remover esta regra?',
+        );
+        if (!confirmou.isConfirmed) return;
 
         try {
             if (isAutorDaRegra) {
-                await manualService.deleteRegra(ruleId);
+                await manualService.deleteRegra(rule.idPublic);
             } else if (isDonoDoManual) {
-                await manualService.hideRule(manualId, ruleId);
+                await manualService.hideRule(manualId, rule.id);
             }
 
-            alert('Regra removida com sucesso!');
+            await customAlert.toastSuccess('Regra removida com sucesso!');
         } catch (error) {
             console.error('Erro ao deletar:', error);
-            alert('Erro ao remover a regra.');
+            customAlert.error('Erro', 'Erro ao remover a regra.');
         }
     };
 

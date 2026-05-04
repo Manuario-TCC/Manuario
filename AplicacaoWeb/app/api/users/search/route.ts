@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/src/database/prisma'; //
+import { prisma } from '@/src/database/prisma';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -16,6 +16,7 @@ export async function GET(request: Request) {
                     contains: email.trim(),
                     mode: 'insensitive',
                 },
+                isDisabled: false,
             },
             select: {
                 id: true,
