@@ -128,8 +128,11 @@ export const useCommentItem = (comment: any, onSuccess: () => void, postId: stri
     };
 
     const disableMutation = useMutation({
-        mutationFn: (reason: string) => commentService.disableComment(comment.id, reason),
-        onSuccess: () => {
+        mutationFn: async (reason: string) => {
+            const data = await commentService.disableComment(comment.id, reason);
+            return data;
+        },
+        onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ['comments'] });
             setIsReasonModalOpen(false);
             onSuccess();
@@ -140,6 +143,10 @@ export const useCommentItem = (comment: any, onSuccess: () => void, postId: stri
                 postId: postId,
                 commentId: comment.id,
             });
+
+            if (data && data.notification) {
+                socket.emit('send_notification', data.notification);
+            }
         },
         onError: () => {
             customAlert.toastError('Erro ao desativar comentário');
@@ -151,8 +158,11 @@ export const useCommentItem = (comment: any, onSuccess: () => void, postId: stri
     };
 
     const validateMutation = useMutation({
-        mutationFn: () => commentService.toggleCommentValidation(comment.id, ''),
-        onSuccess: () => {
+        mutationFn: async () => {
+            const data = await commentService.toggleCommentValidation(comment.id, '');
+            return data;
+        },
+        onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ['comments'] });
             onSuccess();
 
@@ -168,6 +178,10 @@ export const useCommentItem = (comment: any, onSuccess: () => void, postId: stri
                 commentId: comment.id,
                 isValidated: !comment.isValidated,
             });
+
+            if (data && data.notification) {
+                socket.emit('send_notification', data.notification);
+            }
         },
         onError: () => {
             customAlert.toastError('Erro ao validar comentário');

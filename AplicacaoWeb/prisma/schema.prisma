@@ -221,3 +221,23 @@ model AdminLog {
     adminId   String
     createdAt DateTime @default(now())
 }
+
+enum NotificationType {
+    REPLY
+    DELETE
+    BADGE
+}
+
+model Notification {
+    id        String           @id @default(auto()) @map("_id") @db.ObjectId
+    userId    String           @db.ObjectId
+    type      NotificationType
+    isRead    Boolean          @default(false)
+    createdAt DateTime         @default(now())
+
+    senderId   String? @db.ObjectId
+    senderName String?
+    link       String?
+    targetName String?
+    reason     String?
+}

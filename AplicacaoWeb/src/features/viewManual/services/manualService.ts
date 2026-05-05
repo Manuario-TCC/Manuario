@@ -56,4 +56,17 @@ export const manualService = {
 
         return res.json();
     },
+
+    disableManual: async (idPublic: string, reason: string) => {
+        const response = await fetch(`/api/manual/${idPublic}/disable`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason }),
+        });
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || 'Erro ao desativar manual');
+        }
+        return response.json();
+    },
 };

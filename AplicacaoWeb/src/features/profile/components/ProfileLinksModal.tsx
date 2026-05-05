@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { X, Link2, Globe, ExternalLink, Mail } from 'lucide-react';
-// Importando as marcas do FontAwesome 6 (fa6)
 import {
     FaInstagram,
     FaGithub,

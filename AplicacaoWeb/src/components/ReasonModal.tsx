@@ -33,7 +33,7 @@ export function ReasonModal({
             <div className="bg-background border border-gray rounded-xl w-full max-w-md p-6 relative shadow-2xl">
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 text-sub-text hover:text-white"
+                    className="absolute top-4 right-4 text-sub-text hover:text-white cursor-pointer"
                 >
                     <X size={20} />
                 </button>
