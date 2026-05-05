@@ -24,7 +24,6 @@ export async function PATCH(
             return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 });
         }
 
-        // Verifica privilegios
         const currentUserDb = await prisma.user.findUnique({
             where: { id: currentUserId },
             select: { isSuperAdmin: true, isAdmin: true },
@@ -37,38 +36,88 @@ export async function PATCH(
         const resolvedParams = await params;
         const { type, idPublic } = resolvedParams;
 
+        let postToDisable: any = null;
+
+        if (type === 'rules') {
+            postToDisable = await prisma.rule.findUnique({
+                where: { idPublic },
+                select: {
+                    id: true,
+                    name: true,
+                    userId: true,
+                    user: {
+                        select: {
+                            idPublic: true,
+                        },
+                    },
+                },
+            });
+        } else if (type === 'questions') {
+            postToDisable = await prisma.question.findUnique({
+                where: { idPublic },
+                select: {
+                    id: true,
+                    name: true,
+                    userId: true,
+                    user: {
+                        select: {
+                            idPublic: true,
+                        },
+                    },
+                },
+            });
+        }
+
+        if (!postToDisable) {
+            return NextResponse.json({ error: 'Publicação não encontrada.' }, { status: 404 });
+        }
+
+        const postTitle = postToDisable.name;
+
+        let notificationRecord = null;
+
         await prisma.$transaction(async (tx) => {
-            let targetPostId = idPublic;
-
-            if (type === 'regra') {
-                const post = await tx.rule.update({
-                    where: { idPublic: idPublic },
+            if (type === 'rules') {
+                await tx.rule.update({
+                    where: { id: postToDisable.id },
                     data: { isDisabled: true },
-                    select: { id: true },
                 });
-
-                targetPostId = post.id;
-            } else if (type === 'duvida') {
-                const post = await tx.question.update({
-                    where: { idPublic: idPublic },
+            } else if (type === 'questions') {
+                await tx.question.update({
+                    where: { id: postToDisable.id },
                     data: { isDisabled: true },
-                    select: { id: true },
                 });
-                targetPostId = post.id;
             }
 
-            // Salva o Log
             await tx.adminLog.create({
                 data: {
                     action: `DISABLE_POST_${type.toUpperCase()}`,
                     reason: reason,
-                    targetId: targetPostId,
+                    targetId: postToDisable.id,
                     adminId: currentUserId,
+                },
+            });
+
+            notificationRecord = await tx.notification.create({
+                data: {
+                    userId: postToDisable.userId,
+                    type: 'DELETE',
+                    reason: reason,
+                    targetName: postTitle,
+                    senderName: type === 'rules' ? 'Regra' : 'Dúvida',
+                    link: null,
+                    isRead: false,
                 },
             });
         });
 
-        return NextResponse.json({ success: true });
+        return NextResponse.json({
+            success: true,
+            notification: {
+                ...notificationRecord,
+                receiverIdPublic: postToDisable.user?.idPublic,
+            },
+        });
     } catch (error) {
         console.error('Erro na rota central de disable:', error);
         return NextResponse.json({ error: 'Erro ao desabilitar publicação' }, { status: 500 });

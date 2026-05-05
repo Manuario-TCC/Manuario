@@ -1,15 +1,20 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useSession } from '@/src/hooks/useSession';
 import { customAlert } from '@/src/components/customAlert';
 import { postService } from '@/src/services/postService';
+import { useQueryClient } from '@tanstack/react-query';
+import { socket } from '@/src/services/socket';
 
 export function usePostActions(post: any) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isReasonModalOpen, setIsReasonModalOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+
     const router = useRouter();
+    const pathname = usePathname();
+    const queryClient = useQueryClient();
 
     const { user: currentUser, loading } = useSession();
 
@@ -64,7 +69,13 @@ export function usePostActions(post: any) {
                 await postService.deletePost(post.type, post.idPublic);
 
                 customAlert.toastSuccess('Publicação excluída com sucesso');
-                router.refresh();
+
+                if (pathname.includes('/post/')) {
+                    router.push('/feed');
+                } else {
+                    queryClient.invalidateQueries({ queryKey: ['feed'] });
+                    queryClient.invalidateQueries({ queryKey: ['user-posts'] });
+                }
             } catch (error) {
                 console.error(error);
                 customAlert.toastError('Erro ao excluir publicação');
@@ -78,13 +89,23 @@ export function usePostActions(post: any) {
     const handleDisable = async (reason: string) => {
         try {
             setIsSubmitting(true);
-            await postService.disablePost(post.type, post.idPublic, reason);
+            const responseData = await postService.disablePost(post.type, post.idPublic, reason);
 
             post.isDisabled = true;
             setIsReasonModalOpen(false);
             customAlert.toastSuccess('Publicação desativada com sucesso');
 
-            router.refresh();
+            if (pathname.includes('/post/')) {
+                router.push('/feed');
+            } else {
+                queryClient.invalidateQueries({ queryKey: ['feed'] });
+                queryClient.invalidateQueries({ queryKey: ['user-posts'] });
+                queryClient.invalidateQueries({ queryKey: ['recommendations'] });
+            }
+
+            if (responseData && responseData.notification) {
+                socket.emit('send_notification', responseData.notification);
+            }
         } catch (error) {
             console.error(error);
             customAlert.toastError('Erro ao desativar publicação');

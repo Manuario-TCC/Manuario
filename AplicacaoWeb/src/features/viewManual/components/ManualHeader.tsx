@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
+    ShieldAlert,
     Eye,
     SquareStack,
     Download,
@@ -23,6 +24,7 @@ import { ContributorsModal } from './ContributorsModal';
 import { customAlert } from '@/src/components/customAlert';
 import { useManualActions } from '../hooks/useManualActions';
 import { useSession } from '@/src/hooks/useSession';
+import { ReasonModal } from '@/src/components/ReasonModal';
 
 interface ManualHeaderProps {
     manual: any;
@@ -33,7 +35,16 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const { user } = useSession();
-    const { handleFork, isForking } = useManualActions();
+    const {
+        handleFork,
+        isForking,
+        handleDisableManual,
+        isDisabling,
+        isReasonModalOpen,
+        setIsReasonModalOpen,
+    } = useManualActions();
+
+    const isAdminOrSuperAdmin = user?.isAdmin || user?.isSuperAdmin;
 
     const originalOwner = manual?.clonadoDe?.user;
 
@@ -98,15 +109,27 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
 
     return (
         <div className="w-full text-text relative">
-            {manual?.idPublic && isOwner && (
-                <Link
-                    href={`/create?tab=manual&id=${manual.idPublic}`}
-                    className="absolute top-6 right-6 z-50 p-3 bg-gray/50 backdrop-blur-md hover:bg-background text-white rounded-full transition-all shadow-lg"
-                    title="Editar Manual"
-                >
-                    <Pencil className="w-[1.125rem] h-[1.125rem]" />
-                </Link>
-            )}
+            <div className="absolute top-6 right-6 z-50 flex items-center gap-2">
+                {manual?.idPublic && isOwner && (
+                    <Link
+                        href={`/create?tab=manual&id=${manual.idPublic}`}
+                        className="p-3 bg-gray/50 backdrop-blur-md hover:bg-background text-white rounded-full transition-all shadow-lg"
+                        title="Editar Manual"
+                    >
+                        <Pencil className="w-[1.125rem] h-[1.125rem]" />
+                    </Link>
+                )}
+
+                {manual?.idPublic && !isOwner && isAdminOrSuperAdmin && (
+                    <button
+                        onClick={() => setIsReasonModalOpen(true)}
+                        className="p-3 bg-red-500/80 backdrop-blur-md hover:bg-red-600 text-white rounded-full transition-all shadow-lg cursor-pointer"
+                        title="Desativar Manual (Moderação)"
+                    >
+                        <ShieldAlert className="w-[1.125rem] h-[1.125rem]" />
+                    </button>
+                )}
+            </div>
 
             <div className="w-full h-[18rem] md:h-[21rem] relative">
                 <Image src={bannerImg} alt="Banner" fill className="object-cover" priority />
@@ -285,6 +308,15 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 contributors={contributors}
+            />
+
+            <ReasonModal
+                isOpen={isReasonModalOpen}
+                onClose={() => setIsReasonModalOpen(false)}
+                onConfirm={(reason) => handleDisableManual(manual.idPublic, reason)}
+                title="Desativar Manual"
+                description="Por favor, informe o motivo para desativar este manual. Todas as regras vinculadas a ele também serão desativadas em cascata."
+                actionLabel={isDisabling ? 'Desativando...' : 'Desativar Manual'}
             />
         </div>
     );

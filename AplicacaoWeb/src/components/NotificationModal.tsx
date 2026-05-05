@@ -75,7 +75,7 @@ export function NotificationModal({
                 </button>
 
                 <h2 className="text-xl font-bold text-text mb-6 flex items-center gap-2">
-                    <Bell className="w-[1.5rem] h-[1.5rem] text-primary" />
+                    <Bell className="w-[1.5rem] h-[1.5rem] text-text" />
                     Notificações
                 </h2>
 
@@ -87,63 +87,108 @@ export function NotificationModal({
                     ) : (
                         notifications.map((notif) => {
                             const isUnread = !notif.isRead;
-                            const isLink = notif.type === 'REPLY' || notif.type === 'BADGE';
+                            const isLink = !!notif.link;
 
-                            const contentText = (
-                                <span className="text-sub-text text-sm leading-snug">
-                                    {notif.type === 'REPLY' && (
-                                        <span>
-                                            O usuário{' '}
-                                            <strong className="text-text">
-                                                {notif.senderName}
-                                            </strong>{' '}
-                                            respondeu seu comentário.
-                                        </span>
-                                    )}
-                                    {notif.type === 'DELETE' && (
-                                        <span>
-                                            Sua <strong>{notif.targetName}</strong> foi deletada:{' '}
-                                            <span className="italic text-sub-text">
-                                                "{notif.reason}"
+                            const contentText = (() => {
+                                const isMasculine =
+                                    notif.senderName === 'Manual' || !notif.senderName;
+                                const subject = notif.senderName || 'comentário';
+
+                                return (
+                                    <div className="text-sm leading-snug w-full">
+                                        {notif.type === 'REPLY' && (
+                                            <span className="text-sub-text">
+                                                O usuário{' '}
+                                                <strong className="text-text">
+                                                    {notif.senderName}
+                                                </strong>{' '}
+                                                respondeu seu comentário.
                                             </span>
-                                            .
-                                        </span>
-                                    )}
-                                    {notif.type === 'BADGE' && (
-                                        <span>Seu comentário ganhou selo de validade!</span>
-                                    )}
-                                </span>
-                            );
+                                        )}
+
+                                        {notif.type === 'DELETE' && (
+                                            <div className="flex flex-col gap-2 w-full mt-1">
+                                                <span className="text-sub-text">
+                                                    {isMasculine ? 'Seu' : 'Sua'}{' '}
+                                                    <strong className="text-red-400">
+                                                        {subject}
+                                                    </strong>{' '}
+                                                    foi {isMasculine ? 'removido' : 'removida'}.
+                                                </span>
+
+                                                {notif.targetName && (
+                                                    <div className="bg-card-border/20 p-2.5 rounded-lg border-l-2 border-red-500/50">
+                                                        <p className="text-xs text-sub-text italic line-clamp-2">
+                                                            "{notif.targetName}"
+                                                        </p>
+                                                    </div>
+                                                )}
+
+                                                {notif.reason && (
+                                                    <span className="text-xs text-text mt-0.5">
+                                                        <strong className="text-red-400/80">
+                                                            Motivo:{' '}
+                                                        </strong>
+                                                        {notif.reason}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {notif.type === 'BADGE' && (
+                                            <div className="flex flex-col gap-2 w-full mt-1">
+                                                <span className="text-sub-text">
+                                                    Seu comentário ganhou um{' '}
+                                                    <strong className="text-green-500">
+                                                        Selo de Qualidade
+                                                    </strong>{' '}
+                                                    da moderação!
+                                                </span>
+
+                                                {notif.targetName && (
+                                                    <div className="bg-card-border/20 p-2.5 rounded-lg border-l-2 border-green-500/50">
+                                                        <p className="text-xs text-sub-text italic line-clamp-2">
+                                                            "{notif.targetName}"
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })();
 
                             return (
                                 <div
                                     key={notif.id}
-                                    className={`flex items-center justify-between p-3 rounded-xl bg-background border 
-                                    hover:bg-gray transition-colors duration-200 delay-100 ease-in-out group ${
-                                        isUnread ? 'border-primary' : 'border-card-border'
-                                    }`}
+                                    className={`flex items-center justify-between p-3 rounded-xl bg-background border transition-all duration-200 ease-in-out 
+                                        ${isUnread ? 'border-primary' : 'border-card-border'}
+                                        ${
+                                            isLink
+                                                ? 'cursor-pointer hover:bg-gray active:scale-[0.98]'
+                                                : 'cursor-default hover:bg-transparent' // Remove o ponteiro e a mudança de fundo
+                                        }
+                                    `}
+                                    onClick={() => {
+                                        if (isLink && notif.link) {
+                                            onMarkAsRead(notif.id);
+                                            onClose();
+                                            window.location.href = notif.link;
+                                        } else if (isUnread) {
+                                            onMarkAsRead(notif.id);
+                                        }
+                                    }}
                                 >
                                     <div className="flex-1 flex items-center gap-4">
-                                        <div
-                                            className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-card`}
-                                        >
+                                        <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-card">
                                             {getIcon(notif.type)}
                                         </div>
 
-                                        <div
-                                            className="flex flex-col flex-1 cursor-pointer"
-                                            onClick={() => {
-                                                if (isUnread) onMarkAsRead(notif.id);
-                                            }}
-                                        >
-                                            {isLink && notif.link ? (
-                                                <Link
-                                                    href={notif.link}
-                                                    onClick={onClose}
-                                                    className="hover:underline"
-                                                >
+                                        <div className="flex flex-col flex-1">
+                                            {isLink ? (
+                                                <div className="group-hover:underline">
                                                     {contentText}
-                                                </Link>
+                                                </div>
                                             ) : (
                                                 <div>{contentText}</div>
                                             )}
@@ -151,8 +196,11 @@ export function NotificationModal({
                                     </div>
 
                                     <button
-                                        onClick={() => onDelete(notif.id)}
-                                        className="ml-2 p-2 text-sub-text hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer shrink-0"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onDelete(notif.id);
+                                        }}
+                                        className="ml-2 p-2 text-sub-text hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer shrink-0 z-20"
                                         title="Apagar notificação"
                                     >
                                         <Trash2 className="w-4 h-4" />

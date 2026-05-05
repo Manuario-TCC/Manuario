@@ -33,7 +33,42 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         const resolvedParams = await params;
         const targetCommentId = resolvedParams.id;
 
-        await prisma.$transaction([
+        const comment = await prisma.comment.findUnique({
+            where: { id: targetCommentId },
+            select: {
+                authorId: true,
+                author: { select: { idPublic: true } },
+                text: true,
+                rule: { select: { idPublic: true } },
+                question: { select: { idPublic: true } },
+                aiPost: { select: { idPublic: true } },
+            },
+        });
+
+        if (!comment) {
+            return NextResponse.json({ error: 'Comentário não encontrado.' }, { status: 404 });
+        }
+
+        let postType = '';
+        let postIdPublic = '';
+
+        if (comment.rule?.idPublic) {
+            postType = 'rules';
+            postIdPublic = comment.rule.idPublic;
+        } else if (comment.question?.idPublic) {
+            postType = 'questions';
+            postIdPublic = comment.question.idPublic;
+        } else if (comment.aiPost?.idPublic) {
+            postType = 'ia';
+            postIdPublic = comment.aiPost.idPublic;
+        }
+
+        const snippet =
+            comment.text.length > 60 ? comment.text.substring(0, 60) + '...' : comment.text;
+
+        const postLink = postIdPublic ? `/post/${postType}/${postIdPublic}` : null;
+
+        const [updatedComment, log, notification] = await prisma.$transaction([
             prisma.comment.update({
                 where: { id: targetCommentId },
                 data: { isDisabled: true },
@@ -46,9 +81,25 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
                     adminId: currentUserId,
                 },
             }),
+            prisma.notification.create({
+                data: {
+                    userId: comment.authorId,
+                    type: 'DELETE',
+                    reason: reason,
+                    targetName: snippet,
+                    link: postLink,
+                    isRead: false,
+                },
+            }),
         ]);
 
-        return NextResponse.json({ success: true });
+        return NextResponse.json({
+            success: true,
+            notification: {
+                ...notification,
+                receiverIdPublic: comment.author?.idPublic,
+            },
+        });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: 'Erro ao desabilitar comentário' }, { status: 500 });
