@@ -88,6 +88,7 @@ export const useComments = (postId: string, postType: string) => {
 
             queryClient.setQueryData(queryKey, (oldData: any[]) => {
                 if (!oldData) return [newComment];
+
                 if (newComment.parentId) {
                     return updateCommentTree(oldData, 'add', {
                         parentId: newComment.parentId,
@@ -101,6 +102,10 @@ export const useComments = (postId: string, postType: string) => {
                 postId,
                 comment: newComment,
             });
+
+            if (apiResponse.notification) {
+                socket.emit('send_notification', apiResponse.notification);
+            }
         },
         onError: (error) => {
             console.error('Erro ao adicionar comentário:', error);

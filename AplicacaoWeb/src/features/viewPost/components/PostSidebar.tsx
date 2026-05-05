@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useRecommendations } from '../hooks/useRecommendations';
 import { formatTimeAgo } from '../../../utils/formatTimeAgo';
-import { MessageCircleQuestion } from 'lucide-react';
 
 interface PostSidebarProps {
     type: string;
@@ -70,22 +69,15 @@ export function PostSidebar({ type, gameName, currentIdPublic }: PostSidebarProp
                                       href={`/post/${type}/${item.idPublic}`}
                                       className="group flex items-start gap-3 p-3 rounded-xl transition-all duration-200 hover:bg-card-border/20 active:scale-[0.98] border border-transparent hover:border-card-border/50"
                                   >
-                                      <div className="relative w-14 h-14 shrink-0 overflow-hidden rounded-lg bg-card-border/30 border border-card-border/50 mt-0.5">
-                                          {isRule ? (
+                                      {isRule && (
+                                          <div className="relative w-14 h-14 shrink-0 overflow-hidden rounded-lg bg-card-border/30 border border-card-border/50 mt-0.5">
                                               <img
                                                   src={manualImg || fallbackImg}
                                                   alt={item.name}
                                                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                               />
-                                          ) : (
-                                              <div className="w-full h-full flex items-center justify-center text-text">
-                                                  <MessageCircleQuestion
-                                                      size={24}
-                                                      strokeWidth={1.5}
-                                                  />
-                                              </div>
-                                          )}
-                                      </div>
+                                          </div>
+                                      )}
 
                                       <div className="flex flex-col flex-1 min-w-0">
                                           <div className="flex items-center gap-1 text-xs text-sub-text font-medium">

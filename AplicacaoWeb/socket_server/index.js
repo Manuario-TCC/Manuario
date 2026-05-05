@@ -24,6 +24,21 @@ io.on('connection', (socket) => {
         socket.to(data.postId).emit('action_comment', data);
     });
 
+    socket.on('join_user_room', (userId) => {
+        const roomName = `user_${userId}`;
+        socket.join(roomName);
+        console.log(`Usuário entrou na sala pessoal: ${roomName}`);
+    });
+
+    socket.on('send_notification', (notification) => {
+        const targetId = notification.receiverIdPublic || notification.userId;
+        const roomName = `user_${targetId}`;
+
+        console.log(`Ping! Enviando notificação em TEMPO REAL para a sala: ${roomName}`);
+
+        socket.to(roomName).emit('receive_notification', notification);
+    });
+
     socket.on('disconnect', () => {
         console.log('Usuário desconectado:', socket.id);
     });

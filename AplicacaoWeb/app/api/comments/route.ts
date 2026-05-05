@@ -103,27 +103,78 @@ export async function POST(req: Request) {
 
         const { texto, text, postId, postType, parentId } = await req.json();
 
-        if (postType !== 'rules' && postType !== 'questions') {
-            return NextResponse.json({ error: 'Tipo de post inválido' }, { status: 400 });
-        }
-
         const data: any = {
             text: text || texto,
             authorId: session.user.id,
             parentId: parentId || null,
         };
 
-        if (postType === 'rules') {
-            data.ruleId = postId;
-        } else if (postType === 'questions') {
-            data.questionId = postId;
-        }
+        if (postType === 'rules') data.ruleId = postId;
+        else if (postType === 'questions') data.questionId = postId;
 
         const novoComentario = await prisma.comment.create({ data });
 
-        return NextResponse.json({ ...novoComentario, isLiked: false }, { status: 201 });
+        let newNotification = null;
+
+        if (parentId) {
+            const parentComment = await prisma.comment.findUnique({
+                where: { id: parentId },
+                select: {
+                    authorId: true,
+                    author: {
+                        select: { idPublic: true },
+                    },
+                },
+            });
+
+            if (parentComment && parentComment.authorId !== session.user.id) {
+                const currentUser = await prisma.user.findUnique({
+                    where: { id: session.user.id },
+                    select: { name: true },
+                });
+
+                let postLink = '';
+                if (postType === 'rules') {
+                    const postInfo = await prisma.rule.findUnique({
+                        where: {
+                            id: postId,
+                        },
+                        select: { idPublic: true },
+                    });
+                    if (postInfo) {
+                        postLink = `/post/rules/${postInfo.idPublic}`;
+                    }
+                } else if (postType === 'questions') {
+                    const postInfo = await prisma.question.findUnique({
+                        where: { id: postId },
+                        select: { idPublic: true },
+                    });
+
+                    if (postInfo) {
+                        postLink = `/post/questions/${postInfo.idPublic}`;
+                    }
+                }
+
+                newNotification = await prisma.notification.create({
+                    data: {
+                        userId: parentComment.authorId,
+                        type: 'REPLY',
+                        senderId: session.user.id,
+                        senderName: currentUser?.name || 'Anônimo',
+                        link: postLink,
+                    },
+                });
+
+                (newNotification as any).receiverIdPublic = parentComment.author.idPublic;
+            }
+        }
+
+        return NextResponse.json(
+            { ...novoComentario, isLiked: false, notification: newNotification },
+            { status: 201 },
+        );
     } catch (error) {
-        console.error('Erro ao postar comentário:', error);
+        console.error('Erro ao postar:', error);
         return NextResponse.json({ error: 'Erro ao postar' }, { status: 500 });
     }
 }
