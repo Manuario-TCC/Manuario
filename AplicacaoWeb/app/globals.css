@@ -52,6 +52,44 @@ input:-webkit-autofill:active {
     background: #27222d;
 }
 
+@keyframes flip-continuous {
+    0%,
+    15% {
+        transform: rotateY(0deg);
+    }
+    45%,
+    65% {
+        transform: rotateY(180deg);
+    }
+    95%,
+    100% {
+        transform: rotateY(0deg);
+    }
+}
+
+.animate-card-flip-continuous {
+    animation: flip-continuous 6s ease-in-out infinite;
+}
+
+@keyframes float-up-down {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+.animate-float-1 {
+    animation: float-up-down 4s ease-in-out infinite;
+}
+
+.animate-float-2 {
+    animation: float-up-down 5s ease-in-out infinite;
+    animation-delay: 1s;
+}
+
 @layer base {
     body {
         background-color: var(--color-background);
