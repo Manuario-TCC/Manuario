@@ -117,7 +117,7 @@ export function NotificationModal({
                                                 </span>
 
                                                 {notif.targetName && (
-                                                    <div className="bg-card-border/20 p-2.5 rounded-lg border-l-2 border-red-500/50">
+                                                    <div className="bg-card-border/20 p-2.5 rounded-lg">
                                                         <p className="text-xs text-sub-text italic line-clamp-2">
                                                             "{notif.targetName}"
                                                         </p>
@@ -146,7 +146,7 @@ export function NotificationModal({
                                                 </span>
 
                                                 {notif.targetName && (
-                                                    <div className="bg-card-border/20 p-2.5 rounded-lg border-l-2 border-green-500/50">
+                                                    <div className="bg-card-border/20 p-2.5 rounded-lg">
                                                         <p className="text-xs text-sub-text italic line-clamp-2">
                                                             "{notif.targetName}"
                                                         </p>
