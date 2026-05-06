@@ -48,9 +48,7 @@ export async function GET(
         } else if (type === 'regra') {
             const regraWhereCondition = {
                 ...baseWhereCondition,
-                status: {
-                    not: 'CLONADO',
-                },
+                status: 'PUBLICADO',
                 isDisabled: false,
             };
 

@@ -6,7 +6,6 @@ import {
     Pencil,
     Trash2,
     Flag,
-    ShieldAlert,
     BadgeCheck,
     ShieldCheck,
 } from 'lucide-react';
@@ -205,17 +204,32 @@ export default function CommentItem({
                         </div>
                     ) : (
                         <p className="text-text text-sm whitespace-pre-wrap leading-relaxed">
-                            {comment.text.split(' ').map((word: string, i: number) =>
-                                word.startsWith('@') ? (
-                                    <span key={i} className="text-primary font-medium mr-1">
-                                        {word}
-                                    </span>
-                                ) : (
-                                    <span key={i} className="mr-1">
-                                        {word}
-                                    </span>
-                                ),
-                            )}
+                            {comment.text
+                                .split(
+                                    /(@[\w\u00C0-\u017F]+(?:\s[\w\u00C0-\u017F]+)?|\[gif:.*?\])/g,
+                                )
+                                .map((part: string, i: number) => {
+                                    if (part.startsWith('@')) {
+                                        return (
+                                            <span key={i} className="text-primary font-medium">
+                                                {part}
+                                            </span>
+                                        );
+                                    }
+
+                                    if (part.startsWith('[gif:') && part.endsWith(']')) {
+                                        const gifUrl = part.slice(5, -1);
+                                        return (
+                                            <img
+                                                key={i}
+                                                src={gifUrl}
+                                                alt="GIF"
+                                                className="max-w-[200px] w-full rounded-xl mt-2 block border border-card-border/50"
+                                            />
+                                        );
+                                    }
+                                    return <span key={i}>{part}</span>;
+                                })}
                         </p>
                     )}
                 </div>
@@ -262,6 +276,7 @@ export default function CommentItem({
                                 handleReplySuccess();
                                 onReplySuccess();
                             }}
+                            isReply={true}
                         />
                     </div>
                 )}

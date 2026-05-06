@@ -25,6 +25,12 @@ export default function RegraCard({ post, isFullView = false }: RegraCardProps) 
                 <span className="bg-primary text-text text-sm font-bold px-4 py-1 rounded-[0.4rem] uppercase tracking-tight">
                     {manualRelacionado?.game || 'Regra'}
                 </span>
+
+                {post.isHouseRule && (
+                    <span className="bg-primary text-text text-sm font-bold px-4 py-1 rounded-[0.4rem] uppercase tracking-tight ml-2">
+                        Regra da casa
+                    </span>
+                )}
             </div>
 
             <div className="bg-background border border-card-border rounded-lg overflow-hidden mb-2 mt-4">
