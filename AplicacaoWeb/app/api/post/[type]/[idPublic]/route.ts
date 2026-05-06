@@ -10,7 +10,7 @@ export async function GET(
         const { type, idPublic } = await params;
         const userId = await getAuthUserId();
 
-        const isRule = type === 'rules' || type === 'regra' || type === 'rule';
+        const isRule = type === 'rules';
         const model = isRule ? prisma.rule : prisma.question;
 
         const post = await (model as any).findUnique({
@@ -30,6 +30,15 @@ export async function GET(
                     },
                 },
                 ...(isRule ? { manuals: true } : {}),
+                _count: {
+                    select: {
+                        comments: {
+                            where: {
+                                isDisabled: false,
+                            },
+                        },
+                    },
+                },
             },
         });
 
@@ -43,6 +52,7 @@ export async function GET(
         const formattedPost = {
             ...post,
             type,
+            commentCount: post._count?.comments || 0,
             hasLiked: userId && post.likedByIds ? post.likedByIds.includes(userId) : false,
         };
 
@@ -65,7 +75,7 @@ export async function DELETE(
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
         }
 
-        const isRule = type === 'rules' || type === 'regra' || type === 'rule';
+        const isRule = type === 'rules';
         const model = isRule ? prisma.rule : prisma.question;
 
         await (model as any).update({

@@ -47,7 +47,13 @@ export async function GET(request: NextRequest) {
                     },
                     manuals: true,
                     _count: {
-                        select: { comments: true },
+                        select: {
+                            comments: {
+                                where: {
+                                    isDisabled: false,
+                                },
+                            },
+                        },
                     },
                 },
                 orderBy: { createdAt: 'desc' },
@@ -69,9 +75,14 @@ export async function GET(request: NextRequest) {
                             isSuperAdmin: true,
                         },
                     },
-
                     _count: {
-                        select: { comments: true },
+                        select: {
+                            comments: {
+                                where: {
+                                    isDisabled: false,
+                                },
+                            },
+                        },
                     },
                 },
                 orderBy: { createdAt: 'desc' },

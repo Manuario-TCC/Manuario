@@ -2,8 +2,6 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { LogOut } from 'lucide-react';
-import { useAuth } from '@/src/hooks/useAuth';
 
 interface FooterMenuProps {
     user: any;
@@ -12,22 +10,13 @@ interface FooterMenuProps {
 }
 
 export function FooterMenu({ user, loading, isOpen }: FooterMenuProps) {
-    const { logout } = useAuth();
-
     const containerClasses = `relative flex items-center h-16 shrink-0 w-full transition-all duration-300 ${
         isOpen ? 'px-2' : 'px-0 justify-center xl:justify-start xl:px-2'
     }`;
-
     const textContainerClasses = `flex flex-col justify-center overflow-hidden transition-all duration-300 ${
         isOpen
             ? 'opacity-100 ml-3 w-auto block'
             : 'opacity-0 w-0 hidden ml-0 xl:opacity-100 xl:w-auto xl:ml-3 xl:block'
-    }`;
-
-    const logoutBtnClasses = `absolute right-2 p-2 rounded-lg text-sub-text hover:text-red-500 hover:bg-gray shrink-0 z-20 cursor-pointer transition-all duration-300 ${
-        isOpen
-            ? 'opacity-100 pointer-events-auto block'
-            : 'opacity-0 hidden pointer-events-none xl:opacity-100 xl:pointer-events-auto xl:block'
     }`;
 
     if (loading)
@@ -60,7 +49,6 @@ export function FooterMenu({ user, loading, isOpen }: FooterMenuProps) {
                         className="object-cover"
                     />
                 </div>
-
                 <div className={textContainerClasses}>
                     <p className="text-base font-semibold text-text whitespace-nowrap overflow-hidden text-ellipsis">
                         {user.name}
@@ -70,10 +58,6 @@ export function FooterMenu({ user, loading, isOpen }: FooterMenuProps) {
                     </p>
                 </div>
             </Link>
-
-            <button onClick={logout} className={logoutBtnClasses} aria-label="Sair da conta">
-                <LogOut className="size-5" strokeWidth={1.5} />
-            </button>
         </div>
     );
 }

@@ -17,7 +17,7 @@ export default function CommentSection({ postId, postType }: any) {
     const { comments, loading, addComment, fetchComments } = useComments(postId, postType);
 
     return (
-        <div className="bg-card rounded-xl p-6 w-full max-w-[40rem] shadow-sm border border-card-border/40">
+        <div className="bg-card rounded-xl p-6 w-full shadow-sm border border-card-border/40">
             <div className="flex flex-col">
                 <CommentInput onSubmit={(t: string) => addComment(t, null)} />
 

@@ -1,4 +1,4 @@
-import { Crown, ShieldCheck } from 'lucide-react'; //
+import { Crown, ShieldCheck } from 'lucide-react';
 
 interface RoleBadgeProps {
     isAdmin?: boolean;
@@ -11,20 +11,17 @@ export function RoleBadge({ isAdmin, isSuperAdmin, size = 16 }: RoleBadgeProps) 
         return (
             <div
                 title="Super Administrador"
-                className="flex items-center justify-center bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 p-1.5 rounded-lg"
+                className="flex items-center justify-center text-yellow-500"
             >
-                <Crown size={size} />
+                <Crown className="w-[1rem] h-[1rem]" />
             </div>
         );
     }
 
     if (!isSuperAdmin && isAdmin) {
         return (
-            <div
-                title="Administrador"
-                className="flex items-center justify-center bg-primary border border-primary text-text p-1.5 rounded-lg"
-            >
-                <ShieldCheck size={size} />
+            <div title="Administrador" className="flex items-center justify-center text-tretiary">
+                <ShieldCheck className="w-[1rem] h-[1rem]" />
             </div>
         );
     }

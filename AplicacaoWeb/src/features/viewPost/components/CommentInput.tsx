@@ -74,7 +74,7 @@ export default function CommentInput({
                     <button
                         type="button"
                         onClick={toggleGif}
-                        className="text-sub-text hover:text-primary transition-colors p-1.5 cursor-pointer shrink-0 font-black text-[10px] uppercase tracking-wider"
+                        className="text-sub-text hover:text-primary transition-colors p-1.5 cursor-pointer shrink-0 font-black text-[0.6rem] uppercase tracking-wider"
                     >
                         GIF
                     </button>
@@ -166,7 +166,7 @@ export default function CommentInput({
                 <button
                     type="submit"
                     disabled={isSubmitting || !texto.trim()}
-                    className={`flex items-center justify-center shrink-0 w-10 h-10 sm:w-auto sm:h-auto sm:px-6 bg-primary text-white font-bold text-sm rounded-lg hover:opacity-90 transition-opacity disabled:opacity-30 cursor-pointer select-none ${isReply ? 'sm:py-1.5' : 'sm:py-2.5'}`}
+                    className={`flex items-center justify-center shrink-0 w-10 h-10 sm:w-auto sm:h-auto sm:px-6 bg-primary text-white font-bold text-sm rounded-lg hover:opacity-90 transition-opacity disabled:opacity-30 cursor-pointer select-none gap-1 ${isReply ? 'sm:py-1.5' : 'sm:py-2.5'}`}
                 >
                     <SendHorizontal className="w-5 h-5 sm:w-4 sm:h-4" />
                     <span className="hidden sm:inline">{isSubmitting ? '...' : 'Postar'}</span>

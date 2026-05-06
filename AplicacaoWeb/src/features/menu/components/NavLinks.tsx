@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageSquare, Search, PlusCircle, Library, Bell } from 'lucide-react';
+import { MessageSquare, Search, PlusCircle, Library, Bell, LogOut } from 'lucide-react';
 import { useSession } from '@/src/hooks/useSession';
 import { useNotifications } from '@/src/hooks/useNotifications';
 import { NotificationModal } from '@/src/components/NotificationModal';
+import { useAuth } from '@/src/hooks/useAuth';
 
 interface NavLinksProps {
     isOpen: boolean;
@@ -28,7 +29,7 @@ const navItems: NavItem[] = [
 export function NavLinks({ isOpen, closeMenu }: NavLinksProps) {
     const pathname = usePathname();
     const { user } = useSession();
-
+    const { logout } = useAuth();
     const {
         isModalOpen,
         openModal,
@@ -48,7 +49,6 @@ export function NavLinks({ isOpen, closeMenu }: NavLinksProps) {
             <nav className="flex-1 flex flex-col gap-2 p-3 mt-2 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-card-border">
                 {navItems.map((item) => {
                     const isActive = pathname.startsWith(item.href);
-
                     const baseClasses = `flex items-center gap-3 py-2.5 rounded-lg transition-colors overflow-hidden group w-full text-left cursor-pointer z-10 ${
                         isOpen
                             ? 'px-4 justify-start'
@@ -58,7 +58,6 @@ export function NavLinks({ isOpen, closeMenu }: NavLinksProps) {
                             ? 'bg-gray text-text font-medium'
                             : 'text-sub-text hover:bg-background hover:text-text'
                     }`;
-
                     const textClasses = `whitespace-nowrap text-base transition-all duration-300 ${
                         isOpen
                             ? 'opacity-100 block'
@@ -102,6 +101,28 @@ export function NavLinks({ isOpen, closeMenu }: NavLinksProps) {
                         }`}
                     >
                         Notificações
+                    </span>
+                </button>
+
+                <button
+                    onClick={logout}
+                    className={`hidden sm:flex items-center gap-3 py-2.5 rounded-lg transition-colors overflow-hidden group w-full text-left cursor-pointer z-10 text-sub-text hover:bg-background hover:text-red-500 ${
+                        isOpen
+                            ? 'px-4 justify-start'
+                            : 'justify-center px-0 xl:px-4 xl:justify-start'
+                    }`}
+                >
+                    <div className="relative shrink-0 flex items-center justify-center">
+                        <LogOut className="size-5" strokeWidth={1.5} />
+                    </div>
+                    <span
+                        className={`whitespace-nowrap text-base transition-all duration-300 ${
+                            isOpen
+                                ? 'opacity-100 block'
+                                : 'opacity-0 hidden w-0 xl:opacity-100 xl:block xl:w-auto'
+                        }`}
+                    >
+                        Sair da conta
                     </span>
                 </button>
             </nav>

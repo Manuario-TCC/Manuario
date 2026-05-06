@@ -16,7 +16,6 @@ import { ReactNode } from 'react';
 import { useLike } from '@/src/hooks/useLike';
 import { useShare } from '@/src/hooks/useShare';
 import { usePostActions } from '@/src/hooks/usePostActions';
-
 import { RoleBadge } from '@/src/components/RoleBadge';
 import { ReasonModal } from '@/src/components/ReasonModal';
 
@@ -42,7 +41,6 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
     );
 
     const { sharePost } = useShare();
-
     const {
         isMenuOpen,
         setIsMenuOpen,
@@ -60,31 +58,28 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
     } = usePostActions(post);
 
     return (
-        <div className="bg-card border border-card-border rounded-xl p-5 mb-4 hover:border-gray transition-colors w-full shadow-md max-w-[40rem]">
+        <div className="bg-card border border-card-border rounded-2xl p-5 mb-5 hover:border-primary/30 transition-colors duration-300 w-full shadow-sm">
             <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
+                    {' '}
                     <Link href={`/perfil/${userIdUrl}`}>
                         <img
                             src={userAvatarUrl}
                             alt={post.user?.name}
-                            className="w-10 h-10 rounded-full object-cover border border-card-border"
+                            className="w-8 h-8 rounded-full object-cover border border-card-border hover:opacity-80 transition-opacity"
                         />
                     </Link>
-
                     <div className="flex items-center gap-1.5">
-                        <Link
-                            href={`/perfil/${userIdUrl}`}
-                            className="text-text font-bold text-base"
-                        >
+                        <Link href={`/perfil/${userIdUrl}`} className="text-text font-bold text-sm">
                             {post.user?.name}
                         </Link>
                         <RoleBadge
                             isAdmin={post.user?.isAdmin}
                             isSuperAdmin={post.user?.isSuperAdmin}
-                            size={16}
+                            size={14}
                         />
-                        <span className="text-sub-text text-sm flex items-center gap-1 ml-0.5">
-                            <span className="text-lg leading-none">•</span>{' '}
+                        <span className="text-sub-text text-xs flex items-center gap-1 ml-0.5">
+                            <span className="font-bold leading-none">·</span>{' '}
                             {formatTimeAgo(post.createdAt)}
                         </span>
                     </div>
@@ -94,9 +89,9 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
                     <div className="relative" ref={menuRef}>
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="text-sub-text hover:text-text cursor-pointer transition-colors p-1"
+                            className="text-sub-text hover:text-text cursor-pointer transition-colors p-1.5 rounded-full hover:bg-card-border/50"
                         >
-                            <MoreHorizontal size={18} />
+                            <MoreHorizontal className="w-[1rem] h-[1rem]" />
                         </button>
 
                         {isMenuOpen && (
@@ -109,7 +104,6 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
                                         <Edit2 size={15} /> Editar
                                     </button>
                                 )}
-
                                 {(isOwner || isAdminOrSuperAdmin) && (
                                     <button
                                         onClick={() => {
@@ -134,7 +128,6 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
                                         {!isOwner && isAdminOrSuperAdmin ? 'Desativar' : 'Excluir'}
                                     </button>
                                 )}
-
                                 {!isOwner && (
                                     <button
                                         onClick={handleReport}
@@ -151,23 +144,26 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
 
             {children}
 
-            <div className="flex items-center gap-4 mt-4 pt-3 border-t border-card-border">
+            {/* AQUI ESTÁ A MUDANÇA: Sem borda, com mais respiro e botões mais polidos */}
+            <div className="flex items-center gap-6 mt-2 pt-2">
                 <button
                     onClick={handleToggleLike}
                     disabled={isLoadingLike}
-                    className={`flex items-center gap-1.5 cursor-pointer transition-all ${isLiked ? 'text-red-500' : 'text-sub-text hover:text-red-500'}`}
+                    className={`flex items-center gap-1.5 cursor-pointer transition-all duration-300 active:scale-75 hover:scale-110 ${
+                        isLiked ? 'text-red-500' : 'text-sub-text hover:text-red-500'
+                    }`}
                 >
                     <Heart
                         size="1.25rem"
                         fill={isLiked ? 'currentColor' : 'none'}
-                        className="transition-all"
+                        className={`transition-all duration-300 ${isLiked ? 'scale-110' : 'scale-100'}`}
                     />
                     <span className="text-xs font-bold">{likeCount}</span>
                 </button>
 
                 <Link
                     href={postUrl}
-                    className="flex items-center gap-1.5 text-sub-text hover:text-secondary transition-all"
+                    className="flex items-center gap-1.5 text-sub-text hover:text-secondary hover:scale-110 active:scale-90 transition-all duration-200"
                 >
                     <MessageCircle size="1.25rem" />
                     <span className="text-xs font-bold">{post.commentCount || 0}</span>
@@ -175,7 +171,7 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
 
                 <button
                     onClick={() => sharePost(post.type, post.idPublic)}
-                    className="flex items-center gap-1.5 text-sub-text hover:text-primary cursor-pointer transition-colors"
+                    className="flex items-center gap-1.5 text-sub-text hover:text-primary hover:scale-110 active:scale-90 cursor-pointer transition-all duration-200"
                 >
                     <Share2 size="1.25rem" />
                 </button>
@@ -186,7 +182,7 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
                 onClose={() => setIsReasonModalOpen(false)}
                 onConfirm={handleDisable}
                 title="Desativar Publicação"
-                description="Por favor, informe o motivo detalhado para desativar esta publicação. Essa ação será registrada nos logs da plataforma."
+                description="Por favor, informe o motivo detalhado para desativar esta publicação."
                 actionLabel={isSubmitting ? 'Desativando...' : 'Desativar Publicação'}
             />
         </div>

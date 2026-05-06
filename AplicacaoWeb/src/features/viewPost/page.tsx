@@ -9,7 +9,7 @@ import { PostSidebar } from './components/PostSidebar';
 import { notFound } from 'next/navigation';
 
 const PostCardSkeleton = () => (
-    <div className="w-full max-w-[40rem] bg-card rounded-xl p-6 border border-card-border/40 space-y-6">
+    <div className="w-full max-w-4xl bg-card rounded-xl p-6 border border-card-border/40 space-y-6">
         <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-card-border/20" />
             <div className="flex-1 space-y-2">
@@ -27,7 +27,7 @@ const PostCardSkeleton = () => (
 );
 
 const SidebarSkeleton = () => (
-    <div className="hidden lg:block w-80 sticky top-8 animate-pulse">
+    <div className="hidden lg:block w-full lg:w-[17rem] xl:w-[21rem] sticky top-8 animate-pulse shrink-0">
         <div className="bg-card border border-card-border/20 rounded-2xl p-5">
             <div className="h-6 bg-card-border/20 rounded w-1/2 mb-6" />
 
@@ -47,12 +47,12 @@ const SidebarSkeleton = () => (
 );
 
 const PostSkeleton = () => (
-    <div className="w-full py-8 px-4 lg:px-12 flex justify-center animate-pulse">
-        <div className="flex flex-col lg:flex-row gap-12 w-full max-w-7xl items-start justify-center">
-            <div className="flex-1 flex flex-col items-center lg:items-start w-full min-w-0 lg:ml-4">
+    <div className="w-full py-8 px-4 md:px-6 xl:px-12 flex justify-center animate-pulse">
+        <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-6 xl:gap-12 items-start lg:justify-between">
+            <div className="w-full lg:flex-1 max-w-4xl flex flex-col min-w-0 mx-auto lg:mx-0">
                 <PostCardSkeleton />
 
-                <div className="w-full max-w-[40rem] mt-10 bg-card/40 rounded-xl p-6 border border-card-border/20">
+                <div className="w-full mt-10 bg-card/40 rounded-xl p-6 border border-card-border/20">
                     <div className="h-10 bg-card-border/10 rounded-md w-full mb-6" />
                     <div className="space-y-4">
                         <div className="h-12 bg-card-border/5 rounded w-full" />
@@ -91,15 +91,15 @@ export default function ViewPostFeature({ tipo, idPublic }: { tipo: string; idPu
     const gameName = post?.game || post?.manuals?.[0]?.game;
 
     return (
-        <div className="w-full py-8 px-4 lg:px-12 flex justify-center">
-            <div className="flex flex-col lg:flex-row gap-12 w-full max-w-7xl items-start justify-center">
-                <div className="flex-1 flex flex-col items-center lg:items-start w-full min-w-0 lg:ml-4">
-                    <div className="w-full flex justify-center lg:justify-start">
+        <div className="w-full py-8 px-4 md:px-6 xl:px-12 flex justify-center">
+            <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-6 xl:gap-12 items-start lg:justify-between">
+                <div className="w-full lg:flex-1 max-w-4xl flex flex-col min-w-0 mx-auto lg:mx-0">
+                    <div className="w-full">
                         {tipo === 'questions' && <DuvidaCard post={post} isFullView={true} />}
                         {tipo === 'rules' && <RegraCard post={post} isFullView={true} />}
                     </div>
 
-                    <div className="w-full mt-10 flex justify-center lg:justify-start">
+                    <div className="w-full mt-10">
                         <CommentSection postId={post.id} postType={tipo} />
                     </div>
                 </div>

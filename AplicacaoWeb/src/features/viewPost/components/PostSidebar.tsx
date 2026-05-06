@@ -40,7 +40,7 @@ export function PostSidebar({ type, gameName, currentIdPublic }: PostSidebarProp
     }
 
     return (
-        <aside className="w-full lg:w-[21rem] flex flex-col gap-6 shrink-0 mt-8 lg:mt-0 sticky top-8">
+        <aside className="w-full lg:w-[17rem] xl:w-[21rem] flex flex-col gap-6 shrink-0 mt-8 lg:mt-0 sticky top-8 transition-all duration-300">
             <div className="bg-card border border-card-border/50 rounded-2xl p-4 shadow-sm">
                 <h3 className="text-base font-bold text-text/90 mb-4 px-2 flex items-center gap-2">
                     <span className="w-1 h-4 bg-primary rounded-full" />

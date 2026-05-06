@@ -92,7 +92,7 @@ export const NumberStepper = ({ label, value, onChange, placeholder, isError, ma
                     onTouchEnd={stopHold}
                     className={`flex items-center justify-center h-full w-12 transition-colors ${isError ? 'text-red-500 hover:bg-red-500/10' : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground'}`}
                 >
-                    <Minus size={16} />
+                    <Minus className="w-[1rem] h-[1rem]" />
                 </button>
 
                 <input
@@ -112,7 +112,7 @@ export const NumberStepper = ({ label, value, onChange, placeholder, isError, ma
                     onTouchEnd={stopHold}
                     className={`flex items-center justify-center h-full w-12 transition-colors ${isError ? 'text-red-500 hover:bg-red-500/10' : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground'}`}
                 >
-                    <Plus size={16} />
+                    <Plus className="w-[1rem] h-[1rem]" />
                 </button>
             </div>
         </div>
