@@ -3,10 +3,11 @@ import { SendHorizontal, Square } from 'lucide-react';
 
 interface ChatInputProps {
     onSendMessage: (text: string) => void;
+    onCancel: () => void;
     isLoading: boolean;
 }
 
-export default function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
+export default function ChatInput({ onSendMessage, onCancel, isLoading }: ChatInputProps) {
     const [text, setText] = useState('');
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -31,13 +32,23 @@ export default function ChatInput({ onSendMessage, isLoading }: ChatInputProps) 
                     className="w-full bg-transparent py-4 pl-6 pr-14 text-text placeholder:text-sub-text focus:outline-none text-base"
                 />
 
-                <button
-                    type="submit"
-                    disabled={isLoading || !text.trim()}
-                    className="absolute right-3 p-2 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded-xl disabled:opacity-30 transition-all flex items-center justify-center active:scale-95"
-                >
-                    {isLoading ? <Square size={20} /> : <SendHorizontal size={20} />}
-                </button>
+                {isLoading ? (
+                    <button
+                        type="button"
+                        onClick={onCancel}
+                        className="absolute right-3 p-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all flex items-center justify-center active:scale-95"
+                    >
+                        <Square size={20} />
+                    </button>
+                ) : (
+                    <button
+                        type="submit"
+                        disabled={!text.trim()}
+                        className="absolute right-3 p-2 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded-xl disabled:opacity-30 transition-all flex items-center justify-center active:scale-95"
+                    >
+                        <SendHorizontal size={20} />
+                    </button>
+                )}
             </div>
         </form>
     );

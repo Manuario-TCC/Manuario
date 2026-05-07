@@ -7,19 +7,30 @@ import { Bookmark, Share, RefreshCw, Copy, Check } from 'lucide-react';
 
 interface ChatMessageProps {
     message: ChatMessageData;
+    onCopy: (text: string, onSuccess: () => void) => void;
+    onRetry: () => void;
+    onOptionSelect?: (optionText: string) => void;
+    onPost?: () => void;
 }
 
-export default function ChatMessage({ message }: ChatMessageProps) {
+export default function ChatMessage({
+    message,
+    onCopy,
+    onRetry,
+    onOptionSelect,
+    onPost,
+}: ChatMessageProps) {
     const { user } = useSession();
     const isUser = message.role === 'user';
-
     const { displayedContent, isTyping } = useTypewriter(message.content, isUser);
     const [isCopied, setIsCopied] = useState(false);
+    const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
-    const handleCopy = () => {
-        navigator.clipboard.writeText(message.content);
-        setIsCopied(true);
-        setTimeout(() => setIsCopied(false), 2000);
+    const handleCopyClick = () => {
+        onCopy(message.content, () => {
+            setIsCopied(true);
+            setTimeout(() => setIsCopied(false), 2000);
+        });
     };
 
     return (
@@ -64,8 +75,57 @@ export default function ChatMessage({ message }: ChatMessageProps) {
                                 {message.content}
                             </p>
                         ) : (
-                            <div className="text-sm sm:text-base max-w-none">
+                            <div className="text-sm sm:text-base max-w-none flex flex-col">
                                 <ChatMarkdown content={displayedContent} isTyping={isTyping} />
+
+                                {message.options && message.options.length > 0 && !isTyping && (
+                                    <div className="mt-5 flex flex-col gap-2 mb-2">
+                                        <span className="text-xs text-sub-text mb-1 font-medium">
+                                            Selecione uma opção:
+                                        </span>
+
+                                        {message.options.map((option, idx) => {
+                                            const isSelected = selectedOption === option;
+                                            const hasSelection = selectedOption !== null;
+
+                                            return (
+                                                <button
+                                                    key={idx}
+                                                    disabled={hasSelection}
+                                                    onClick={() => {
+                                                        setSelectedOption(option);
+
+                                                        if (onOptionSelect) {
+                                                            onOptionSelect(option);
+                                                        }
+                                                    }}
+                                                    className={`flex items-center gap-3 w-full text-left px-4 py-3 text-sm border rounded-xl transition-all 
+                                                        ${
+                                                            isSelected
+                                                                ? 'bg-primary/10 border-primary text-primary font-medium'
+                                                                : hasSelection
+                                                                  ? 'bg-background border-card-border opacity-50 cursor-not-allowed text-sub-text'
+                                                                  : 'bg-background border-card-border hover:border-primary hover:bg-primary/5 active:scale-[0.98] text-text group' // Estilo normal (antes de clicar)
+                                                        }`}
+                                                >
+                                                    <div
+                                                        className={`w-4 h-4 rounded-full border flex items-center justify-center flex-shrink-0 transition-colors
+                                                            ${isSelected ? 'border-primary' : 'border-sub-text group-hover:border-primary'}
+                                                        `}
+                                                    >
+                                                        <div
+                                                            className={`w-2 h-2 rounded-full transition-colors 
+                                                                ${isSelected ? 'bg-primary' : 'bg-transparent group-hover:bg-primary'}
+                                                            `}
+                                                        ></div>
+                                                    </div>
+
+                                                    <span>{option}</span>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
@@ -76,32 +136,34 @@ export default function ChatMessage({ message }: ChatMessageProps) {
                                 className="p-1.5 hover:text-text hover:bg-card/60 rounded-md transition-all active:scale-95"
                                 title="Salvar"
                             >
-                                <Bookmark size={16} />
+                                <Bookmark className="w-[1rem] h-[1rem]" />
                             </button>
 
                             <button
+                                onClick={onPost}
                                 className="p-1.5 hover:text-text hover:bg-card/60 rounded-md transition-all active:scale-95"
                                 title="Postar"
                             >
-                                <Share size={16} />
+                                <Share className="w-[1rem] h-[1rem]" />
                             </button>
 
                             <button
+                                onClick={onRetry}
                                 className="p-1.5 hover:text-text hover:bg-card/60 rounded-md transition-all active:scale-95"
                                 title="Gerar novamente"
                             >
-                                <RefreshCw size={16} />
+                                <RefreshCw className="w-[1rem] h-[1rem]" />
                             </button>
 
                             <button
-                                onClick={handleCopy}
+                                onClick={handleCopyClick}
                                 className="p-1.5 hover:text-text hover:bg-card/60 rounded-md transition-all active:scale-95"
                                 title="Copiar mensagem"
                             >
                                 {isCopied ? (
-                                    <Check size={16} className="text-primary" />
+                                    <Check className="text-primary w-[1rem] h-[1rem]" />
                                 ) : (
-                                    <Copy size={16} />
+                                    <Copy className="w-[1rem] h-[1rem]" />
                                 )}
                             </button>
                         </div>

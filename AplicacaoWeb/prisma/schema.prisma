@@ -143,6 +143,7 @@ model AIPost {
     id         String  @id @default(auto()) @map("_id") @db.ObjectId
     idPublic   String  @unique @default(uuid())
     title      String?
+    gameName   String?
     promptUser String
     aiResponse String
     likeCount  Int     @default(0)
