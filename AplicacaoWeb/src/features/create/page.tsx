@@ -65,7 +65,7 @@ function CreateFeatureContent() {
 
     return (
         <div className="mx-auto w-full max-w-5xl px-4 py-10">
-            <div className="overflow-hidden rounded-3xl border border-card-border bg-card shadow-2xl">
+            <div className="overflow-hidden rounded-3xl bg-card shadow-2xl">
                 <div className="mt-2 w-full overflow-x-auto no-scrollbar bg-card p-4">
                     <div className="flex w-max flex-nowrap overflow-hidden rounded-full bg-background">
                         {tabs.map((tab) => {

@@ -58,7 +58,7 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
     } = usePostActions(post);
 
     return (
-        <div className="bg-card border border-card-border rounded-2xl p-5 mb-5 hover:border-primary/30 transition-colors duration-300 w-full shadow-sm">
+        <div className="bg-card rounded-2xl p-5 mb-5 hover:border-primary/30 transition-colors duration-300 w-full shadow-sm">
             <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-2.5">
                     {' '}
@@ -99,7 +99,7 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
                                 {isOwner && (
                                     <button
                                         onClick={handleEdit}
-                                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-card-border/30 transition-colors flex items-center gap-2 text-text cursor-pointer"
+                                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-card transition-colors flex items-center gap-2 text-text cursor-pointer"
                                     >
                                         <Edit2 size={15} /> Editar
                                     </button>
@@ -116,7 +116,7 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
                                         }}
                                         className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-2 cursor-pointer ${
                                             !isOwner && isAdminOrSuperAdmin
-                                                ? 'text-red-500 hover:bg-red-500/10 border-t border-card-border'
+                                                ? 'text-red-500 hover:bg-red-500/10'
                                                 : 'text-red-500 hover:bg-card-border/30'
                                         }`}
                                     >
@@ -131,7 +131,7 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
                                 {!isOwner && (
                                     <button
                                         onClick={handleReport}
-                                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-card-border/30 transition-colors flex items-center gap-2 text-text cursor-pointer border-t border-card-border"
+                                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-card transition-colors flex items-center gap-2 text-text cursor-pointer"
                                     >
                                         <Flag size={15} /> Denunciar
                                     </button>
@@ -171,7 +171,7 @@ export default function FeedCardBase({ post, postUrl, children }: FeedCardBasePr
 
                 <button
                     onClick={() => sharePost(post.type, post.idPublic)}
-                    className="flex items-center gap-1.5 text-sub-text hover:text-primary hover:scale-110 active:scale-90 cursor-pointer transition-all duration-200"
+                    className="flex items-center gap-1.5 text-sub-text hover:text-secondary hover:scale-110 active:scale-90 cursor-pointer transition-all duration-200"
                 >
                     <Share2 size="1.25rem" />
                 </button>

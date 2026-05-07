@@ -206,7 +206,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
             Link.configure({
                 openOnClick: false,
                 HTMLAttributes: {
-                    class: 'text-primary underline cursor-pointer hover:text-primary-hover transition-colors',
+                    class: 'text-primary underline cursor-pointer hover:text-text transition-colors',
                 },
             }),
             TextAlign.configure({

@@ -37,7 +37,7 @@ export default function ViewManualFeature({ id }: { id: string }) {
                             placeholder="Buscar regras..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 bg-transparent border border-gray rounded-lg text-text focus:outline-none transition-colors"
+                            className="w-full pl-10 pr-4 py-2 bg-transparent border border-card-border focus:border-primary rounded-lg text-text focus:outline-none transition-colors"
                         />
                     </div>
                 </div>
@@ -70,9 +70,9 @@ export default function ViewManualFeature({ id }: { id: string }) {
                 {hasMore && rules && rules.length > 0 && (
                     <div className="mt-6 flex justify-center">
                         <button
-                            onClick={loadMore}
+                            onClick={() => loadMore()}
                             disabled={loadingRegras}
-                            className="px-6 py-2 bg-transparent border border-gray hover:bg-gray/50 text-text rounded-lg transition-colors disabled:opacity-50"
+                            className="px-6 py-2 bg-transparent border border-card-border hover:card-border/50 text-text rounded-lg transition-colors disabled:opacity-50"
                         >
                             {loadingRegras ? 'Carregando...' : 'Carregar mais'}
                         </button>

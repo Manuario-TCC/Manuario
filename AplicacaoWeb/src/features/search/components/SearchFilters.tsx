@@ -165,7 +165,7 @@ export default function SearchFilters({ filters, setFilters }: SearchFiltersProp
                                     <button
                                         onClick={applyFilter}
                                         disabled={!tempFilterValue}
-                                        className="w-full bg-primary text-text font-bold py-3.5 rounded-xl hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-lg"
+                                        className="w-full bg-primary text-text font-bold py-3.5 rounded-xl hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-lg"
                                     >
                                         Aplicar Filtro
                                     </button>
@@ -219,7 +219,7 @@ export default function SearchFilters({ filters, setFilters }: SearchFiltersProp
                                     <button
                                         onClick={applyFilter}
                                         disabled={!tempFilterValue}
-                                        className="bg-primary text-text text-xs font-bold px-5 py-2.5 rounded-lg hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                        className="bg-primary text-text text-xs font-bold px-5 py-2.5 rounded-lg hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                                     >
                                         Aplicar
                                     </button>

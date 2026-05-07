@@ -13,7 +13,7 @@ export default function DuvidaCard({ post, isFullView = false }: DuvidaCardProps
     return (
         <FeedCardBase post={post} postUrl={postUrl}>
             <div className="mb-2 mt-2">
-                <span className="bg-secondary text-text text-[0.75rem] font-bold px-4 py-1 rounded-full uppercase tracking-tight">
+                <span className="bg-primary text-text text-[0.75rem] font-bold px-4 py-1 rounded-full uppercase tracking-tight">
                     {post.game}
                 </span>
             </div>

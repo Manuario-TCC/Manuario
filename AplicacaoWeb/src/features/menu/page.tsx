@@ -41,7 +41,7 @@ export default function Menu() {
 
             <aside
                 className={`
-                    top-0 left-0 h-screen bg-card border-r border-card-border z-50
+                    top-0 left-0 h-screen bg-card z-50
                     transition-all duration-300 ease-in-out flex flex-col
                     hidden sm:flex overflow-x-hidden
                     fixed xl:relative xl:shrink-0

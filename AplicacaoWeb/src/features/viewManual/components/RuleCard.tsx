@@ -55,9 +55,9 @@ export function RuleCard({ rules, loading, manualId, manualUserId }: RuleCardPro
 
     if (loading) {
         return (
-            <div className="bg-transparent border border-gray/80 rounded-lg p-4 h-[3.75rem] animate-pulse flex items-center justify-between">
-                <div className="h-4 bg-gray rounded w-1/3" />
-                <div className="h-6 bg-gray rounded-full w-6" />
+            <div className="bg-transparent border border-card-border/80 rounded-lg p-4 h-[3.75rem] animate-pulse flex items-center justify-between">
+                <div className="h-4 bg-card-border rounded w-1/3" />
+                <div className="h-6 bg-card-border rounded-full w-6" />
             </div>
         );
     }
@@ -76,7 +76,7 @@ export function RuleCard({ rules, loading, manualId, manualUserId }: RuleCardPro
                     <h3 className="text-text font-medium">{rules.name}</h3>
 
                     {isClonada && (
-                        <span className="text-[10px] text-purple-500 font-bold uppercase tracking-wider">
+                        <span className="text-[0.6rem] text-primary font-bold uppercase tracking-wider">
                             {isEditada ? 'Regra Clonada e Editada' : 'Regra Clonada'}
                         </span>
                     )}
@@ -91,13 +91,13 @@ export function RuleCard({ rules, loading, manualId, manualUserId }: RuleCardPro
                             <div className="relative">
                                 <button
                                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                    className="p-2 hover:bg-gray rounded-full text-sub-text hover:text-text transition-colors"
+                                    className="p-2 hover:bg-background rounded-full text-sub-text hover:text-text transition-colors"
                                 >
                                     <MoreVertical size={18} />
                                 </button>
 
                                 {isMenuOpen && (
-                                    <div className="absolute right-0 top-full mt-1 w-40 bg-gray border border-gray rounded-md shadow-lg z-[100] py-1">
+                                    <div className="absolute right-0 top-full mt-1 w-40 bg-background rounded-md shadow-lg z-[100] py-1">
                                         {rules.status === 'PUBLICADO' && (
                                             <Link
                                                 href={`/post/rules/${rules.idPublic}`}
@@ -112,7 +112,7 @@ export function RuleCard({ rules, loading, manualId, manualUserId }: RuleCardPro
                                                 setIsMenuOpen(false);
                                                 handleEdit(rules);
                                             }}
-                                            className="w-full flex items-center gap-2 px-4 py-2 text-sm rounded-lg text-sub-text hover:bg-background hover:text-text text-left cursor-pointer transition-colors"
+                                            className="w-full flex items-center gap-2 px-4 py-2 text-sm rounded-lg text-sub-text hover:bg-card-border hover:text-text text-left cursor-pointer transition-colors"
                                         >
                                             <Edit size={16} /> Editar
                                         </button>

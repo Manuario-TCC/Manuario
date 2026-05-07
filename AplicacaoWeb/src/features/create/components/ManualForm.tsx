@@ -40,7 +40,7 @@ export function ManualForm({
     ];
 
     const inputBaseClass =
-        'w-full rounded-2xl bg-transparent border border-card-border px-4 text-sm outline-none focus:border-primary/50 transition-all text-foreground';
+        'w-full rounded-2xl bg-transparent border border-card-border px-4 text-sm outline-none focus:border-primary transition-all text-foreground';
 
     return (
         <div className="flex flex-col gap-6">

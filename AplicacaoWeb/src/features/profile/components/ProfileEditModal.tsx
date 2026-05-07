@@ -63,7 +63,7 @@ export const ProfileEditModal: React.FC<Props> = ({
             aria-modal="true"
         >
             <div
-                className="bg-card border border-card-border rounded-t-3xl sm:rounded-2xl w-full max-w-[38rem] shadow-2xl max-h-[90vh] flex flex-col"
+                className="bg-background rounded-t-3xl sm:rounded-2xl w-full max-w-[38rem] shadow-2xl max-h-[90vh] flex flex-col"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="flex justify-between items-start p-5 sm:p-6 shrink-0 border-b border-card-border">
@@ -140,7 +140,7 @@ export const ProfileEditModal: React.FC<Props> = ({
                                 {formData.links.map((link, index) => (
                                     <div
                                         key={index}
-                                        className="flex flex-col gap-2 p-3 bg-card-border/30 border border-card-border rounded-xl relative"
+                                        className="flex flex-col gap-2 p-3 border border-card-border rounded-xl relative"
                                     >
                                         <div className="flex justify-between items-center mb-1">
                                             <span className="text-xs text-sub-text uppercase tracking-wider font-bold">
@@ -180,7 +180,7 @@ export const ProfileEditModal: React.FC<Props> = ({
                             <button
                                 type="button"
                                 onClick={addLink}
-                                className="bg-primary text-white hover:bg-primary-hover px-5 py-2.5 rounded-xl text-sm font-bold self-start transition cursor-pointer"
+                                className="bg-primary text-white hover:bg-secondary px-5 py-2.5 rounded-xl text-sm font-bold self-start transition cursor-pointer"
                             >
                                 + Adicionar Link
                             </button>
@@ -190,7 +190,7 @@ export const ProfileEditModal: React.FC<Props> = ({
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full bg-primary text-text font-bold text-base py-3 rounded-xl hover:bg-primary-hover transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full bg-primary text-text font-bold text-base py-3 rounded-xl hover:bg-secondary transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isLoading ? 'Salvando...' : 'Salvar Alterações'}
                             </button>
@@ -200,7 +200,7 @@ export const ProfileEditModal: React.FC<Props> = ({
                             <button
                                 type="button"
                                 onClick={onLogout}
-                                className="w-full flex items-center justify-center gap-2 border border-card-border text-text font-bold text-base py-3 rounded-xl hover:bg-card-border/50 transition cursor-pointer"
+                                className="w-full flex items-center justify-center gap-2 border border-card-border text-text font-bold text-base py-3 rounded-xl hover:bg-card-border transition cursor-pointer"
                             >
                                 <LogOut className="w-[1.2rem] h-[1.2rem]" /> Sair da conta
                             </button>

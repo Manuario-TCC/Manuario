@@ -68,7 +68,7 @@ export function useQuestionForm(editId?: string | null) {
         if (e) e.preventDefault();
 
         if (!isValid) {
-            customAlert.warning('Atenção', 'Preencha todos os campos obrigatórios.');
+            customAlert.toastInfo('Preencha todos os campos obrigatórios.');
             return;
         }
 
@@ -121,7 +121,7 @@ export function useQuestionForm(editId?: string | null) {
 
             router.push('/feed');
         } catch (error) {
-            customAlert.error('Erro', 'Não foi possível salvar a dúvida no momento.');
+            customAlert.toastError('Erro, Não foi possível salvar a dúvida no momento.');
         } finally {
             setIsLoading(false);
         }
@@ -142,9 +142,7 @@ export function useQuestionForm(editId?: string | null) {
                 await customAlert.toastSuccess('Dúvida excluída com sucesso!');
                 router.push('/feed');
             } catch (error) {
-                customAlert.toastError
-                    ? await customAlert.toastError('Não foi possível excluir a dúvida.')
-                    : customAlert.error('Erro', 'Não foi possível excluir a dúvida.');
+                await customAlert.toastError('Não foi possível excluir a dúvida.');
             } finally {
                 setIsLoading(false);
             }

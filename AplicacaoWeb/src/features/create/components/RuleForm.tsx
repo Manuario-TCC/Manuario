@@ -30,9 +30,8 @@ export function RuleForm({
 
     const onActionClick = (status: 'PRIVADO' | 'PUBLICADO') => {
         if (!isValid) {
-            customAlert.warning(
-                'Atenção',
-                'Preencha todos os campos obrigatórios antes de prosseguir.',
+            customAlert.toastInfo(
+                'Atenção! Preencha todos os campos obrigatórios antes de prosseguir.',
             );
             return;
         }
@@ -209,7 +208,7 @@ export function RuleForm({
                     type="button"
                     disabled={isLoading}
                     onClick={() => onActionClick('PUBLICADO')}
-                    className="flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-bold text-white transition-all hover:bg-primary-hover disabled:opacity-50"
+                    className="flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-bold text-white transition-all hover:bg-secondary disabled:opacity-50"
                 >
                     {isEditing ? 'Atualizar regra' : 'Postar regra'}
                     <Send className="h-4 w-4" />

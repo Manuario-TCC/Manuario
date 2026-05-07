@@ -72,7 +72,7 @@ export function AuthForm() {
                     <button
                         type="submit"
                         disabled={isLoading || !canSubmit}
-                        className="w-full bg-primary hover:bg-primary-hover text-text font-semibold rounded-xl px-4 py-3 mt-4 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        className="w-full bg-primary hover:bg-secondary text-text font-semibold rounded-xl px-4 py-3 mt-4 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                         {isLoading ? 'Aguarde...' : isLogin ? 'Entrar' : 'Criar conta'}
                     </button>

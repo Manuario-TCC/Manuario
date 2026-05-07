@@ -19,6 +19,11 @@ export default function CommentInput({
 }: any) {
     const { user } = useSession();
 
+    const userAvatarUrl =
+        user?.img && user?.idPublic
+            ? `/upload/${user.idPublic}/user/${user.img}`
+            : '/img/iconePadrao.jpg';
+
     const { texto, setTexto, isSubmitting, handleSubmit } = useCommentInput(
         onSubmit,
         onSuccess,
@@ -51,8 +56,9 @@ export default function CommentInput({
                 <Image
                     src={user?.img || '/img/iconePadrao.jpg'}
                     alt="User"
-                    width={32}
-                    height={32}
+                    width={80}
+                    height={80}
+                    quality={90}
                     className="rounded-full object-cover shrink-0 w-8 h-8 sm:w-10 sm:h-10 select-none"
                 />
             )}
@@ -101,8 +107,8 @@ export default function CommentInput({
                         >
                             <style jsx global>{`
                                 em-emoji-picker {
-                                    --bg: #0f0d12;
-                                    --border-color: rgba(255, 255, 255, 0.1);
+                                    --rgb-background: 15, 13, 18;
+                                    --color-border: rgba(255, 255, 255, 0.1);
                                     width: 100%;
                                     min-width: 280px;
                                     max-height: 350px;
@@ -114,6 +120,7 @@ export default function CommentInput({
                                     }
                                 }
                             `}</style>
+
                             <Picker
                                 data={data}
                                 i18n={pt}

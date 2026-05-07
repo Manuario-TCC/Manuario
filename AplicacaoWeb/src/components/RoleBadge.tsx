@@ -20,7 +20,7 @@ export function RoleBadge({ isAdmin, isSuperAdmin, size = 16 }: RoleBadgeProps) 
 
     if (!isSuperAdmin && isAdmin) {
         return (
-            <div title="Administrador" className="flex items-center justify-center text-tretiary">
+            <div title="Administrador" className="flex items-center justify-center text-primary">
                 <ShieldCheck className="w-[1rem] h-[1rem]" />
             </div>
         );

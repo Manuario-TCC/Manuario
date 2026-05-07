@@ -3,19 +3,18 @@
 
 @theme {
     --color-background: #0f0d12;
-    --color-card: #17141b;
-    --color-card-border: #2a2438;
-    --color-gray: #201f22;
-    --color-primary: #470279;
-    --color-secondary: #4d20a6;
-    --color-primary-hover: #5d03a1;
+    --color-card: #15111d;
+    --color-card-border: #2c2935;
+    --color-gray: var(--color-secondary);
+    --color-primary: #7f52ff;
+    --color-secondary: #6140bd;
+    --color-tretiary: #ac4bff;
     --color-accent: #816cfb;
     --color-accent-hover: #9b8afc;
     --color-text: #ffffff;
     --color-sub-text: #a1a1aa;
     --color-text-inverted: #000000;
     --color-black: #000000;
-    --color-tretiary: #ac4bff;
 
     --background-image-img-fundo: url('/img/background.jpg');
     --font-sans: 'Roboto', sans-serif;

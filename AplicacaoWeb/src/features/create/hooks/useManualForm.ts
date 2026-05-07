@@ -214,9 +214,7 @@ export function useManualForm(editId?: string | null) {
                 await customAlert.toastSuccess('Manual excluído com sucesso!');
                 router.push('/feed');
             } catch (error) {
-                customAlert.toastError
-                    ? await customAlert.toastError('Não foi possível excluir o manual.')
-                    : customAlert.error('Erro', 'Não foi possível excluir o manual.');
+                await customAlert.toastError('Não foi possível excluir o manual.');
             } finally {
                 setIsSubmitting(false);
             }

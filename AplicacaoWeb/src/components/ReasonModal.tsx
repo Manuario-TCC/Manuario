@@ -30,7 +30,7 @@ export function ReasonModal({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-            <div className="bg-background border border-gray rounded-xl w-full max-w-md p-6 relative shadow-2xl">
+            <div className="bg-background rounded-xl w-full max-w-md p-6 relative shadow-2xl">
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 text-sub-text hover:text-white cursor-pointer"
