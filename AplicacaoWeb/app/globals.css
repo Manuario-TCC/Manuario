@@ -173,6 +173,22 @@ input:-webkit-autofill:active {
     animation: float-suit 2.8s ease-out infinite;
 }
 
+@keyframes typing-dot {
+    0%,
+    100% {
+        transform: scale(0.8);
+        opacity: 0.4;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+.animate-typing-dot {
+    animation: typing-dot 1s infinite ease-in-out;
+}
+
 @layer base {
     body {
         background-color: var(--color-background);
