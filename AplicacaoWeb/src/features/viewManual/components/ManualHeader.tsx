@@ -78,27 +78,27 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
     if (loading) {
         return (
             <div className="relative w-full animate-pulse">
-                <div className="h-[15.6rem] md:h-[21.8rem] w-full bg-gray/50" />
+                <div className="h-[15.6rem] md:h-[21.8rem] w-full bg-card-border/50" />
 
                 <div className="w-full px-6 md:px-12 relative">
                     <div className="flex flex-col md:flex-row gap-6 -mt-20 md:-mt-24 items-start">
                         <div className="w-40 h-40 md:w-48 md:h-48 bg-zinc-900 rounded-xl overflow-hidden shrink-0 shadow-2xl relative">
-                            <div className="w-full h-full bg-gray" />
+                            <div className="w-full h-full bg-card-border" />
                         </div>
 
                         <div className="flex-1 space-y-3 pt-20 md:pt-28 w-full">
-                            <div className="h-8 bg-gray rounded w-3/4 mb-4" />
+                            <div className="h-8 bg-card-border rounded w-3/4 mb-4" />
 
                             <div className="flex flex-wrap gap-3">
-                                <div className="h-6 bg-gray rounded w-20" />
-                                <div className="h-6 bg-gray rounded w-20" />
-                                <div className="h-6 bg-gray rounded w-24" />
+                                <div className="h-6 bg-card-border rounded w-20" />
+                                <div className="h-6 bg-card-border rounded w-20" />
+                                <div className="h-6 bg-card-border rounded w-24" />
                             </div>
 
                             <div className="pt-8 space-y-2.5">
-                                <div className="h-4 bg-gray/60 rounded w-full" />
-                                <div className="h-4 bg-gray/60 rounded w-[95%]" />
-                                <div className="h-4 bg-gray/60 rounded w-[40%]" />
+                                <div className="h-4 bg-card-border/60 rounded w-full" />
+                                <div className="h-4 bg-card-border/60 rounded w-[95%]" />
+                                <div className="h-4 bg-card-border/60 rounded w-[40%]" />
                             </div>
                         </div>
                     </div>
@@ -113,7 +113,7 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                 {manual?.idPublic && isOwner && (
                     <Link
                         href={`/create?tab=manual&id=${manual.idPublic}`}
-                        className="p-3 bg-gray/50 backdrop-blur-md hover:bg-background text-white rounded-full transition-all shadow-lg"
+                        className="p-3 bg-card-border/50 backdrop-blur-md hover:bg-background text-text rounded-full transition-all shadow-lg"
                         title="Editar Manual"
                     >
                         <Pencil className="w-[1.125rem] h-[1.125rem]" />
@@ -204,7 +204,7 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                         </div>
 
                         <div className="w-full">
-                            <hr className="border-gray/60" />
+                            <hr className="border-card-border/60" />
 
                             <div className="flex flex-row md:flex-row max-md:flex-col items-start max-md:items-center justify-between py-4 gap-6">
                                 <div className="flex flex-wrap justify-center md:justify-start items-center gap-x-6 gap-y-4 flex-1">
@@ -269,7 +269,7 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                                 </div>
 
                                 <div className="flex gap-2.5 shrink-0 mt-0 max-md:mt-2 items-center justify-start max-md:justify-center">
-                                    <button className="p-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer">
+                                    <button className="p-2 bg-primary hover:bg-secondary text-text rounded-xl transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer">
                                         <Eye className="w-[1.25rem] h-[1.25rem]" />
                                     </button>
 
@@ -278,7 +278,7 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                                             onClick={() => handleFork(manual.id)}
                                             disabled={isForking}
                                             title="Clonar Manual para minha conta"
-                                            className="p-2 bg-purple-600 hover:bg-purple-500 disabled:bg-purple-600/50 disabled:cursor-wait text-white rounded-xl transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer flex items-center justify-center"
+                                            className="p-2 bg-primary hover:bg-secondary disabled:bg-primary/50 disabled:cursor-wait text-text rounded-xl transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer flex items-center justify-center"
                                         >
                                             <SquareStack
                                                 className={`w-[1.25rem] h-[1.25rem] ${isForking ? 'animate-pulse' : ''}`}
@@ -286,7 +286,7 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                                         </button>
                                     )}
 
-                                    <button className="p-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer">
+                                    <button className="p-2 bg-primary hover:bg-secondary text-text rounded-xl transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer">
                                         <Download className="w-[1.25rem] h-[1.25rem]" />
                                     </button>
                                 </div>

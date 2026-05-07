@@ -13,7 +13,7 @@ export default function DuvidaCard({ post, isFullView = false }: DuvidaCardProps
     return (
         <FeedCardBase post={post} postUrl={postUrl}>
             <div className="mb-2 mt-2">
-                <span className="bg-secondary text-text text-sm font-bold px-4 py-1 rounded-[0.4rem] uppercase tracking-tight">
+                <span className="bg-primary text-text text-[0.75rem] font-bold px-4 py-1 rounded-full uppercase tracking-tight">
                     {post.game}
                 </span>
             </div>
@@ -36,7 +36,7 @@ export default function DuvidaCard({ post, isFullView = false }: DuvidaCardProps
                 </div>
             ) : (
                 <Link href={postUrl} className="block group cursor-pointer relative">
-                    <div className="max-h-[12.5rem] overflow-hidden relative">
+                    <div className="max-h-[20rem] overflow-hidden relative">
                         <div className="text-sm">
                             <MarkdownViewer content={post.description} />
                         </div>

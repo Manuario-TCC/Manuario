@@ -20,7 +20,7 @@ export const useManualActions = () => {
             router.push(`/manual/${data.manualId}`);
         } catch (error) {
             console.error('Falha ao clonar:', error);
-            customAlert.error('Erro', 'Não foi possível clonar o manual.');
+            customAlert.toastError('Erro, Não foi possível clonar o manual.');
         } finally {
             setIsForking(false);
         }

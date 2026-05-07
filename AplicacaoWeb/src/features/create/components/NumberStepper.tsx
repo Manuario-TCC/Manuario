@@ -80,7 +80,7 @@ export const NumberStepper = ({ label, value, onChange, placeholder, isError, ma
                 className={`flex items-center h-12 rounded-2xl border bg-transparent transition-all overflow-hidden ${
                     isError
                         ? 'border-red-500 focus-within:border-red-500'
-                        : 'border-card-border focus-within:border-primary/50'
+                        : 'border-card-border focus-within:border-primary'
                 }`}
             >
                 <button
@@ -90,9 +90,9 @@ export const NumberStepper = ({ label, value, onChange, placeholder, isError, ma
                     onMouseLeave={stopHold}
                     onTouchStart={onMouseDownDecrement}
                     onTouchEnd={stopHold}
-                    className={`flex items-center justify-center h-full w-12 transition-colors ${isError ? 'text-red-500 hover:bg-red-500/10' : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground'}`}
+                    className={`flex items-center justify-center h-full w-12 transition-colors ${isError ? 'text-red-500 hover:bg-red-500/10' : 'text-muted-foreground hover:bg-primary hover:text-foreground'}`}
                 >
-                    <Minus size={16} />
+                    <Minus className="w-[1rem] h-[1rem]" />
                 </button>
 
                 <input
@@ -110,9 +110,9 @@ export const NumberStepper = ({ label, value, onChange, placeholder, isError, ma
                     onMouseLeave={stopHold}
                     onTouchStart={onMouseDownIncrement}
                     onTouchEnd={stopHold}
-                    className={`flex items-center justify-center h-full w-12 transition-colors ${isError ? 'text-red-500 hover:bg-red-500/10' : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground'}`}
+                    className={`flex items-center justify-center h-full w-12 transition-colors ${isError ? 'text-red-500 hover:bg-red-500/10' : 'text-muted-foreground hover:bg-primary hover:text-foreground'}`}
                 >
-                    <Plus size={16} />
+                    <Plus className="w-[1rem] h-[1rem]" />
                 </button>
             </div>
         </div>

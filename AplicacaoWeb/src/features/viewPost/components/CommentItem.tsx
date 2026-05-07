@@ -107,7 +107,7 @@ export default function CommentItem({
                             onClick={toggleMenu}
                             className="text-sub-text hover:text-text cursor-pointer transition-colors p-1"
                         >
-                            <MoreHorizontal size={18} />
+                            <MoreHorizontal className="w-[1rem] h-[1rem]" />
                         </button>
 
                         {isMenuOpen && (
@@ -117,7 +117,7 @@ export default function CommentItem({
                                         onClick={startEditing}
                                         className="flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-gray transition-colors w-full text-left cursor-pointer"
                                     >
-                                        <Pencil size={14} /> Editar
+                                        <Pencil className="w-[0.8rem] h-[0.8rem]" /> Editar
                                     </button>
                                 )}
 
@@ -129,7 +129,7 @@ export default function CommentItem({
                                         }}
                                         className="flex items-center gap-2 px-3 py-2 text-sm text-green-500 hover:bg-green-500/10 transition-colors w-full text-left cursor-pointer"
                                     >
-                                        <ShieldCheck size={14} />
+                                        <ShieldCheck className="w-[0.8rem] h-[0.8rem]" />
                                         {comment.isValidated
                                             ? 'Remover Validação'
                                             : 'Validar Comentário'}
@@ -148,13 +148,13 @@ export default function CommentItem({
                                         }}
                                         className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-500/10 transition-colors w-full text-left cursor-pointer"
                                     >
-                                        <Trash2 size={14} /> Excluir
+                                        <Trash2 className="w-[0.8rem] h-[0.8rem]" /> Excluir
                                     </button>
                                 )}
 
                                 {!isAuthor && (
                                     <button className="flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-gray transition-colors w-full text-left cursor-pointer border-t border-card-border">
-                                        <Flag size={14} /> Reportar
+                                        <Flag className="w-[0.8rem] h-[0.8rem]" /> Reportar
                                     </button>
                                 )}
                             </div>
@@ -164,8 +164,8 @@ export default function CommentItem({
 
                 {comment.isValidated && (
                     <div className="flex items-center gap-1.5 mb-2 px-2 py-1 bg-green-500/10 text-green-500 rounded-md w-fit">
-                        <BadgeCheck size={14} />
-                        <span className="text-[10px] uppercase tracking-wider font-bold">
+                        <BadgeCheck className="w-[0.8rem] h-[0.8rem]" />
+                        <span className="text-[0.6rem] uppercase tracking-wider font-bold">
                             Validado pelos Moderadores
                         </span>
                     </div>
@@ -181,6 +181,7 @@ export default function CommentItem({
                                 disabled={isSubmitting}
                                 autoFocus
                             />
+
                             <div className="flex gap-2 justify-end mt-2">
                                 <button
                                     onClick={() => setIsEditing(false)}
@@ -189,6 +190,7 @@ export default function CommentItem({
                                 >
                                     Cancelar
                                 </button>
+
                                 <button
                                     onClick={handleUpdate}
                                     disabled={
@@ -211,7 +213,7 @@ export default function CommentItem({
                                 .map((part: string, i: number) => {
                                     if (part.startsWith('@')) {
                                         return (
-                                            <span key={i} className="text-primary font-medium">
+                                            <span key={i} className="text-tretiary font-medium">
                                                 {part}
                                             </span>
                                         );
@@ -224,7 +226,7 @@ export default function CommentItem({
                                                 key={i}
                                                 src={gifUrl}
                                                 alt="GIF"
-                                                className="max-w-[200px] w-full rounded-xl mt-2 block border border-card-border/50"
+                                                className="max-w-[12.5rem] w-full rounded-xl mt-2 block border border-card-border/50"
                                             />
                                         );
                                     }
@@ -243,7 +245,10 @@ export default function CommentItem({
                                 isLiked ? 'text-red-500' : 'hover:text-red-500'
                             }`}
                         >
-                            <Heart size={16} fill={isLiked ? 'currentColor' : 'none'} />
+                            <Heart
+                                className="w-[0.9rem] h-[0.9rem]"
+                                fill={isLiked ? 'currentColor' : 'none'}
+                            />
                             {likeCount}
                         </button>
 
@@ -251,7 +256,7 @@ export default function CommentItem({
                             onClick={() => toggleReplyInput(comment.author?.name)}
                             className="flex items-center gap-1.5 select-none hover:text-secondary transition-all cursor-pointer"
                         >
-                            <MessageCircle size={16} /> Responder
+                            <MessageCircle className="w-[0.9rem] h-[0.9rem]" /> Responder
                         </button>
 
                         {comment.replies?.length > 0 && (

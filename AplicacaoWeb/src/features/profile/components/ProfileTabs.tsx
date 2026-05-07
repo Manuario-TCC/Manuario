@@ -36,7 +36,7 @@ export const ProfileTabs: React.FC<ProfileTabsProps> = ({ idPublic, isOwnProfile
 
     return (
         <div className="w-full flex flex-col">
-            <div className="max-w-5xl w-full mx-auto mt-4 px-4 md:px-8 flex items-center gap-8 border-b border-gray">
+            <div className="max-w-5xl w-full mx-auto mt-4 px-4 md:px-8 flex flex-nowrap overflow-x-auto no-scrollbar items-center gap-8 border-b border-card-border">
                 {tabs.map((tab) => {
                     const Icon = tab.icon;
                     const isActive = activeTab === tab.id;
@@ -45,13 +45,13 @@ export const ProfileTabs: React.FC<ProfileTabsProps> = ({ idPublic, isOwnProfile
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 py-4 border-b-2 font-medium transition-colors cursor-pointer ${
+                            className={`shrink-0 whitespace-nowrap flex items-center gap-2 py-4 border-b-2 font-medium transition-colors cursor-pointer ${
                                 isActive
                                     ? 'border-text text-text'
                                     : 'border-transparent text-sub-text hover:text-text'
                             }`}
                         >
-                            <Icon size={18} /> {tab.label}
+                            <Icon className="w-[1.1rem] h-[1.1rem]" /> {tab.label}
                         </button>
                     );
                 })}

@@ -80,7 +80,7 @@ export function ProfileLinksModal({ links, onClose }: ProfileLinksModalProps) {
             onClick={onClose}
         >
             <div
-                className="bg-card border border-card-border rounded-2xl w-full max-w-md p-6 shadow-2xl relative"
+                className="bg-background rounded-2xl w-full max-w-md p-6 shadow-2xl relative"
                 onClick={(e) => e.stopPropagation()}
             >
                 <button
@@ -92,7 +92,7 @@ export function ProfileLinksModal({ links, onClose }: ProfileLinksModalProps) {
                 </button>
 
                 <h2 className="text-xl font-bold text-text mb-6 flex items-center gap-2">
-                    <Link2 className="w-[1.5rem] h-[1.5rem] text-primary" />
+                    <Link2 className="w-[1.5rem] h-[1.5rem] text-text" />
                     Links:
                 </h2>
 
@@ -106,9 +106,9 @@ export function ProfileLinksModal({ links, onClose }: ProfileLinksModalProps) {
                                 href={href}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-4 p-3 rounded-xl bg-background border border-card-border hover:bg-gray transition-colors group"
+                                className="flex items-center gap-4 p-3 rounded-xl border border-card-border hover:bg-card transition-colors group"
                             >
-                                <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 border-2 border-card-border bg-card group-hover:border-primary transition-colors">
+                                <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 border-2 border-card-border bg-card">
                                     {getLinkIcon(link.url, link.name)}
                                 </div>
                                 <div className="flex flex-col flex-1 overflow-hidden">

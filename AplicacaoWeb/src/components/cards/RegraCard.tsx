@@ -22,18 +22,18 @@ export default function RegraCard({ post, isFullView = false }: RegraCardProps) 
     return (
         <FeedCardBase post={post} postUrl={postUrl}>
             <div className="mb-2 mt-2">
-                <span className="bg-primary text-text text-sm font-bold px-4 py-1 rounded-[0.4rem] uppercase tracking-tight">
+                <span className="bg-primary text-text text-[0.75rem] font-bold px-4 py-1 rounded-full uppercase tracking-tight">
                     {manualRelacionado?.game || 'Regra'}
                 </span>
 
                 {post.isHouseRule && (
-                    <span className="bg-primary text-text text-sm font-bold px-4 py-1 rounded-[0.4rem] uppercase tracking-tight ml-2">
+                    <span className="bg-primary text-text text-[0.75rem] font-bold px-4 py-1 rounded-full uppercase tracking-tight ml-2">
                         Regra da casa
                     </span>
                 )}
             </div>
 
-            <div className="bg-background border border-card-border rounded-lg overflow-hidden mb-2 mt-4">
+            <div className="bg-background rounded-lg overflow-hidden mb-2 mt-4">
                 <div className="p-3 flex items-center justify-between border-b border-card-border">
                     <div className="flex items-center gap-3">
                         <img
@@ -48,10 +48,10 @@ export default function RegraCard({ post, isFullView = false }: RegraCardProps) 
 
                     <Link
                         href={manualUrl}
-                        className="bg-card hover:bg-gray border border-card-border text-text text-[10px] uppercase font-black py-2 px-3 rounded-md transition-colors flex items-center gap-1"
+                        className="bg-card hover:bg-gray border border-card-border text-text text-[0.6rem] uppercase font-black py-2 px-3 rounded-md transition-colors flex items-center gap-1"
                     >
                         Ver Manual
-                        <ChevronRight size={14} />
+                        <ChevronRight className="w-[0.9rem] h-[0.9rem]" />
                     </Link>
                 </div>
 
@@ -63,7 +63,7 @@ export default function RegraCard({ post, isFullView = false }: RegraCardProps) 
                     </div>
                 ) : (
                     <Link href={postUrl} className="block p-4 group cursor-pointer relative">
-                        <div className="max-h-[10rem] overflow-hidden relative">
+                        <div className="max-h-[20rem] overflow-hidden relative">
                             <div className="text-sm">
                                 <MarkdownViewer content={post.description} />
                             </div>

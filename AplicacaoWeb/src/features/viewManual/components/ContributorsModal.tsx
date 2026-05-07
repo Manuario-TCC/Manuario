@@ -24,7 +24,7 @@ export function ContributorsModal({ isOpen, onClose, contributors }: Contributor
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-            <div className="bg-card rounded-2xl w-full max-w-md p-6 shadow-2xl relative border border-card-border">
+            <div className="bg-background rounded-2xl w-full max-w-md p-6 shadow-2xl relative border border-card-border">
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 text-sub-text hover:text-white p-1.5 rounded-lg cursor-pointer transition-colors"
@@ -32,8 +32,8 @@ export function ContributorsModal({ isOpen, onClose, contributors }: Contributor
                     <X className="w-[1.25rem] h-[1.25rem]" />
                 </button>
 
-                <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                    <Users className="w-[1.5rem] h-[1.5rem] text-purple-500" />
+                <h2 className="text-xl font-bold text-texte mb-6 flex items-center gap-2">
+                    <Users className="w-[1.5rem] h-[1.5rem] text-text" />
                     Contribuidores
                 </h2>
 
@@ -47,7 +47,7 @@ export function ContributorsModal({ isOpen, onClose, contributors }: Contributor
                             <Link
                                 key={user.idPublic}
                                 href={`/perfil/${user.idPublic}`}
-                                className="flex items-center gap-4 p-3 rounded-xl bg-background hover:bg-gray/50 border border-transparent hover:border-card-border transition-all"
+                                className="flex items-center gap-4 p-3 rounded-xl bg-card border border-card hover:border-primary transition-all"
                             >
                                 <div className="w-12 h-12 rounded-full overflow-hidden relative bg-gray shrink-0 border-2 border-card-border">
                                     <Image

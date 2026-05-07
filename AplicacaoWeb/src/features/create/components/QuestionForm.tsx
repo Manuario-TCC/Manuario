@@ -22,9 +22,8 @@ export function QuestionForm({
 
     const onSubmitClick = () => {
         if (!isValid) {
-            customAlert.warning(
-                'Atenção',
-                'Preencha todos os campos obrigatórios antes de postar.',
+            customAlert.toastInfo(
+                'Atenção! Preencha todos os campos obrigatórios antes de postar.',
             );
             return;
         }
@@ -80,7 +79,7 @@ export function QuestionForm({
                     type="button"
                     onClick={onSubmitClick}
                     disabled={isLoading}
-                    className="flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-bold text-white transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-bold text-white transition-all hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     {isLoading ? (
                         <Loader2 className="w-5 h-5 animate-spin" />

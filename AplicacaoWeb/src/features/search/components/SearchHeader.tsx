@@ -28,7 +28,7 @@ export default function SearchHeader({
         <div className="relative w-full mb-10 group">
             <div className="flex flex-col sm:flex-row gap-3 w-full">
                 <div className="relative flex-1 flex items-center bg-card border border-card-border rounded-2xl p-1.5 transition-all shadow-sm w-full">
-                    <Search size={20} className="absolute left-4 text-sub-text transition-colors" />
+                    <Search className="w-[1.2rem] h-[1.2rem] absolute left-4 text-sub-text transition-colors" />
                     <input
                         type="text"
                         value={query}
@@ -44,7 +44,7 @@ export default function SearchHeader({
                                 <button
                                     key={tab.id}
                                     onClick={() => setType(tab.id)}
-                                    className={`px-3 py-1.5 text-[11px] uppercase font-black rounded-lg transition-all cursor-pointer ${
+                                    className={`px-3 py-1.5 text-[0.7rem] uppercase font-black rounded-lg transition-all cursor-pointer ${
                                         type === tab.id
                                             ? 'bg-primary text-text shadow-md scale-[1.02]'
                                             : 'text-sub-text hover:text-text hover:bg-card-border/30'

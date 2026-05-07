@@ -65,9 +65,9 @@ function CreateFeatureContent() {
 
     return (
         <div className="mx-auto w-full max-w-5xl px-4 py-10">
-            <div className="overflow-hidden rounded-3xl border border-card-border bg-card shadow-2xl">
-                <div className="mt-2 flex bg-card p-4">
-                    <div className="flex overflow-hidden rounded-full bg-background">
+            <div className="overflow-hidden rounded-3xl bg-card shadow-2xl">
+                <div className="mt-2 w-full overflow-x-auto no-scrollbar bg-card p-4">
+                    <div className="flex w-max flex-nowrap overflow-hidden rounded-full bg-background">
                         {tabs.map((tab) => {
                             const Icon = tab.icon;
                             const isActive = activeTab === tab.id;
@@ -76,7 +76,7 @@ function CreateFeatureContent() {
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id as TabType)}
-                                    className={`relative flex items-center gap-2 rounded-full px-6 py-3 transition-colors ${
+                                    className={`relative shrink-0 flex items-center gap-2 rounded-full px-6 py-3 transition-colors ${
                                         isActive ? 'text-white' : 'text-sub-text hover:text-text'
                                     }`}
                                 >
@@ -94,7 +94,7 @@ function CreateFeatureContent() {
                                     )}
 
                                     <span className="relative z-10 flex items-center gap-2 whitespace-nowrap text-sm font-bold">
-                                        <Icon size={18} />
+                                        <Icon className="w-[1rem] h-[1rem]" />
                                         {tab.label}
                                     </span>
                                 </button>

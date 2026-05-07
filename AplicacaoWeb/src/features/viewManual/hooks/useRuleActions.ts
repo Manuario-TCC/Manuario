@@ -47,7 +47,7 @@ export const useRuleActions = ({
             await customAlert.toastSuccess('Regra removida com sucesso!');
         } catch (error) {
             console.error('Erro ao deletar:', error);
-            customAlert.error('Erro', 'Erro ao remover a regra.');
+            customAlert.toastError('Erro ao remover a regra.');
         }
     };
 

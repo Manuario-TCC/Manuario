@@ -105,9 +105,9 @@ export const PublicationsTab: React.FC<PublicationsTabProps> = ({ idPublic }) =>
     };
 
     return (
-        <div className="w-full flex flex-col min-h-[300px]">
-            <div className="mt-2 flex bg-transparent pb-4 mb-6">
-                <div className="flex overflow-hidden rounded-full bg-background border border-card-border shadow-sm">
+        <div className="w-full flex flex-col min-h-[18rem]">
+            <div className="mt-2 w-full overflow-x-auto no-scrollbar pb-4 mb-6">
+                <div className="flex w-max flex-nowrap overflow-hidden rounded-full bg-background border border-card-border shadow-sm">
                     {tabs.map((tab) => {
                         const Icon = tab.icon;
                         const isActive = activeTab === tab.id;
@@ -116,7 +116,7 @@ export const PublicationsTab: React.FC<PublicationsTabProps> = ({ idPublic }) =>
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as SubTabType)}
-                                className={`relative flex items-center gap-2 rounded-full px-6 py-3 transition-colors ${
+                                className={`relative shrink-0 flex items-center gap-2 rounded-full px-6 py-3 transition-colors ${
                                     isActive ? 'text-white' : 'text-sub-text hover:text-text'
                                 }`}
                             >
@@ -134,7 +134,7 @@ export const PublicationsTab: React.FC<PublicationsTabProps> = ({ idPublic }) =>
                                 )}
 
                                 <span className="relative z-10 flex items-center gap-2 whitespace-nowrap text-sm font-bold">
-                                    <Icon size={18} />
+                                    <Icon className="w-[1.1rem] h-[1.1rem]" />
                                     {tab.label}
                                 </span>
                             </button>

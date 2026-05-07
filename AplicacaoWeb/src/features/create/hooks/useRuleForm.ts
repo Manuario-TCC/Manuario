@@ -138,7 +138,7 @@ export function useRuleForm(editId?: string | null) {
         },
 
         onError: () => {
-            customAlert.error('Erro!', 'Ocorreu um erro ao salvar no banco.');
+            customAlert.toastError('Ocorreu um erro ao salvar no banco.');
         },
     });
 
@@ -153,13 +153,13 @@ export function useRuleForm(editId?: string | null) {
             router.push('/feed');
         },
         onError: async () => {
-            customAlert.error('Erro', 'Não foi possível excluir a regra.');
+            customAlert.toastError('Não foi possível excluir a regra.');
         },
     });
 
     const handleSubmit = async (status: 'PUBLICADO' | 'PRIVADO') => {
         if (!isValid) {
-            customAlert.warning('Atenção', 'Preencha Título, Manual e Conteúdo.');
+            customAlert.toastWarning('Preencha Título, Manual e Conteúdo.');
             return;
         }
         await saveMutation.mutateAsync(status);

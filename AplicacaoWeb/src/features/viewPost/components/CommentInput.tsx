@@ -19,6 +19,11 @@ export default function CommentInput({
 }: any) {
     const { user } = useSession();
 
+    const userAvatarUrl =
+        user?.img && user?.idPublic
+            ? `/upload/${user.idPublic}/user/${user.img}`
+            : '/img/iconePadrao.jpg';
+
     const { texto, setTexto, isSubmitting, handleSubmit } = useCommentInput(
         onSubmit,
         onSuccess,
@@ -51,8 +56,9 @@ export default function CommentInput({
                 <Image
                     src={user?.img || '/img/iconePadrao.jpg'}
                     alt="User"
-                    width={32}
-                    height={32}
+                    width={80}
+                    height={80}
+                    quality={90}
                     className="rounded-full object-cover shrink-0 w-8 h-8 sm:w-10 sm:h-10 select-none"
                 />
             )}
@@ -74,7 +80,7 @@ export default function CommentInput({
                     <button
                         type="button"
                         onClick={toggleGif}
-                        className="text-sub-text hover:text-primary transition-colors p-1.5 cursor-pointer shrink-0 font-black text-[10px] uppercase tracking-wider"
+                        className="text-sub-text hover:text-primary transition-colors p-1.5 cursor-pointer shrink-0 font-black text-[0.6rem] uppercase tracking-wider"
                     >
                         GIF
                     </button>
@@ -101,8 +107,8 @@ export default function CommentInput({
                         >
                             <style jsx global>{`
                                 em-emoji-picker {
-                                    --bg: #0f0d12;
-                                    --border-color: rgba(255, 255, 255, 0.1);
+                                    --rgb-background: 15, 13, 18;
+                                    --color-border: rgba(255, 255, 255, 0.1);
                                     width: 100%;
                                     min-width: 280px;
                                     max-height: 350px;
@@ -114,6 +120,7 @@ export default function CommentInput({
                                     }
                                 }
                             `}</style>
+
                             <Picker
                                 data={data}
                                 i18n={pt}
@@ -166,7 +173,7 @@ export default function CommentInput({
                 <button
                     type="submit"
                     disabled={isSubmitting || !texto.trim()}
-                    className={`flex items-center justify-center shrink-0 w-10 h-10 sm:w-auto sm:h-auto sm:px-6 bg-primary text-white font-bold text-sm rounded-lg hover:opacity-90 transition-opacity disabled:opacity-30 cursor-pointer select-none ${isReply ? 'sm:py-1.5' : 'sm:py-2.5'}`}
+                    className={`flex items-center justify-center shrink-0 w-10 h-10 sm:w-auto sm:h-auto sm:px-6 bg-primary text-white font-bold text-sm rounded-lg hover:opacity-90 transition-opacity disabled:opacity-30 cursor-pointer select-none gap-1 ${isReply ? 'sm:py-1.5' : 'sm:py-2.5'}`}
                 >
                     <SendHorizontal className="w-5 h-5 sm:w-4 sm:h-4" />
                     <span className="hidden sm:inline">{isSubmitting ? '...' : 'Postar'}</span>

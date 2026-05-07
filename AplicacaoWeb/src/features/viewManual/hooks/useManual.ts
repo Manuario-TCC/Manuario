@@ -10,6 +10,7 @@ export function useManual(id: string) {
         data: manual = null,
         isLoading: loading,
         isError,
+        error: queryError,
     } = useQuery({
         queryKey: ['manual', id],
         queryFn: () => manualService.getManualById(id),
@@ -26,5 +27,6 @@ export function useManual(id: string) {
     return {
         manual,
         loading,
+        error: isError ? 'Erro ao carregar o manual' : null,
     };
 }

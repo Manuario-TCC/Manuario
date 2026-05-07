@@ -64,7 +64,7 @@ export function NotificationModal({
             onClick={onClose}
         >
             <div
-                className="bg-card border border-card-border rounded-2xl w-full max-w-lg p-6 shadow-2xl relative"
+                className="bg-background rounded-2xl w-full max-w-lg p-6 shadow-2xl relative"
                 onClick={(e) => e.stopPropagation()}
             >
                 <button
@@ -165,8 +165,8 @@ export function NotificationModal({
                                         ${isUnread ? 'border-primary' : 'border-card-border'}
                                         ${
                                             isLink
-                                                ? 'cursor-pointer hover:bg-gray active:scale-[0.98]'
-                                                : 'cursor-default hover:bg-transparent' // Remove o ponteiro e a mudança de fundo
+                                                ? 'cursor-pointer hover:border-primary active:scale-[0.98]'
+                                                : 'cursor-default hover:bg-transparent'
                                         }
                                     `}
                                     onClick={() => {

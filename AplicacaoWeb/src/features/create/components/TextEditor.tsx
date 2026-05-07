@@ -124,7 +124,7 @@ const ImageNode = (props: any) => {
                             onClick={() => props.updateAttributes({ align: 'left' })}
                             className={`p-1.5 rounded-lg transition-colors cursor-pointer ${props.node.attrs.align === 'left' ? 'text-white bg-primary' : 'text-sub-text hover:text-white hover:bg-card-border'}`}
                         >
-                            <AlignLeft size={14} />
+                            <AlignLeft className="w-[0.8rem] h-[0.8rem]" />
                         </button>
 
                         <button
@@ -133,7 +133,7 @@ const ImageNode = (props: any) => {
                             onClick={() => props.updateAttributes({ align: 'center' })}
                             className={`p-1.5 rounded-lg transition-colors cursor-pointer ${props.node.attrs.align === 'center' ? 'text-white bg-primary' : 'text-sub-text hover:text-white hover:bg-card-border'}`}
                         >
-                            <AlignCenter size={14} />
+                            <AlignCenter className="w-[0.8rem] h-[0.8rem]" />
                         </button>
 
                         <button
@@ -142,7 +142,7 @@ const ImageNode = (props: any) => {
                             onClick={() => props.updateAttributes({ align: 'right' })}
                             className={`p-1.5 rounded-lg transition-colors cursor-pointer ${props.node.attrs.align === 'right' ? 'text-white bg-primary' : 'text-sub-text hover:text-white hover:bg-card-border'}`}
                         >
-                            <AlignRight size={14} />
+                            <AlignRight className="w-[0.8rem] h-[0.8rem]" />
                         </button>
 
                         <div className="w-px h-5 bg-card-border mx-1" />
@@ -153,7 +153,7 @@ const ImageNode = (props: any) => {
                             onClick={props.deleteNode}
                             className="p-1.5 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
                         >
-                            <Trash2 size={16} strokeWidth={2.5} />
+                            <Trash2 className="w-[1rem] h-[1rem]" strokeWidth={2.5} />
                         </button>
                     </div>
                 )}
@@ -206,7 +206,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
             Link.configure({
                 openOnClick: false,
                 HTMLAttributes: {
-                    class: 'text-primary underline cursor-pointer hover:text-primary-hover transition-colors',
+                    class: 'text-primary underline cursor-pointer hover:text-text transition-colors',
                 },
             }),
             TextAlign.configure({
@@ -327,7 +327,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
             showCancelButton: true,
             confirmButtonText: 'Salvar',
             cancelButtonText: 'Cancelar',
-            background: '#151718',
+            background: '#0f0d12',
             color: '#ffffff',
             customClass: {
                 popup: 'border border-card-border rounded-xl shadow-2xl',
@@ -398,7 +398,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
                     onClick={() => editor.chain().focus().toggleBold().run()}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive('bold') ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
-                    <Bold size={18} />
+                    <Bold className="w-[1.1rem] h-[1.1rem]" />
                 </button>
 
                 <button
@@ -407,7 +407,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
                     onClick={() => editor.chain().focus().toggleItalic().run()}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive('italic') ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
-                    <Italic size={18} />
+                    <Italic className="w-[1.1rem] h-[1.1rem]" />
                 </button>
 
                 <button
@@ -416,7 +416,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
                     onClick={() => editor.chain().focus().toggleUnderline().run()}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive('underline') ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
-                    <UnderlineIcon size={18} />
+                    <UnderlineIcon className="w-[1.1rem] h-[1.1rem]" />
                 </button>
 
                 <div className="w-px h-6 bg-card-border mx-2" />
@@ -427,7 +427,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
                     onClick={() => editor.chain().focus().setTextAlign('left').run()}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive({ textAlign: 'left' }) ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
-                    <AlignLeft size={18} />
+                    <AlignLeft className="w-[1.1rem] h-[1.1rem]" />
                 </button>
 
                 <button
@@ -436,7 +436,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
                     onClick={() => editor.chain().focus().setTextAlign('center').run()}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive({ textAlign: 'center' }) ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
-                    <AlignCenter size={18} />
+                    <AlignCenter className="w-[1.1rem] h-[1.1rem]" />
                 </button>
 
                 <button
@@ -445,7 +445,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
                     onClick={() => editor.chain().focus().setTextAlign('right').run()}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive({ textAlign: 'right' }) ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
-                    <AlignRight size={18} />
+                    <AlignRight className="w-[1.1rem] h-[1.1rem]" />
                 </button>
 
                 <div className="w-px h-6 bg-card-border mx-2" />
@@ -467,7 +467,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
                     }}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive('bulletList') ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
-                    <List size={18} />
+                    <List className="w-[1.1rem] h-[1.1rem]" />
                 </button>
 
                 <button
@@ -487,7 +487,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
                     }}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive('orderedList') ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
-                    <ListOrdered size={18} />
+                    <ListOrdered className="w-[1.1rem] h-[1.1rem]" />
                 </button>
 
                 <div className="w-px h-6 bg-card-border mx-2" />
@@ -498,7 +498,11 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
                     onClick={setLink}
                     className={`p-2 rounded-lg transition-colors cursor-pointer ${editor.isActive('link') ? 'bg-primary text-white' : 'text-sub-text hover:bg-card-border'}`}
                 >
-                    {editor.isActive('link') ? <Unlink size={18} /> : <LinkIcon size={18} />}
+                    {editor.isActive('link') ? (
+                        <Unlink className="w-[1.1rem] h-[1.1rem]" />
+                    ) : (
+                        <LinkIcon className="w-[1.1rem] h-[1.1rem]" />
+                    )}
                 </button>
 
                 <button
@@ -507,7 +511,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
                     onClick={() => fileInputRef.current?.click()}
                     className="p-2 rounded-lg text-sub-text hover:bg-card-border hover:text-text transition-colors cursor-pointer"
                 >
-                    <ImagePlus size={18} />
+                    <ImagePlus className="w-[1.1rem] h-[1.1rem]" />
                 </button>
 
                 <div className="flex-1" />
@@ -522,7 +526,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
                             : 'bg-background border border-card-border text-sub-text hover:text-text'
                     }`}
                 >
-                    <FileCode2 size={14} />
+                    <FileCode2 className="w-[0.8rem] h-[0.8rem]" />
                     {isSourceMode ? 'Editor' : 'Markdown'}
                 </button>
 
@@ -546,7 +550,7 @@ function TextEditor({ markdown, onChange, onImageAdded }: TextEditorProps) {
                     <textarea
                         value={markdown}
                         onChange={(e) => onChange(e.target.value)}
-                        className="w-full h-full min-h-[350px] p-8 bg-background text-white font-mono text-sm leading-relaxed resize-none focus:outline-none"
+                        className="w-full h-full min-h-[19rem] p-8 bg-background text-white font-mono text-sm leading-relaxed resize-none focus:outline-none"
                         placeholder="Escreva Markdown..."
                     />
                 ) : (

@@ -207,6 +207,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 onDelete={edit.handleDeleteAccount}
                 isLoading={edit.isLoading}
                 addLink={edit.addLink}
+                onLogout={edit.handleLogout}
                 updateLink={edit.updateLink}
                 removeLink={edit.removeLink}
             />

@@ -47,7 +47,7 @@ export function useAuth() {
 
             router.push('/chat');
         } catch (error: any) {
-            customAlert.error('Acesso negado', error.message);
+            customAlert.toastError('Acesso negado');
         } finally {
             setIsLoading(false);
         }

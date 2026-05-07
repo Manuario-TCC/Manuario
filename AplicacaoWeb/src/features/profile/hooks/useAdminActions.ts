@@ -15,12 +15,11 @@ export function useAdminActions() {
             const data = await adminService.toggleAdmin(userId);
             onSuccess(data.isAdmin);
 
-            customAlert.success(
-                'Sucesso!',
+            customAlert.toastSuccess(
                 data.isAdmin ? 'Usuário agora é um ADM.' : 'Cargo de ADM removido.',
             );
         } catch (error: any) {
-            customAlert.error('Ops...', error.message);
+            customAlert.toastError('Ops...');
         } finally {
             setIsActionLoading(false);
         }
@@ -32,9 +31,9 @@ export function useAdminActions() {
             await adminService.disableUser(userId, reason);
             onSuccess();
 
-            customAlert.success('Usuário Desabilitado', 'A ação foi registrada nos logs.');
+            customAlert.toastSuccess('Usuário Desabilitado.');
         } catch (error: any) {
-            customAlert.error('Ops...', error.message);
+            customAlert.toastError('Ops...');
         } finally {
             setIsActionLoading(false);
         }

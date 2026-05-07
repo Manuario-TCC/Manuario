@@ -18,8 +18,8 @@ export function CustomInput({ label, id, error, ...props }: CustomInputProps) {
                 id={id}
                 className={`w-full bg-transparent border rounded-xl px-4 py-3 text-text focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                     error
-                        ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-                        : 'border-card-border focus:border-primary focus:ring-1 focus:ring-primary'
+                        ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                        : 'border-card-border focus:border-primary focus:ring-primary'
                 }`}
                 {...props}
             />

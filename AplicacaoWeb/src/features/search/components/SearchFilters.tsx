@@ -79,7 +79,7 @@ export default function SearchFilters({ filters, setFilters }: SearchFiltersProp
                 }}
                 className="flex items-center gap-2 border border-dashed border-card-border text-sub-text hover:bg-card hover:text-text px-5 py-2.5 rounded-full text-sm font-bold transition-all cursor-pointer"
             >
-                <Plus size={16} /> Adicionar filtro
+                <Plus className="w-[1rem] h-[1rem]" /> Adicionar filtro
             </button>
 
             {Object.keys(filters).map((key) => {
@@ -165,7 +165,7 @@ export default function SearchFilters({ filters, setFilters }: SearchFiltersProp
                                     <button
                                         onClick={applyFilter}
                                         disabled={!tempFilterValue}
-                                        className="w-full bg-primary text-text font-bold py-3.5 rounded-xl hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-lg"
+                                        className="w-full bg-primary text-text font-bold py-3.5 rounded-xl hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-lg"
                                     >
                                         Aplicar Filtro
                                     </button>
@@ -180,7 +180,7 @@ export default function SearchFilters({ filters, setFilters }: SearchFiltersProp
                                 Filtrar por
                             </span>
 
-                            <div className="flex flex-col gap-1 max-h-[300px] overflow-y-auto custom-scrollbar">
+                            <div className="flex flex-col gap-1 max-h-[18rem] overflow-y-auto custom-scrollbar">
                                 {filterOptions.map((opt) => {
                                     const OptIcon = opt.icon;
                                     const isActive = activeConfigFilter === opt.id;
@@ -195,8 +195,9 @@ export default function SearchFilters({ filters, setFilters }: SearchFiltersProp
                                             }`}
                                         >
                                             <OptIcon
-                                                size={16}
-                                                className={isActive ? 'text-text' : 'text-sub-text'}
+                                                className={`w-[1rem] h-[1rem] ${
+                                                    isActive ? 'text-text' : 'text-sub-text'
+                                                }`}
                                             />
                                             {opt.label}
                                         </button>
@@ -208,7 +209,7 @@ export default function SearchFilters({ filters, setFilters }: SearchFiltersProp
                         {activeConfigFilter && activeOption && (
                             <div className="w-72 bg-card border border-card-border rounded-xl shadow-2xl p-5 animate-in fade-in slide-in-from-left-2 h-fit">
                                 <span className="text-base font-bold text-text flex items-center gap-2 mb-5">
-                                    {ActiveIcon && <ActiveIcon size={18} />}
+                                    {ActiveIcon && <ActiveIcon className="w-[1.1rem] h-[1.1rem]" />}
                                     {activeOption.label}
                                 </span>
 
@@ -218,7 +219,7 @@ export default function SearchFilters({ filters, setFilters }: SearchFiltersProp
                                     <button
                                         onClick={applyFilter}
                                         disabled={!tempFilterValue}
-                                        className="bg-primary text-text text-xs font-bold px-5 py-2.5 rounded-lg hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                        className="bg-primary text-text text-xs font-bold px-5 py-2.5 rounded-lg hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                                     >
                                         Aplicar
                                     </button>
