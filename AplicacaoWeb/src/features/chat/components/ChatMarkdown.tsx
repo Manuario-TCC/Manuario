@@ -39,7 +39,7 @@ export default function ChatMarkdown({ content, isTyping }: ChatMarkdownProps) {
                 .custom-chat-markdown li {
                     margin-bottom: 0.25rem;
                 }
-                /* Estilo para blocos de código se a IA mandar */
+
                 .custom-chat-markdown pre {
                     background-color: #0f0d12;
                     border: 1px solid #2c2935;

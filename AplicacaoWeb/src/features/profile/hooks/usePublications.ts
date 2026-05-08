@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { publicationsService } from '../services/publicationsService';
 
-type SubTabType = 'duvida' | 'regra' | 'ia';
+type SubTabType = 'questions' | 'rules' | 'ai';
 
 export interface PublicationsResponse {
     items?: any[];
@@ -17,6 +17,5 @@ export function usePublications(idPublic: string, activeTab: SubTabType) {
             publicationsService.getUserPosts(idPublic, activeTab, limit, pageParam as number),
         initialPageParam: 0,
         getNextPageParam: (lastPage) => lastPage.nextOffset ?? undefined,
-        enabled: activeTab !== 'ia',
     });
 }

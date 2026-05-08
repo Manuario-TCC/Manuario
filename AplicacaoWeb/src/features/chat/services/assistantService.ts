@@ -1,11 +1,77 @@
-interface AskAssistantPayload {
-    message: string;
+export interface AIReference {
+    type: string;
+    idPublic: string;
+    title: string;
 }
 
-export const assistantService = {
-    async askIA({ message }: AskAssistantPayload): Promise<string> {
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+export interface AIResponse {
+    content: string;
+    metadata?: {
+        title: string;
+        gameName: string;
+    };
+    options?: string[];
+    references?: AIReference[];
+    aiToken?: string;
+}
 
-        return `Olá! Recebi sua mensagem: *"${message}"*.\n\nSou o assistente inteligente e estou aqui para tirar dúvidas sobre regras de jogos. Aqui está um exemplo de **Markdown** com uma lista:\n- Pular a vez\n- Comprar duas cartas\n\nComo posso te ajudar mais hoje?`;
+let abortController: AbortController | null = null;
+
+export const assistantService = {
+    async askIA({ message, idPublic }: { message: string; idPublic: string }): Promise<AIResponse> {
+        abortController = new AbortController();
+
+        const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message, idPublic }),
+            signal: abortController.signal,
+        });
+
+        if (!res.ok) {
+            throw new Error('Erro ao se comunicar com a IA.');
+        }
+
+        return await res.json();
+    },
+
+    async retryIA(idPublic: string, lastMessage: string): Promise<AIResponse> {
+        abortController = new AbortController();
+
+        const res = await fetch('/api/chat/retry', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ idPublic, lastMessage }),
+            signal: abortController.signal,
+        });
+
+        if (!res.ok) {
+            throw new Error('Erro ao tentar gerar nova resposta da IA.');
+        }
+
+        return await res.json();
+    },
+
+    async cancelIA(idPublic: string): Promise<void> {
+        if (abortController) {
+            abortController.abort();
+            abortController = null;
+        }
+
+        const res = await fetch('/api/chat/cancel', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ idPublic }),
+        });
+
+        if (!res.ok) {
+            throw new Error('Erro ao cancelar a requisição.');
+        }
     },
 };

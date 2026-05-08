@@ -126,7 +126,7 @@ export const ProfileEditModal: React.FC<Props> = ({
                                 maxLength={150}
                                 rows={3}
                                 placeholder="Fale um pouco sobre você..."
-                                className="w-full bg-card text-text border border-card-border p-3 rounded-xl focus:outline-none focus:border-primary transition resize-none"
+                                className="w-full text-text border border-card-border p-3 rounded-xl focus:outline-none focus:border-primary transition resize-none"
                             />
                             <span className="text-sub-text text-xs text-right">
                                 {formData.bio.length}/150

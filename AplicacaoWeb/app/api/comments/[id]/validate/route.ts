@@ -50,7 +50,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
             postType = 'questions';
             postIdPublic = comment.question.idPublic;
         } else if (comment.aiPost?.idPublic) {
-            postType = 'ia';
+            postType = 'ai';
             postIdPublic = comment.aiPost.idPublic;
         }
 

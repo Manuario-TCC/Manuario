@@ -14,18 +14,15 @@ export async function GET(
 
     try {
         const currentUserId = await getAuthUserId();
-
         let rawItems = [];
         let totalItems = 0;
 
         const baseWhereCondition = {
-            user: {
-                idPublic: idPublic,
-            },
+            user: { idPublic },
             isDisabled: false,
         };
 
-        if (type === 'duvida') {
+        if (type === 'questions') {
             rawItems = await prisma.question.findMany({
                 where: baseWhereCondition,
                 orderBy: { createdAt: 'desc' },
@@ -43,17 +40,11 @@ export async function GET(
                     },
                 },
             });
-
             totalItems = await prisma.question.count({ where: baseWhereCondition });
-        } else if (type === 'regra') {
-            const regraWhereCondition = {
-                ...baseWhereCondition,
-                status: 'PUBLICADO',
-                isDisabled: false,
-            };
-
+        } else if (type === 'rules') {
+            const ruleWhere = { ...baseWhereCondition, status: 'PUBLICADO' };
             rawItems = await prisma.rule.findMany({
-                where: regraWhereCondition,
+                where: ruleWhere,
                 orderBy: { createdAt: 'desc' },
                 skip: offset,
                 take: limit,
@@ -70,27 +61,40 @@ export async function GET(
                     manuals: true,
                 },
             });
-
-            totalItems = await prisma.rule.count({ where: regraWhereCondition });
-        } else if (type === 'ia') {
-            rawItems = [];
-            totalItems = 0;
-        } else {
-            return NextResponse.json({ error: 'Tipo de postagem inválido' }, { status: 400 });
+            totalItems = await prisma.rule.count({ where: ruleWhere });
+        } else if (type === 'ai') {
+            rawItems = await prisma.aIPost.findMany({
+                where: baseWhereCondition,
+                orderBy: { createdAt: 'desc' },
+                skip: offset,
+                take: limit,
+                include: {
+                    user: {
+                        select: {
+                            name: true,
+                            img: true,
+                            idPublic: true,
+                            isAdmin: true,
+                            isSuperAdmin: true,
+                        },
+                    },
+                    _count: { select: { comments: { where: { isDisabled: false } } } },
+                },
+            });
+            totalItems = await prisma.aIPost.count({ where: baseWhereCondition });
         }
 
         const items = rawItems.map((item: any) => ({
             ...item,
-            type: type === 'regra' ? 'regra' : 'duvida',
+            type,
             hasLiked:
                 currentUserId && item.likedByIds ? item.likedByIds.includes(currentUserId) : false,
+            commentCount: item._count?.comments || 0,
         }));
-
-        const nextOffset = offset + items.length < totalItems ? offset + limit : null;
 
         return NextResponse.json({
             items,
-            nextOffset,
+            nextOffset: offset + items.length < totalItems ? offset + limit : null,
         });
     } catch (error) {
         console.error('Erro ao buscar posts do usuário:', error);

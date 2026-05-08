@@ -4,6 +4,7 @@ import { useRef, useCallback, useMemo } from 'react';
 import { useFeed } from './hooks/useFeed';
 import DuvidaCard from '../../components/cards/DuvidaCard';
 import RegraCard from '../../components/cards/RegraCard';
+import AiCard from '../../components/cards/AiCard';
 
 const PostSkeleton = () => (
     <div className="flex w-full animate-pulse flex-col p-4 border border-card-border rounded-xl bg-background shadow-sm mb-4">
@@ -50,7 +51,16 @@ export default function FeedPage() {
             <div className="flex flex-col gap-4 w-full">
                 {posts.map((post, index) => {
                     const isLast = posts.length === index + 1;
-                    const CardComponent = post.type === 'regra' ? RegraCard : DuvidaCard;
+                    let CardComponent: any;
+
+                    if (post.type === 'regra') {
+                        CardComponent = RegraCard;
+                    } else if (post.type === 'duvida') {
+                        CardComponent = DuvidaCard;
+                    } else if (post.type === 'ai') {
+                        CardComponent = AiCard;
+                    } else return null;
+
                     const postKey = `${post.type}-${post.id}-${index}`;
 
                     return (

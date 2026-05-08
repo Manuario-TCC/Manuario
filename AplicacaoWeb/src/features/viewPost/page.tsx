@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useViewPost } from './hooks/useViewPost';
 import DuvidaCard from '@/src/components/cards/DuvidaCard';
 import RegraCard from '@/src/components/cards/RegraCard';
+import AiCard from '@/src/components/cards/AiCard';
 import CommentSection from './components/CommentSection';
 import { PostSidebar } from './components/PostSidebar';
 import { notFound } from 'next/navigation';
@@ -49,7 +50,7 @@ const SidebarSkeleton = () => (
 const PostSkeleton = () => (
     <div className="w-full py-8 px-4 md:px-6 xl:px-12 flex justify-center animate-pulse">
         <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-6 xl:gap-12 items-start lg:justify-between">
-            <div className="w-full lg:flex-1 max-w-4xl flex flex-col min-w-0 mx-auto lg:mx-0">
+            <div className="w-full lg:flex-1 max-w-[50rem] flex flex-col min-w-0 mx-auto lg:mx-0">
                 <PostCardSkeleton />
 
                 <div className="w-full mt-10 bg-card/40 rounded-xl p-6 border border-card-border/20">
@@ -93,10 +94,11 @@ export default function ViewPostFeature({ tipo, idPublic }: { tipo: string; idPu
     return (
         <div className="w-full py-8 px-4 md:px-6 xl:px-12 flex justify-center">
             <div className="w-full max-w-7xl flex flex-col lg:flex-row gap-6 xl:gap-12 items-start lg:justify-between">
-                <div className="w-full lg:flex-1 max-w-4xl flex flex-col min-w-0 mx-auto lg:mx-0">
+                <div className="w-full lg:flex-1 flex flex-col min-w-0 lg:mx-0 max-w-[50rem]">
                     <div className="w-full">
                         {tipo === 'questions' && <DuvidaCard post={post} isFullView={true} />}
                         {tipo === 'rules' && <RegraCard post={post} isFullView={true} />}
+                        {tipo === 'ai' && <AiCard post={post} isFullView={true} />}
                     </div>
 
                     <div className="w-full mt-10">
