@@ -1,12 +1,24 @@
-import { Crown, ShieldCheck } from 'lucide-react';
+import { Crown, ShieldCheck, Bot } from 'lucide-react';
 
 interface RoleBadgeProps {
     isAdmin?: boolean;
     isSuperAdmin?: boolean;
+    isBot?: boolean;
     size?: number;
 }
 
-export function RoleBadge({ isAdmin, isSuperAdmin, size = 16 }: RoleBadgeProps) {
+export function RoleBadge({ isAdmin, isSuperAdmin, isBot }: RoleBadgeProps) {
+    if (isBot) {
+        return (
+            <div
+                title="Conta Oficial (Bot)"
+                className="flex items-center justify-center text-primary"
+            >
+                <Bot className="w-[1.4rem] h-[1.4rem]" />
+            </div>
+        );
+    }
+
     if (isSuperAdmin) {
         return (
             <div
