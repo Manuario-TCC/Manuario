@@ -89,7 +89,7 @@ export default function ViewPostFeature({ tipo, idPublic }: { tipo: string; idPu
         notFound();
     }
 
-    const gameName = post?.game || post?.manuals?.[0]?.game;
+    const gameName = post?.game || post?.gameName || post?.manuals?.[0]?.game;
 
     return (
         <div className="w-full py-8 px-4 md:px-6 xl:px-12 flex justify-center">

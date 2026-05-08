@@ -66,13 +66,27 @@ export async function PATCH(
                     },
                 },
             });
+        } else if (type === 'ai') {
+            postToDisable = await prisma.aIPost.findUnique({
+                where: { idPublic },
+                select: {
+                    id: true,
+                    title: true,
+                    userId: true,
+                    user: {
+                        select: {
+                            idPublic: true,
+                        },
+                    },
+                },
+            });
         }
 
         if (!postToDisable) {
             return NextResponse.json({ error: 'Publicação não encontrada.' }, { status: 404 });
         }
 
-        const postTitle = postToDisable.name;
+        const postTitle = postToDisable.name || postToDisable.title;
 
         let notificationRecord = null;
 
@@ -84,6 +98,11 @@ export async function PATCH(
                 });
             } else if (type === 'questions') {
                 await tx.question.update({
+                    where: { id: postToDisable.id },
+                    data: { isDisabled: true },
+                });
+            } else if (type === 'ai') {
+                await tx.aIPost.update({
                     where: { id: postToDisable.id },
                     data: { isDisabled: true },
                 });
@@ -104,7 +123,12 @@ export async function PATCH(
                     type: 'DELETE',
                     reason: reason,
                     targetName: postTitle,
-                    senderName: type === 'rules' ? 'Regra' : 'Dúvida',
+                    senderName:
+                        type === 'rules'
+                            ? 'Regra'
+                            : type === 'questions'
+                              ? 'Dúvida'
+                              : 'Publicação de IA',
                     link: null,
                     isRead: false,
                 },
