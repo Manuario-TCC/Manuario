@@ -69,4 +69,14 @@ export const manualService = {
         }
         return response.json();
     },
+
+    exportManualPDF: async (manualIdPublic: string) => {
+        const response = await fetch(`/api/manual/${manualIdPublic}/export`);
+
+        if (!response.ok) {
+            throw new Error('Falha na exportação');
+        }
+
+        return response.json();
+    },
 };

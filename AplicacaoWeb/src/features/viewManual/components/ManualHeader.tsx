@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -19,12 +17,14 @@ import {
     Pencil,
     Share2,
     GitFork,
+    Loader2,
 } from 'lucide-react';
 import { ContributorsModal } from './ContributorsModal';
 import { customAlert } from '@/src/components/customAlert';
 import { useManualActions } from '../hooks/useManualActions';
 import { useSession } from '@/src/hooks/useSession';
 import { ReasonModal } from '@/src/components/ReasonModal';
+import { ManualPDFTemplate } from './ManualPDFTemplate';
 
 interface ManualHeaderProps {
     manual: any;
@@ -40,16 +40,16 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
         isForking,
         handleDisableManual,
         isDisabling,
+        handleDownloadPDF,
+        isDownloading,
+        exportData,
         isReasonModalOpen,
         setIsReasonModalOpen,
     } = useManualActions();
 
     const isAdminOrSuperAdmin = user?.isAdmin || user?.isSuperAdmin;
-
     const originalOwner = manual?.clonadoDe?.user;
-
     const isOwner = user?.id === manual?.userId || user?.idPublic === manual?.user?.idPublic;
-
     const canClone = user && !isOwner;
 
     const bannerImg = manual?.imgBanner
@@ -286,8 +286,17 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                                         </button>
                                     )}
 
-                                    <button className="p-2 bg-primary hover:bg-secondary text-text rounded-xl transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer">
-                                        <Download className="w-[1.25rem] h-[1.25rem]" />
+                                    <button
+                                        onClick={() => handleDownloadPDF(manual.idPublic)}
+                                        disabled={isDownloading}
+                                        title="Baixar Manual em PDF"
+                                        className="p-2 bg-primary hover:bg-secondary disabled:bg-primary/50 text-text rounded-xl transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer"
+                                    >
+                                        {isDownloading ? (
+                                            <Loader2 className="w-[1.25rem] h-[1.25rem] animate-spin" />
+                                        ) : (
+                                            <Download className="w-[1.25rem] h-[1.25rem]" />
+                                        )}
                                     </button>
                                 </div>
                             </div>
@@ -318,6 +327,8 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                 description="Por favor, informe o motivo para desativar este manual. Todas as regras vinculadas a ele também serão desativadas em cascata."
                 actionLabel={isDisabling ? 'Desativando...' : 'Desativar Manual'}
             />
+
+            {exportData && <ManualPDFTemplate data={exportData} />}
         </div>
     );
 }
