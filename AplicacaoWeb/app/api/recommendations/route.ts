@@ -71,6 +71,39 @@ export async function GET(request: Request) {
                 take: 30,
                 orderBy: { createdAt: 'desc' },
             });
+        } else if (type === 'ai') {
+            const aiPosts = await prisma.aIPost.findMany({
+                where: {
+                    gameName: gameName,
+                    idPublic: { not: currentId || undefined },
+                    userId: loggedUserId ? { not: loggedUserId } : undefined,
+                    isDisabled: false,
+                },
+                select: {
+                    id: true,
+                    idPublic: true,
+                    title: true,
+                    createdAt: true,
+                    likeCount: true,
+                    user: {
+                        select: {
+                            name: true,
+                            img: true,
+                            idPublic: true,
+                        },
+                    },
+                    _count: {
+                        select: { comments: true },
+                    },
+                },
+                take: 30,
+                orderBy: { createdAt: 'desc' },
+            });
+
+            recommendations = aiPosts.map((post) => ({
+                ...post,
+                name: post.title,
+            }));
         }
 
         const now = new Date().getTime();
