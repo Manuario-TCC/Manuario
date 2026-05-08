@@ -42,7 +42,7 @@ export default function AiCard({ post, isFullView = false }: AiCardProps) {
                 <div className="p-5 space-y-8">
                     <div className="flex w-full justify-end">
                         <div className="flex max-w-[85%] gap-3 flex-row-reverse text-right">
-                            <div className="flex-shrink-0 z-20">
+                            <div className="flex-shrink-0">
                                 <img
                                     src={
                                         post.user?.img
@@ -73,7 +73,7 @@ export default function AiCard({ post, isFullView = false }: AiCardProps) {
 
                     <div className="flex w-full justify-start">
                         <div className="flex max-w-[85%] gap-3 flex-row">
-                            <div className="flex-shrink-0 z-20">
+                            <div className="flex-shrink-0">
                                 <img
                                     src="/img/iconePadrao.jpg"
                                     className="w-9 h-9 rounded-full object-cover shadow-sm border border-card-border"

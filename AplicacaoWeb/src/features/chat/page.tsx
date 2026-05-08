@@ -6,7 +6,7 @@ import { useActionsIA } from './hooks/useActionsIA';
 import { useSession } from '../../hooks/useSession';
 import ChatMessage from './components/ChatMessage';
 import ChatInput from './components/ChatInput';
-import { MessageSquareDashed } from 'lucide-react';
+import { MessageSquareDashed, ArrowLeft } from 'lucide-react';
 import { usePostAI } from './hooks/usePostAI';
 import PublishAIModal from './components/PublishAIModal';
 
@@ -30,17 +30,32 @@ export default function AssistantPage() {
         }
     }, [messages, isLoading, hasMessages]);
 
+    useEffect(() => {
+        const handleBeforeUnload = () => {
+            if (isLoading && user?.idPublic) {
+                const blob = new Blob([JSON.stringify({ idPublic: user.idPublic })], {
+                    type: 'application/json',
+                });
+
+                navigator.sendBeacon('/api/chat/cancel', blob);
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [isLoading, user?.idPublic]);
+
     return (
         <div className="flex flex-col w-full bg-background text-text h-[calc(100dvh-8.5rem)] sm:h-screen overflow-hidden">
             {isPostModalOpen && (
                 <PublishAIModal
-                    key={postData.aiResponse}
                     isOpen={isPostModalOpen}
                     onClose={closePostModal}
                     promptUser={postData.promptUser}
                     aiResponse={postData.aiResponse}
                     initialTitle={postData.title}
                     initialGameName={postData.gameName}
+                    aiToken={postData.aiToken}
                 />
             )}
 
@@ -72,9 +87,24 @@ export default function AssistantPage() {
                 </div>
             ) : (
                 <div className="flex flex-col h-full w-full">
+                    <div className="w-full flex items-center px-4 py-3 bg-background shrink-0 shadow-sm z-10">
+                        <button
+                            onClick={() => {
+                                if (isLoading) handleCancel();
+                                setMessages([]);
+                            }}
+                            className="flex items-center gap-2 text-sm font-medium text-sub-text px-3 py-1.5 cursor-pointer"
+                        >
+                            <ArrowLeft size={18} />
+                            <span>Voltar ao início</span>
+                        </button>
+                    </div>
+
                     <div className="flex-1 overflow-y-auto w-full p-4 md:p-6">
                         <div className="w-full max-w-4xl mx-auto pb-4">
                             {messages.map((msg, index) => {
+                                const isLatestMessage = index === messages.length - 1;
+
                                 const lastUserMsg =
                                     messages
                                         .slice(0, index)
@@ -85,11 +115,17 @@ export default function AssistantPage() {
                                     <ChatMessage
                                         key={msg.id}
                                         message={msg}
+                                        isLatestMessage={isLatestMessage}
                                         onCopy={handleCopy}
                                         onRetry={() => handleRetry(lastUserMsg)}
                                         onOptionSelect={handleSend}
                                         onPost={() =>
-                                            openPostModal(msg.content, lastUserMsg, msg.metadata)
+                                            openPostModal(
+                                                msg.content,
+                                                lastUserMsg,
+                                                msg.metadata,
+                                                msg.aiToken,
+                                            )
                                         }
                                         onSave={() =>
                                             handleSaveSnippet(
@@ -105,7 +141,7 @@ export default function AssistantPage() {
                             {isLoading && (
                                 <div className="flex w-full justify-start mb-6 animate-in fade-in duration-300">
                                     <div className="flex max-w-[85%] sm:max-w-[75%] gap-2 flex-row">
-                                        <div className="flex-shrink-0 z-20">
+                                        <div className="flex-shrink-0">
                                             <img
                                                 src="/img/iconePadrao.jpg"
                                                 alt="AI"

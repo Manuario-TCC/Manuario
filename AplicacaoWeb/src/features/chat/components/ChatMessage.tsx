@@ -3,10 +3,12 @@ import { useSession } from '../../../hooks/useSession';
 import { ChatMessageData } from '../hooks/useAssistant';
 import { useTypewriter } from '../hooks/useTypewriter';
 import ChatMarkdown from './ChatMarkdown';
-import { Bookmark, Share, RefreshCw, Copy, Check } from 'lucide-react';
+import { Bookmark, Share, RefreshCw, Copy, Check, Book } from 'lucide-react';
+import ReferencesModal from './ReferencesModal';
 
 interface ChatMessageProps {
     message: ChatMessageData;
+    isLatestMessage: boolean;
     onCopy: (text: string, onSuccess: () => void) => void;
     onRetry: () => void;
     onOptionSelect?: (optionText: string) => void;
@@ -16,6 +18,7 @@ interface ChatMessageProps {
 
 export default function ChatMessage({
     message,
+    isLatestMessage,
     onCopy,
     onRetry,
     onOptionSelect,
@@ -35,6 +38,7 @@ export default function ChatMessage({
 
     const [isCopied, setIsCopied] = useState(false);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
+    const [isRefModalOpen, setIsRefModalOpen] = useState(false);
 
     const handleCopyClick = () => {
         onCopy(cleanContent, () => {
@@ -50,7 +54,7 @@ export default function ChatMessage({
             <div
                 className={`flex max-w-[85%] sm:max-w-[75%] gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
             >
-                <div className="flex-shrink-0 z-20">
+                <div className="flex-shrink-0">
                     {isUser ? (
                         <img
                             src={user?.img || '/default-avatar.png'}
@@ -76,7 +80,7 @@ export default function ChatMessage({
                     </div>
 
                     <div
-                        className={`relative z-10 px-5 py-3 shadow-sm bg-card text-text rounded-2xl ${
+                        className={`relative px-5 py-3 shadow-sm bg-card text-text rounded-2xl ${
                             isUser ? 'rounded-tr-none' : 'rounded-tl-none'
                         }`}
                     >
@@ -88,6 +92,28 @@ export default function ChatMessage({
                             <div className="text-sm sm:text-base max-w-none flex flex-col">
                                 <ChatMarkdown content={displayedContent} isTyping={isTyping} />
 
+                                {message.references &&
+                                    message.references.length > 0 &&
+                                    !isTyping && (
+                                        <div className="mt-4 pt-4 border-t border-card-border/50">
+                                            <button
+                                                onClick={() => setIsRefModalOpen(true)}
+                                                className="flex items-center gap-2 text-xs sm:text-sm text-sub-text bg-background/50 hover:bg-primary/10 px-3 py-1.5 rounded-lg border border-card-border hover:border-primary/30 transition-all active:scale-95 cursor-pointer"
+                                            >
+                                                <Book size={14} />
+                                                <span>
+                                                    Baseado em {message.references.length} fonte(s)
+                                                </span>
+                                            </button>
+
+                                            <ReferencesModal
+                                                isOpen={isRefModalOpen}
+                                                onClose={() => setIsRefModalOpen(false)}
+                                                references={message.references}
+                                            />
+                                        </div>
+                                    )}
+
                                 {message.options && message.options.length > 0 && !isTyping && (
                                     <div className="mt-5 flex flex-col gap-2 mb-2">
                                         <span className="text-xs text-sub-text mb-1 font-medium">
@@ -96,7 +122,8 @@ export default function ChatMessage({
 
                                         {message.options.map((option, idx) => {
                                             const isSelected = selectedOption === option;
-                                            const hasSelection = selectedOption !== null;
+                                            const hasSelection =
+                                                selectedOption !== null || !isLatestMessage;
 
                                             return (
                                                 <button
@@ -144,7 +171,7 @@ export default function ChatMessage({
                         <div className="flex items-center gap-1 mt-1.5 ml-2 text-sub-text animate-in fade-in duration-500">
                             <button
                                 onClick={onSave}
-                                className="p-1.5 hover:text-text hover:bg-card/60 rounded-md transition-all active:scale-95"
+                                className="p-1.5 hover:text-text hover:bg-card/60 rounded-md transition-all active:scale-95 cursor-pointer"
                                 title="Salvar Trecho"
                             >
                                 <Bookmark className="w-[1rem] h-[1rem]" />
@@ -152,7 +179,7 @@ export default function ChatMessage({
 
                             <button
                                 onClick={onPost}
-                                className="p-1.5 hover:text-text hover:bg-card/60 rounded-md transition-all active:scale-95"
+                                className="p-1.5 hover:text-text hover:bg-card/60 rounded-md transition-all active:scale-95 cursor-pointer"
                                 title="Postar"
                             >
                                 <Share className="w-[1rem] h-[1rem]" />
@@ -160,7 +187,7 @@ export default function ChatMessage({
 
                             <button
                                 onClick={onRetry}
-                                className="p-1.5 hover:text-text hover:bg-card/60 rounded-md transition-all active:scale-95"
+                                className="p-1.5 hover:text-text hover:bg-card/60 rounded-md transition-all active:scale-95 cursor-pointer"
                                 title="Gerar novamente"
                             >
                                 <RefreshCw className="w-[1rem] h-[1rem]" />
@@ -168,7 +195,7 @@ export default function ChatMessage({
 
                             <button
                                 onClick={handleCopyClick}
-                                className="p-1.5 hover:text-text hover:bg-card/60 rounded-md transition-all active:scale-95"
+                                className="p-1.5 hover:text-text hover:bg-card/60 rounded-md transition-all active:scale-95 cursor-pointer"
                                 title="Copiar mensagem"
                             >
                                 {isCopied ? (

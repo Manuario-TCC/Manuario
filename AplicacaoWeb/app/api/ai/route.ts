@@ -2,13 +2,27 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/src/database/prisma';
 import jwt from 'jsonwebtoken';
 
-const AI_POST_SECRET = process.env.AI_POST_SECRET;
-
 export async function POST(req: Request) {
     try {
+        const AI_POST_SECRET = process.env.AI_POST_SECRET;
+
         const { title, gameName, aiToken, idPublicUser } = await req.json();
 
-        const decoded = jwt.verify(aiToken, AI_POST_SECRET) as { prompt: string; response: string };
+        if (!aiToken) {
+            return NextResponse.json({ error: 'Token não fornecido.' }, { status: 400 });
+        }
+
+        let decoded: any;
+
+        try {
+            decoded = jwt.verify(aiToken, AI_POST_SECRET) as { prompt: string; response: string };
+        } catch (jwtError) {
+            console.error('[ERRO JWT na /api/ai]:', jwtError);
+            return NextResponse.json(
+                { error: 'Token de segurança inválido ou expirado.' },
+                { status: 403 },
+            );
+        }
 
         const user = await prisma.user.findUnique({ where: { idPublic: idPublicUser } });
         if (!user) {
@@ -27,9 +41,10 @@ export async function POST(req: Request) {
 
         return NextResponse.json(post, { status: 201 });
     } catch (error) {
+        console.error('[ERRO GERAL /api/ai]:', error);
         return NextResponse.json(
-            { error: 'Token de segurança inválido ou expirado.' },
-            { status: 403 },
+            { error: 'Erro interno ao processar a publicação.' },
+            { status: 500 },
         );
     }
 }

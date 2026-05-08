@@ -11,6 +11,7 @@ interface PublishAIModalProps {
     aiResponse: string;
     initialTitle: string;
     initialGameName: string;
+    aiToken: string;
 }
 
 export default function PublishAIModal({
@@ -20,6 +21,7 @@ export default function PublishAIModal({
     aiResponse,
     initialTitle,
     initialGameName,
+    aiToken,
 }: PublishAIModalProps) {
     const { user } = useSession();
     const { title, setTitle, gameName, setGameName, isSubmitting, handlePublish } = usePublishAI({
@@ -27,6 +29,7 @@ export default function PublishAIModal({
         initialGameName,
         promptUser,
         aiResponse,
+        aiToken,
         idPublicUser: user?.idPublic,
         onSuccess: onClose,
     });

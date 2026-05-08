@@ -24,16 +24,11 @@ export const useActionsIA = ({ idPublic, setMessages, setIsLoading }: UseActions
 
         setMessages((prev) => [
             ...prev,
-            {
-                id: crypto.randomUUID(),
-                role: 'user',
-                content: message,
-            },
+            { id: crypto.randomUUID(), role: 'user', content: message },
         ]);
 
         try {
             setIsLoading(true);
-
             const response = await assistantService.askIA({ message, idPublic });
 
             setMessages((prev) => [
@@ -45,10 +40,15 @@ export const useActionsIA = ({ idPublic, setMessages, setIsLoading }: UseActions
                     options: response.options,
                     metadata: response.metadata,
                     aiToken: response.aiToken,
+                    references: response.references,
                 },
             ]);
-        } catch (error) {
-            console.error('Erro ao enviar:', error);
+        } catch (error: any) {
+            if (error.name === 'AbortError') {
+                console.log('Requisição abortada pelo usuário.');
+            } else {
+                console.error('Erro ao enviar:', error);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -78,10 +78,16 @@ export const useActionsIA = ({ idPublic, setMessages, setIsLoading }: UseActions
                     content: response.content,
                     options: response.options,
                     metadata: response.metadata,
+                    aiToken: response.aiToken,
+                    references: response.references,
                 },
             ]);
-        } catch (error) {
-            console.error('Erro no retry:', error);
+        } catch (error: any) {
+            if (error.name === 'AbortError') {
+                console.log('Requisição de Retry abortada.');
+            } else {
+                console.error('Erro no retry:', error);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -90,10 +96,20 @@ export const useActionsIA = ({ idPublic, setMessages, setIsLoading }: UseActions
     const handleCancel = async () => {
         if (!idPublic) return;
         try {
+            setMessages((prev) => [
+                ...prev,
+                {
+                    id: crypto.randomUUID(),
+                    role: 'ai',
+                    content: 'Processo cancelado!',
+                },
+            ]);
+
             await assistantService.cancelIA(idPublic);
-            setIsLoading(false);
         } catch (error) {
             console.error('Erro ao cancelar:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 

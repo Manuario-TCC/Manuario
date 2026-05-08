@@ -7,15 +7,22 @@ export function usePostAI() {
         aiResponse: '',
         title: '',
         gameName: '',
+        aiToken: '',
     });
 
     const openPostModal = useCallback(
-        (content: string, userMsg: string, metadata?: { title?: string; gameName?: string }) => {
+        (
+            content: string,
+            userMsg: string,
+            metadata?: { title?: string; gameName?: string },
+            aiToken?: string,
+        ) => {
             setPostData({
                 promptUser: userMsg,
                 aiResponse: content,
                 title: metadata?.title || '',
                 gameName: metadata?.gameName || '',
+                aiToken: aiToken || '',
             });
             setIsPostModalOpen(true);
         },

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AIReference } from '../services/assistantService';
 
 export type MessageRole = 'user' | 'ai';
 
@@ -11,6 +12,7 @@ export interface ChatMessageData {
         title: string;
         gameName: string;
     };
+    references?: AIReference[];
     aiToken?: string;
 }
 
