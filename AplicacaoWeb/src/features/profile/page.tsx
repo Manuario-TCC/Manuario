@@ -26,6 +26,7 @@ export default function ProfilePage({ id }: ProfilePageProps) {
         <main className="w-full flex flex-col min-h-screen">
             <ProfileHeader
                 initialData={{
+                    id: profileData.id,
                     name: profileData.name,
                     email: profileData.email,
                     avatarUrl: profileData.avatarUrl,
@@ -33,9 +34,9 @@ export default function ProfilePage({ id }: ProfilePageProps) {
                     idPublic: profileData.publicId,
                     bio: profileData.bio,
                     links: profileData.links,
-                    id: profileData.id,
                     isAdmin: profileData.isAdmin,
                     isSuperAdmin: profileData.isSuperAdmin,
+                    isBot: profileData.isBot,
                 }}
                 currentUserIsSuperAdmin={currentUser?.isSuperAdmin}
                 stats={{

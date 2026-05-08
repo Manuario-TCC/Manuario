@@ -103,6 +103,7 @@ export async function GET(request: Request) {
                     img: true,
                     isAdmin: true,
                     isSuperAdmin: true,
+                    isBot: true,
                 },
             });
         }

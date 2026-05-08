@@ -24,6 +24,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 links: true,
                 isAdmin: true,
                 isSuperAdmin: true,
+                isBot: true,
                 _count: {
                     select: {
                         followers: true,
@@ -78,6 +79,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
             links: dbUser.links,
             isAdmin: dbUser.isAdmin,
             isSuperAdmin: dbUser.isSuperAdmin,
+            isBot: dbUser.isBot,
             followers: dbUser._count.followers,
             following: dbUser._count.following,
             rules: dbUser._count.rules,

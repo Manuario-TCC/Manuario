@@ -29,6 +29,7 @@ interface ProfileHeaderProps {
         links?: { name: string; url: string }[];
         isAdmin?: boolean;
         isSuperAdmin?: boolean;
+        isBot?: boolean;
     };
     stats: {
         followers: number;
@@ -161,6 +162,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                             stats={stats}
                             isAdmin={initialData.isAdmin}
                             isSuperAdmin={initialData.isSuperAdmin}
+                            isBot={initialData.isBot}
                         />
 
                         <div className="mt-4 flex flex-col gap-3">

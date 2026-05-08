@@ -22,6 +22,7 @@ export async function GET() {
                 links: true,
                 isSuperAdmin: true,
                 isAdmin: true,
+                isBot: true,
             },
         });
 

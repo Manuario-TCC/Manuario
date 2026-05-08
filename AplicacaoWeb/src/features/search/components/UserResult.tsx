@@ -9,7 +9,7 @@ export default function UserResult({ user }: { user: any }) {
     return (
         <Link
             href={`/perfil/${user.idPublic}`}
-            className="bg-card border border-card-border rounded-2xl p-4 flex items-center gap-4 hover:bg-gray transition-colors"
+            className="bg-card border border-card-border rounded-2xl p-4 flex items-center gap-4 hover:border-primary transition-colors"
         >
             <img
                 src={avatarUrl}
@@ -20,7 +20,12 @@ export default function UserResult({ user }: { user: any }) {
             <div className="flex items-center gap-2">
                 <h3 className="text-text font-bold">{user.name}</h3>
 
-                <RoleBadge isAdmin={user.isAdmin} isSuperAdmin={user.isSuperAdmin} size={16} />
+                <RoleBadge
+                    isAdmin={user.isAdmin}
+                    isSuperAdmin={user.isSuperAdmin}
+                    isBot={user.isBot}
+                    size={16}
+                />
             </div>
         </Link>
     );

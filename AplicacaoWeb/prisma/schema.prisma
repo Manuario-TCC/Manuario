@@ -53,6 +53,7 @@ model User {
     isSuperAdmin Boolean @default(false)
     isAdmin      Boolean @default(false)
     isDisabled   Boolean @default(false)
+    isBot        Boolean @default(false)
 }
 
 model Manual {
