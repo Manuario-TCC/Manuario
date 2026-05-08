@@ -8,7 +8,7 @@ export default async function PostRoute({
 }) {
     const { type, idPublic } = await params;
 
-    if (type !== 'rules' && type !== 'questions') {
+    if (type !== 'rules' && type !== 'questions' && type !== 'ai') {
         notFound();
     }
 

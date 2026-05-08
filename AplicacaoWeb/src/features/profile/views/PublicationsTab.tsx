@@ -8,7 +8,7 @@ import RegraCard from '@/src/components/cards/RegraCard';
 import { usePublications } from '../hooks/usePublications';
 import AiCard from '@/src/components/cards/AiCard';
 
-type SubTabType = 'duvida' | 'regra' | 'ia';
+type SubTabType = 'questions' | 'rules' | 'ai';
 
 interface PublicationsTabProps {
     idPublic: string;
@@ -29,12 +29,12 @@ const PostSkeleton = () => (
 );
 
 export const PublicationsTab: React.FC<PublicationsTabProps> = ({ idPublic }) => {
-    const [activeTab, setActiveTab] = useState<SubTabType>('duvida');
+    const [activeTab, setActiveTab] = useState<SubTabType>('questions');
 
     const tabs = [
-        { id: 'duvida', label: 'Dúvidas', icon: MessageSquareQuote },
-        { id: 'regra', label: 'Regras', icon: ScrollText },
-        { id: 'ia', label: 'Post IA', icon: Sparkles },
+        { id: 'questions', label: 'Dúvidas', icon: MessageSquareQuote },
+        { id: 'rules', label: 'Regras', icon: ScrollText },
+        { id: 'ai', label: 'Post IA', icon: Sparkles },
     ] as const;
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } =
@@ -62,7 +62,7 @@ export const PublicationsTab: React.FC<PublicationsTabProps> = ({ idPublic }) =>
         if (posts.length === 0) {
             return (
                 <div className="py-10 text-center text-sub-text">
-                    Nenhuma {activeTab === 'duvida' ? 'dúvida' : 'regra'} encontrada.
+                    Nenhuma {activeTab === 'questions' ? 'dúvida' : 'regra'} encontrada.
                 </div>
             );
         }
@@ -70,13 +70,13 @@ export const PublicationsTab: React.FC<PublicationsTabProps> = ({ idPublic }) =>
         return (
             <div className="flex flex-col gap-4 w-full mt-4">
                 {posts.map((post: any) => {
-                    if (activeTab === 'duvida') {
+                    if (activeTab === 'questions') {
                         return <DuvidaCard key={post.id || post.idPublic} post={post} />;
                     }
-                    if (activeTab === 'regra') {
+                    if (activeTab === 'rules') {
                         return <RegraCard key={post.id || post.idPublic} post={post} />;
                     }
-                    if (activeTab === 'ia') {
+                    if (activeTab === 'ai') {
                         return <AiCard key={post.id || post.idPublic} post={post} />;
                     }
                     return null;

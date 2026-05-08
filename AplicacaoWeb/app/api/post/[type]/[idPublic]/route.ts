@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/src/database/prisma';
 import { getAuthUserId, getServerSession } from '@/src/utils/auth';
 
+const modelMap: Record<string, any> = {
+    rules: prisma.rule,
+    ai: prisma.aIPost,
+    questions: prisma.question,
+};
+
 export async function GET(
     request: Request,
     { params }: { params: Promise<{ type: string; idPublic: string }> },
@@ -10,10 +16,14 @@ export async function GET(
         const { type, idPublic } = await params;
         const userId = await getAuthUserId();
 
-        const isRule = type === 'rules';
-        const model = isRule ? prisma.rule : prisma.question;
+        const model = modelMap[type];
+        if (!model) {
+            return NextResponse.json({ error: 'Tipo de postagem inválido' }, { status: 400 });
+        }
 
-        const post = await (model as any).findUnique({
+        const isRule = type === 'rules';
+
+        const post = await model.findUnique({
             where: {
                 idPublic,
                 isDisabled: false,
@@ -33,9 +43,7 @@ export async function GET(
                 _count: {
                     select: {
                         comments: {
-                            where: {
-                                isDisabled: false,
-                            },
+                            where: { isDisabled: false },
                         },
                     },
                 },
@@ -75,10 +83,10 @@ export async function DELETE(
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
         }
 
-        const isRule = type === 'rules';
-        const model = isRule ? prisma.rule : prisma.question;
+        const model = modelMap[type];
+        if (!model) return NextResponse.json({ error: 'Tipo inválido' }, { status: 400 });
 
-        await (model as any).update({
+        await model.update({
             where: { idPublic },
             data: { isDisabled: true },
         });

@@ -15,7 +15,7 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'PostId não fornecido' }, { status: 400 });
         }
 
-        if (postType !== 'rules' && postType !== 'questions') {
+        if (postType !== 'rules' && postType !== 'questions' && postType !== 'ai') {
             return NextResponse.json({ error: 'Tipo de post inválido' }, { status: 400 });
         }
 
@@ -25,6 +25,8 @@ export async function GET(req: Request) {
             where.ruleId = postId;
         } else if (postType === 'questions') {
             where.questionId = postId;
+        } else if (postType === 'ai') {
+            where.aiPostId = postId;
         }
 
         const comments = await prisma.comment.findMany({
@@ -109,8 +111,13 @@ export async function POST(req: Request) {
             parentId: parentId || null,
         };
 
-        if (postType === 'rules') data.ruleId = postId;
-        else if (postType === 'questions') data.questionId = postId;
+        if (postType === 'rules') {
+            data.ruleId = postId;
+        } else if (postType === 'questions') {
+            data.questionId = postId;
+        } else if (postType === 'ai') {
+            data.aiPostId = postId;
+        }
 
         const novoComentario = await prisma.comment.create({ data });
 
@@ -134,13 +141,13 @@ export async function POST(req: Request) {
                 });
 
                 let postLink = '';
+
                 if (postType === 'rules') {
                     const postInfo = await prisma.rule.findUnique({
-                        where: {
-                            id: postId,
-                        },
+                        where: { id: postId },
                         select: { idPublic: true },
                     });
+
                     if (postInfo) {
                         postLink = `/post/rules/${postInfo.idPublic}`;
                     }
@@ -152,6 +159,15 @@ export async function POST(req: Request) {
 
                     if (postInfo) {
                         postLink = `/post/questions/${postInfo.idPublic}`;
+                    }
+                } else if (postType === 'ai' || postType === 'ia') {
+                    const postInfo = await prisma.aIPost.findUnique({
+                        where: { id: postId },
+                        select: { idPublic: true },
+                    });
+
+                    if (postInfo) {
+                        postLink = `/post/ai/${postInfo.idPublic}`;
                     }
                 }
 

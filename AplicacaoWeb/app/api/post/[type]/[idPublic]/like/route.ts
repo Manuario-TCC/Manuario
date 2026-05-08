@@ -8,17 +8,27 @@ export async function POST(
 ) {
     try {
         const { type, idPublic } = await params;
-
         const userId = await getAuthUserId();
 
         if (!userId) {
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
         }
 
-        const isRule = type === 'rules';
-        const model = isRule ? prisma.rule : prisma.question;
+        let model: any;
+        let userLikedField = '';
 
-        const post = await (model as any).findUnique({
+        if (type === 'rules' || type === 'regra') {
+            model = prisma.rule;
+            userLikedField = 'likedRuleIds';
+        } else if (type === 'ai' || type === 'ia') {
+            model = prisma.aIPost;
+            userLikedField = 'likedAIPostIds';
+        } else {
+            model = prisma.question;
+            userLikedField = 'likedQuestionIds';
+        }
+
+        const post = await model.findUnique({
             where: { idPublic },
             select: { id: true, likedByIds: true },
         });
@@ -30,7 +40,7 @@ export async function POST(
         const hasLiked = post.likedByIds.includes(userId);
 
         if (hasLiked) {
-            await (model as any).update({
+            await model.update({
                 where: { idPublic },
                 data: {
                     likedByIds: { set: post.likedByIds.filter((id: string) => id !== userId) },
@@ -38,23 +48,23 @@ export async function POST(
                 },
             });
 
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+                select: { [userLikedField]: true },
+            });
+
             await prisma.user.update({
                 where: { id: userId },
                 data: {
-                    [isRule ? 'likedRuleIds' : 'likedQuestionIds']: {
-                        set: (
-                            (await prisma.user.findUnique({
-                                where: { id: userId },
-                                select: { [isRule ? 'likedRuleIds' : 'likedQuestionIds']: true },
-                            })) as any
-                        )?.[isRule ? 'likedRuleIds' : 'likedQuestionIds'].filter(
+                    [userLikedField]: {
+                        set: ((user as any)?.[userLikedField] || []).filter(
                             (id: string) => id !== post.id,
                         ),
                     },
                 },
             });
         } else {
-            await (model as any).update({
+            await model.update({
                 where: { idPublic },
                 data: {
                     likedByIds: { push: userId },
@@ -65,7 +75,7 @@ export async function POST(
             await prisma.user.update({
                 where: { id: userId },
                 data: {
-                    [isRule ? 'likedRuleIds' : 'likedQuestionIds']: {
+                    [userLikedField]: {
                         push: post.id,
                     },
                 },
