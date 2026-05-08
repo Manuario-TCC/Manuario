@@ -6,6 +6,7 @@ import { MessageSquareQuote, ScrollText, Sparkles } from 'lucide-react';
 import DuvidaCard from '@/src/components/cards/DuvidaCard';
 import RegraCard from '@/src/components/cards/RegraCard';
 import { usePublications } from '../hooks/usePublications';
+import AiCard from '@/src/components/cards/AiCard';
 
 type SubTabType = 'duvida' | 'regra' | 'ia';
 
@@ -40,15 +41,6 @@ export const PublicationsTab: React.FC<PublicationsTabProps> = ({ idPublic }) =>
         usePublications(idPublic, activeTab);
 
     const renderContent = () => {
-        if (activeTab === 'ia') {
-            return (
-                <div className="flex flex-col items-center justify-center py-20 text-sub-text">
-                    <Sparkles size={48} className="mb-4 opacity-20" />
-                    <p>Funcionalidade de IA em breve.</p>
-                </div>
-            );
-        }
-
         if (isLoading) {
             return (
                 <div className="flex flex-col gap-2 w-full mt-4">
@@ -83,6 +75,9 @@ export const PublicationsTab: React.FC<PublicationsTabProps> = ({ idPublic }) =>
                     }
                     if (activeTab === 'regra') {
                         return <RegraCard key={post.id || post.idPublic} post={post} />;
+                    }
+                    if (activeTab === 'ia') {
+                        return <AiCard key={post.id || post.idPublic} post={post} />;
                     }
                     return null;
                 })}

@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 
         const takeCount = limit + offset;
 
-        const [rules, questions] = await Promise.all([
+        const [rules, questions, aiPosts] = await Promise.all([
             prisma.rule.findMany({
                 where: {
                     userId: { in: followedIds },
@@ -88,6 +88,33 @@ export async function GET(request: NextRequest) {
                 orderBy: { createdAt: 'desc' },
                 take: takeCount,
             }),
+
+            prisma.aIPost.findMany({
+                where: {
+                    userId: { in: followedIds },
+                    isDisabled: false,
+                },
+                include: {
+                    user: {
+                        select: {
+                            name: true,
+                            img: true,
+                            idPublic: true,
+                            isAdmin: true,
+                            isSuperAdmin: true,
+                        },
+                    },
+                    _count: {
+                        select: {
+                            comments: {
+                                where: { isDisabled: false },
+                            },
+                        },
+                    },
+                },
+                orderBy: { createdAt: 'desc' },
+                take: takeCount,
+            }),
         ]);
 
         const regrasFormatadas = rules.map((r) => ({
@@ -104,9 +131,18 @@ export async function GET(request: NextRequest) {
             commentCount: d._count?.comments || 0,
         }));
 
-        const combined = [...regrasFormatadas, ...duvidasFormatadas].sort((a, b) => {
-            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        });
+        const aiFormatadas = aiPosts.map((ai) => ({
+            ...ai,
+            type: 'ai',
+            hasLiked: ai.likedByIds ? ai.likedByIds.includes(userId) : false,
+            commentCount: ai._count?.comments || 0,
+        }));
+
+        const combined = [...regrasFormatadas, ...duvidasFormatadas, ...aiFormatadas].sort(
+            (a, b) => {
+                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            },
+        );
 
         const paginatedFeed = combined.slice(offset, offset + limit);
 

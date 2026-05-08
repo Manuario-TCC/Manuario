@@ -16,7 +16,7 @@ export default function AssistantPage() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const { isPostModalOpen, postData, openPostModal, closePostModal } = usePostAI();
 
-    const { handleSend, handleCopy, handleRetry, handleCancel } = useActionsIA({
+    const { handleSend, handleCopy, handleRetry, handleCancel, handleSaveSnippet } = useActionsIA({
         idPublic: user?.idPublic,
         setMessages,
         setIsLoading,
@@ -80,6 +80,7 @@ export default function AssistantPage() {
                                         .slice(0, index)
                                         .reverse()
                                         .find((m) => m.role === 'user')?.content || '';
+
                                 return (
                                     <ChatMessage
                                         key={msg.id}
@@ -89,6 +90,13 @@ export default function AssistantPage() {
                                         onOptionSelect={handleSend}
                                         onPost={() =>
                                             openPostModal(msg.content, lastUserMsg, msg.metadata)
+                                        }
+                                        onSave={() =>
+                                            handleSaveSnippet(
+                                                lastUserMsg,
+                                                msg.content,
+                                                msg.metadata?.gameName,
+                                            )
                                         }
                                     />
                                 );
@@ -118,12 +126,10 @@ export default function AssistantPage() {
 
                                             <div className="relative z-10 px-5 py-4 shadow-sm bg-card rounded-2xl rounded-tl-none flex items-center gap-1.5 h-[40px]">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-primary/80 animate-typing-dot"></span>
-
                                                 <span
                                                     className="w-1.5 h-1.5 rounded-full bg-primary/80 animate-typing-dot"
                                                     style={{ animationDelay: '0.2s' }}
                                                 ></span>
-
                                                 <span
                                                     className="w-1.5 h-1.5 rounded-full bg-primary/80 animate-typing-dot"
                                                     style={{ animationDelay: '0.4s' }}

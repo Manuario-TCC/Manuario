@@ -82,7 +82,7 @@ export default function PublishAIModal({
                                         </svg>
                                     </div>
 
-                                    <div className="relative z-10 px-5 py-3.5 bg-card rounded-2xl rounded-tr-none shadow-sm text-sm border border-card-border/50 text-text">
+                                    <div className="relative z-10 px-5 py-3.5 bg-card rounded-2xl rounded-tr-none shadow-sm text-sm text-text">
                                         {promptUser}
                                     </div>
                                 </div>

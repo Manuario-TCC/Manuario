@@ -11,6 +11,7 @@ interface ChatMessageProps {
     onRetry: () => void;
     onOptionSelect?: (optionText: string) => void;
     onPost?: () => void;
+    onSave?: () => void;
 }
 
 export default function ChatMessage({
@@ -19,15 +20,24 @@ export default function ChatMessage({
     onRetry,
     onOptionSelect,
     onPost,
+    onSave,
 }: ChatMessageProps) {
     const { user } = useSession();
     const isUser = message.role === 'user';
-    const { displayedContent, isTyping } = useTypewriter(message.content, isUser);
+
+    let cleanContent = message.content;
+    if (cleanContent) {
+        cleanContent = cleanContent.replace(/\\n/g, '\n');
+        cleanContent = cleanContent.replace(/^"|"$/g, '');
+    }
+
+    const { displayedContent, isTyping } = useTypewriter(cleanContent, isUser);
+
     const [isCopied, setIsCopied] = useState(false);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
     const handleCopyClick = () => {
-        onCopy(message.content, () => {
+        onCopy(cleanContent, () => {
             setIsCopied(true);
             setTimeout(() => setIsCopied(false), 2000);
         });
@@ -133,8 +143,9 @@ export default function ChatMessage({
                     {!isUser && !isTyping && (
                         <div className="flex items-center gap-1 mt-1.5 ml-2 text-sub-text animate-in fade-in duration-500">
                             <button
+                                onClick={onSave}
                                 className="p-1.5 hover:text-text hover:bg-card/60 rounded-md transition-all active:scale-95"
-                                title="Salvar"
+                                title="Salvar Trecho"
                             >
                                 <Bookmark className="w-[1rem] h-[1rem]" />
                             </button>

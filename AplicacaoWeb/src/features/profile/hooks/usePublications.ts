@@ -17,6 +17,5 @@ export function usePublications(idPublic: string, activeTab: SubTabType) {
             publicationsService.getUserPosts(idPublic, activeTab, limit, pageParam as number),
         initialPageParam: 0,
         getNextPageParam: (lastPage) => lastPage.nextOffset ?? undefined,
-        enabled: activeTab !== 'ia',
     });
 }

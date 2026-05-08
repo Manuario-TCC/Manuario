@@ -4,12 +4,12 @@ export type MessageRole = 'user' | 'ai';
 
 export interface ChatMessageData {
     id: string;
-    role: MessageRole;
+    role: 'user' | 'ai';
     content: string;
     options?: string[];
     metadata?: {
-        title?: string;
-        gameName?: string;
+        title: string;
+        gameName: string;
     };
     aiToken?: string;
 }

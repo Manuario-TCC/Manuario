@@ -1,5 +1,7 @@
 import { assistantService } from '../services/assistantService';
+import { snippetService } from '../services/snippetService';
 import { ChatMessageData } from './useAssistant';
+import { customAlert } from '@/src/components/customAlert';
 
 interface UseActionsIAProps {
     idPublic: string | undefined;
@@ -95,5 +97,25 @@ export const useActionsIA = ({ idPublic, setMessages, setIsLoading }: UseActions
         }
     };
 
-    return { handleCopy, handleSend, handleRetry, handleCancel };
+    const handleSaveSnippet = async (prompt: string, response: string, gameName?: string) => {
+        try {
+            await snippetService.save({
+                promptUser: prompt,
+                aiResponse: response,
+                gameName: gameName,
+            });
+            customAlert.toastSuccess('Trecho salvo no seu perfil!');
+        } catch (error) {
+            console.error('Erro ao salvar:', error);
+            customAlert.toastError('Erro ao salvar o trecho.');
+        }
+    };
+
+    return {
+        handleCopy,
+        handleSend,
+        handleRetry,
+        handleCancel,
+        handleSaveSnippet,
+    };
 };

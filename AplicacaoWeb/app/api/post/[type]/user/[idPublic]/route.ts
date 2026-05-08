@@ -73,17 +73,42 @@ export async function GET(
 
             totalItems = await prisma.rule.count({ where: regraWhereCondition });
         } else if (type === 'ia') {
-            rawItems = [];
-            totalItems = 0;
+            rawItems = await prisma.aIPost.findMany({
+                where: baseWhereCondition,
+                orderBy: { createdAt: 'desc' },
+                skip: offset,
+                take: limit,
+                include: {
+                    user: {
+                        select: {
+                            name: true,
+                            img: true,
+                            idPublic: true,
+                            isAdmin: true,
+                            isSuperAdmin: true,
+                        },
+                    },
+                    _count: {
+                        select: {
+                            comments: {
+                                where: { isDisabled: false },
+                            },
+                        },
+                    },
+                },
+            });
+
+            totalItems = await prisma.aIPost.count({ where: baseWhereCondition });
         } else {
             return NextResponse.json({ error: 'Tipo de postagem inválido' }, { status: 400 });
         }
 
         const items = rawItems.map((item: any) => ({
             ...item,
-            type: type === 'regra' ? 'regra' : 'duvida',
+            type: type,
             hasLiked:
                 currentUserId && item.likedByIds ? item.likedByIds.includes(currentUserId) : false,
+            commentCount: item._count?.comments || 0,
         }));
 
         const nextOffset = offset + items.length < totalItems ? offset + limit : null;
