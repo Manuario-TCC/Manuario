@@ -34,7 +34,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
                         isSuperAdmin: true,
                     },
                 },
-                rules: true,
             },
         });
 
@@ -42,7 +41,23 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
             return NextResponse.json({ error: 'Manual não encontrado' }, { status: 404 });
         }
 
-        let manualFinal: any = { ...manual };
+        const rules = await prisma.rule.findMany({
+            where: {
+                manualIds: {
+                    has: manual.id,
+                },
+                isDisabled: false,
+                status: {
+                    in: ['PUBLICADO', 'PRIVADO', 'CLONADO'],
+                },
+            },
+            orderBy: { createdAt: 'asc' },
+        });
+
+        let manualFinal: any = {
+            ...manual,
+            rules: rules,
+        };
 
         if (manual.clonedFromId) {
             const manualOriginal = await prisma.manual.findUnique({
