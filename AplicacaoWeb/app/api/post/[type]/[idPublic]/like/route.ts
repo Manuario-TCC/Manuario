@@ -2,6 +2,15 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/src/database/prisma';
 import { getAuthUserId } from '@/src/utils/auth';
 
+function stripMarkdownForAI(markdown: string): string {
+    if (!markdown) return '';
+    return markdown
+        .replace(/!\[.*?\]\(.*?\)/g, '')
+        .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+        .replace(/[*_~`#>-]/g, '')
+        .trim();
+}
+
 export async function POST(
     request: Request,
     { params }: { params: Promise<{ type: string; idPublic: string }> },
@@ -64,11 +73,14 @@ export async function POST(
                 },
             });
         } else {
-            await model.update({
+            const updatedPost = await model.update({
                 where: { idPublic },
                 data: {
                     likedByIds: { push: userId },
                     likeCount: { increment: 1 },
+                },
+                include: {
+                    manual: true,
                 },
             });
 
@@ -80,6 +92,44 @@ export async function POST(
                     },
                 },
             });
+
+            if (
+                (type === 'rules' || type === 'regra') &&
+                updatedPost.likeCount >= 10 &&
+                updatedPost.likeCount % 10 === 0
+            ) {
+                const plainTextDescription = stripMarkdownForAI(updatedPost.description || '');
+
+                const payload = {
+                    idPublic: updatedPost.idPublic,
+                    name: updatedPost.name,
+                    likeCount: updatedPost.likeCount,
+                    isHouseRule: updatedPost.isHouseRule,
+                    description: plainTextDescription,
+                    tipo: 'REGRA',
+                    manual: updatedPost.manual
+                        ? {
+                              game: updatedPost.manual.game,
+                              genre: updatedPost.manual.genre,
+                              playTime: updatedPost.manual.playTime,
+                              minPlayers: updatedPost.manual.minPlayers,
+                              maxPlayers: updatedPost.manual.maxPlayers,
+                              description: updatedPost.manual.description,
+                              ageRange: updatedPost.manual.ageRange,
+                              edition: updatedPost.manual.edition,
+                              type: updatedPost.manual.type,
+                              system: updatedPost.manual.system,
+                              isOfficial: updatedPost.manual.isOfficial,
+                          }
+                        : null,
+                };
+
+                fetch(process.env.N8N_WEBHOOK_DATA, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                }).catch((err) => console.error('Erro ao notificar o n8n:', err));
+            }
         }
 
         return NextResponse.json({ success: true, isLiked: !hasLiked });

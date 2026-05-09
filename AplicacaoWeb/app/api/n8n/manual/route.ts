@@ -11,6 +11,7 @@ export async function POST(req: Request) {
 
         const body = await req.json();
         const {
+            idPublic,
             name,
             game,
             genre,
@@ -36,7 +37,8 @@ export async function POST(req: Request) {
             );
         }
 
-        const manualIdPublic = crypto.randomUUID();
+        const manualIdPublic = idPublic || crypto.randomUUID();
+
         const novoManual = await prisma.manual.create({
             data: {
                 idPublic: manualIdPublic,
@@ -60,7 +62,7 @@ export async function POST(req: Request) {
             for (const rule of rules) {
                 await prisma.rule.create({
                     data: {
-                        idPublic: crypto.randomUUID(),
+                        idPublic: rule.idPublic || crypto.randomUUID(),
                         name: rule.name,
                         description: rule.description,
                         status: 'PRIVADO',
