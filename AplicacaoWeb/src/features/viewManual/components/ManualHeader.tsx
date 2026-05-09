@@ -25,6 +25,7 @@ import { useManualActions } from '../hooks/useManualActions';
 import { useSession } from '@/src/hooks/useSession';
 import { ReasonModal } from '@/src/components/ReasonModal';
 import { ManualPDFTemplate } from './ManualPDFTemplate';
+import { ManualFlipbookModal } from './ManualFlipbookModal';
 
 interface ManualHeaderProps {
     manual: any;
@@ -67,6 +68,8 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
     const dataCriacao = manual?.createdAt
         ? new Date(manual.createdAt).toLocaleDateString('pt-BR')
         : '27/04/2026';
+
+    const [isFlipbookOpen, setIsFlipbookOpen] = useState(false);
 
     const handleShare = async () => {
         try {
@@ -269,7 +272,10 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
                                 </div>
 
                                 <div className="flex gap-2.5 shrink-0 mt-0 max-md:mt-2 items-center justify-start max-md:justify-center">
-                                    <button className="p-2 bg-primary hover:bg-secondary text-text rounded-xl transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer">
+                                    <button
+                                        onClick={() => setIsFlipbookOpen(true)}
+                                        className="p-2 bg-primary hover:bg-secondary text-text rounded-xl transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer"
+                                    >
                                         <Eye className="w-[1.25rem] h-[1.25rem]" />
                                     </button>
 
@@ -329,6 +335,12 @@ export function ManualHeader({ manual, loading }: ManualHeaderProps) {
             />
 
             {exportData && <ManualPDFTemplate data={exportData} />}
+
+            <ManualFlipbookModal
+                isOpen={isFlipbookOpen}
+                onClose={() => setIsFlipbookOpen(false)}
+                data={manual}
+            />
         </div>
     );
 }

@@ -12,9 +12,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
                 user: {
                     select: { name: true },
                 },
-                rules: {
-                    orderBy: { createdAt: 'asc' },
-                },
             },
         });
 
@@ -22,7 +19,25 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
             return NextResponse.json({ error: 'Manual não encontrado' }, { status: 404 });
         }
 
-        return NextResponse.json(manual);
+        const rules = await prisma.rule.findMany({
+            where: {
+                manualIds: {
+                    has: manual.id,
+                },
+                isDisabled: false,
+                status: {
+                    in: ['PUBLICADO', 'PRIVADO', 'CLONADO'],
+                },
+            },
+            orderBy: { createdAt: 'asc' },
+        });
+
+        const manualParaExportar = {
+            ...manual,
+            rules: rules,
+        };
+
+        return NextResponse.json(manualParaExportar);
     } catch (error) {
         console.error('Erro ao exportar manual:', error);
         return NextResponse.json({ error: 'Erro ao gerar dados de exportação' }, { status: 500 });

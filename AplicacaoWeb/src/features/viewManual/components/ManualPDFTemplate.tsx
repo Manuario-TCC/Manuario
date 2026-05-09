@@ -126,17 +126,39 @@ export const ManualPDFTemplate: React.FC<ManualPDFTemplateProps> = ({ data }) =>
                     <div className="flex flex-col gap-16">
                         {data.rules
                             ?.filter((r: any) => !r.isDisabled)
-                            .map((rule: any) => (
-                                <div key={rule.id} style={{ pageBreakInside: 'avoid' }}>
-                                    <h3 className="text-3xl font-black mb-6 text-zinc-900 uppercase flex items-center gap-4">
-                                        <span className="w-3 h-10 bg-zinc-900"></span>
-                                        {rule.name}
-                                    </h3>
-                                    <div className="prose prose-slate prose-xl max-w-none text-zinc-800 markdown-pdf-content">
-                                        <MarkdownViewer content={rule.description} />
+                            .map((rule: any) => {
+                                // Verifica se a regra é clonada ou privada
+                                const isClonada = Boolean(rule.originManualId);
+                                const isPrivada = rule.status !== 'PUBLICADO';
+
+                                return (
+                                    <div key={rule.id} style={{ pageBreakInside: 'avoid' }}>
+                                        <h3 className="text-3xl font-black mb-6 text-zinc-900 uppercase flex items-center flex-wrap gap-4">
+                                            <div className="flex items-center gap-4">
+                                                <span className="w-3 h-10 bg-zinc-900 shrink-0"></span>
+                                                {rule.name}
+                                            </div>
+
+                                            <div className="flex gap-2">
+                                                {isClonada && (
+                                                    <span className="text-sm bg-purple-100 text-purple-700 px-3 py-1 rounded-full font-bold uppercase tracking-wider border border-purple-200">
+                                                        Clonada
+                                                    </span>
+                                                )}
+
+                                                {isPrivada && (
+                                                    <span className="text-sm bg-zinc-200 text-zinc-600 px-3 py-1 rounded-full font-bold uppercase tracking-wider border border-zinc-300">
+                                                        Privada
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </h3>
+                                        <div className="prose prose-slate prose-xl max-w-none text-zinc-800 markdown-pdf-content">
+                                            <MarkdownViewer content={rule.description} />
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                     </div>
                 </div>
             </div>
