@@ -208,7 +208,7 @@ export default function CommentItem({
                         <p className="text-text text-sm whitespace-pre-wrap leading-relaxed">
                             {comment.text
                                 .split(
-                                    /(@[\w\u00C0-\u017F]+(?:\s[\w\u00C0-\u017F]+)?|\[gif:.*?\])/g,
+                                    /(@[\w\u00C0-\u017F]+(?:\s+(?:[A-Z\u00C0-\u00DF][\w\u00C0-\u017F]*|de|da|do|dos|das))*\b|\[gif:.*?\])/g,
                                 )
                                 .map((part: string, i: number) => {
                                     if (part.startsWith('@')) {

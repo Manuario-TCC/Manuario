@@ -29,7 +29,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                     select: {
                         followers: true,
                         following: true,
-                        rules: true,
+                        rules: {
+                            where: {
+                                isDisabled: false,
+                            },
+                        },
                     },
                 },
             },

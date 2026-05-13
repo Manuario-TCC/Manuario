@@ -72,7 +72,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             return (
                 <button
                     onClick={edit.openModal}
-                    className="px-4 py-1.5 min-[900px]:px-6 min-[900px]:py-2 rounded-full border border-card-border text-text font-semibold hover:bg-card-border transition text-sm cursor-pointer"
+                    className="px-4 py-1.5 min-[900px]:px-6 min-[900px]:py-2 rounded-full border border-card-border text-text font-semibold bg-card hover:bg-card-border transition text-sm cursor-pointer"
                 >
                     Editar Perfil
                 </button>
