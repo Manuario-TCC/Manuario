@@ -22,10 +22,6 @@ export async function GET(request: NextRequest) {
         const followedIds = following.map((f) => f.followedId);
         followedIds.push(userId);
 
-        if (followedIds.length === 0) {
-            return NextResponse.json([]);
-        }
-
         const takeCount = limit + offset;
 
         const [rules, questions, aiPosts] = await Promise.all([
@@ -144,9 +140,101 @@ export async function GET(request: NextRequest) {
             },
         );
 
-        const paginatedFeed = combined.slice(offset, offset + limit);
+        let isRecommendation = false;
+        let paginatedFeed = combined.slice(offset, offset + limit);
 
-        return NextResponse.json(paginatedFeed);
+        // Se nao houver nenhum post traz 10 com recomendacao
+        if (combined.length === 0 && offset === 0) {
+            isRecommendation = true;
+
+            const [globalRules, globalQuestions, globalAiPosts] = await Promise.all([
+                prisma.rule.findMany({
+                    where: { status: 'PUBLICADO', isDisabled: false },
+                    include: {
+                        user: {
+                            select: {
+                                name: true,
+                                img: true,
+                                idPublic: true,
+                                isAdmin: true,
+                                isSuperAdmin: true,
+                            },
+                        },
+                        manuals: true,
+                        _count: { select: { comments: { where: { isDisabled: false } } } },
+                    },
+                    orderBy: { createdAt: 'desc' },
+                    take: 10,
+                }),
+
+                prisma.question.findMany({
+                    where: { isDisabled: false },
+                    include: {
+                        user: {
+                            select: {
+                                name: true,
+                                img: true,
+                                idPublic: true,
+                                isAdmin: true,
+                                isSuperAdmin: true,
+                            },
+                        },
+                        _count: { select: { comments: { where: { isDisabled: false } } } },
+                    },
+                    orderBy: { createdAt: 'desc' },
+                    take: 10,
+                }),
+
+                prisma.aIPost.findMany({
+                    where: { isDisabled: false },
+                    include: {
+                        user: {
+                            select: {
+                                name: true,
+                                img: true,
+                                idPublic: true,
+                                isAdmin: true,
+                                isSuperAdmin: true,
+                            },
+                        },
+                        _count: { select: { comments: { where: { isDisabled: false } } } },
+                    },
+                    orderBy: { createdAt: 'desc' },
+                    take: 10,
+                }),
+            ]);
+
+            const gRegras = globalRules.map((r) => ({
+                ...r,
+                type: 'regra',
+                hasLiked: r.likedByIds ? r.likedByIds.includes(userId) : false,
+                commentCount: r._count?.comments || 0,
+            }));
+
+            const gDuvidas = globalQuestions.map((d) => ({
+                ...d,
+                type: 'duvida',
+                hasLiked: d.likedByIds ? d.likedByIds.includes(userId) : false,
+                commentCount: d._count?.comments || 0,
+            }));
+
+            const gAi = globalAiPosts.map((ai) => ({
+                ...ai,
+                type: 'ai',
+                hasLiked: ai.likedByIds ? ai.likedByIds.includes(userId) : false,
+                commentCount: ai._count?.comments || 0,
+            }));
+
+            const globalCombined = [...gRegras, ...gDuvidas, ...gAi].sort(
+                (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+            );
+
+            paginatedFeed = globalCombined.slice(0, 10);
+        } else if (combined.length === 0) {
+            paginatedFeed = [];
+        }
+
+        return NextResponse.json({ posts: paginatedFeed, isRecommendation });
     } catch (error) {
         console.error('Erro ao buscar feed:', error);
         return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 });

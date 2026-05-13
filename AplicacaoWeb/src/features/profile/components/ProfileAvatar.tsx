@@ -18,7 +18,7 @@ export const ProfileAvatar: React.FC<Props> = ({
 }) => (
     <>
         <div
-            className={`relative w-32 h-32 md:w-40 md:h-40 rounded-full border-4 overflow-hidden border-card-border flex-shrink-0 ${isOwnProfile ? 'cursor-pointer group' : ''}`}
+            className={`relative w-32 h-32 md:w-40 md:h-40 rounded-full border-4 overflow-hidden border-background flex-shrink-0 ${isOwnProfile ? 'cursor-pointer group' : ''}`}
             onClick={onClick}
         >
             <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />

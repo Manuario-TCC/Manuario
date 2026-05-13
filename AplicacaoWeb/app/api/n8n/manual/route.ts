@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/src/database/prisma';
-import crypto from 'crypto';
 
 export async function POST(req: Request) {
     try {
@@ -37,7 +36,7 @@ export async function POST(req: Request) {
             );
         }
 
-        const manualIdPublic = idPublic || crypto.randomUUID();
+        const manualIdPublic = idPublic;
 
         const novoManual = await prisma.manual.create({
             data: {
@@ -62,7 +61,7 @@ export async function POST(req: Request) {
             for (const rule of rules) {
                 await prisma.rule.create({
                     data: {
-                        idPublic: rule.idPublic || crypto.randomUUID(),
+                        idPublic: rule.idPublic,
                         name: rule.name,
                         description: rule.description,
                         status: 'PRIVADO',

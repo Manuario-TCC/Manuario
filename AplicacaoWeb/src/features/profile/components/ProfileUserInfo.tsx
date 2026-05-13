@@ -30,7 +30,7 @@ export const ProfileUserInfo: React.FC<Props> = ({ name, stats, isAdmin, isSuper
                 <span className="font-bold text-text">{stats?.following || 0}</span> Seguindo
             </p>
             <p>
-                <span className="font-bold text-text">{stats?.rules || 0}</span> Regras Postadas
+                <span className="font-bold text-text">{stats?.rules || 0}</span> Regras criadas
             </p>
         </div>
     </div>

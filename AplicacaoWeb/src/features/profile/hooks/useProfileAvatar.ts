@@ -1,10 +1,10 @@
 import { useState, useRef } from 'react';
-import Swal from 'sweetalert2';
+import { useQueryClient } from '@tanstack/react-query';
 import { profileService } from '../services/profileService';
-
-import { socket } from '@/src/services/socket';
+import { customAlert } from '@/src/components/customAlert';
 
 export const useProfileAvatar = (initialAvatarUrl: string, isOwnProfile: boolean) => {
+    const queryClient = useQueryClient();
     const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
     const [isAvatarEditorOpen, setIsAvatarEditorOpen] = useState(false);
     const [tempAvatarImage, setTempAvatarImage] = useState<string>('');
@@ -35,18 +35,9 @@ export const useProfileAvatar = (initialAvatarUrl: string, isOwnProfile: boolean
 
         await profileService.updateAvatar(file);
 
-        Swal.fire({
-            title: 'Avatar atualizado!',
-            icon: 'success',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            background: '#18181b',
-            color: '#fff',
-        });
+        customAlert.toastSuccess('Salvo com sucesso');
 
-        socket.emit('profile_updated', { type: 'avatar' });
+        queryClient.invalidateQueries({ queryKey: ['user-me'] });
     };
 
     return {

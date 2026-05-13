@@ -12,11 +12,15 @@ export function useFeed() {
         initialPageParam: 0,
 
         getNextPageParam: (lastPage, allPages) => {
-            if (lastPage.length < LIMIT) {
+            if (lastPage.isRecommendation) {
                 return undefined;
             }
 
-            const totalItemsLoaded = allPages.flat().length;
+            if (lastPage.posts.length < LIMIT) {
+                return undefined;
+            }
+
+            const totalItemsLoaded = allPages.reduce((acc, page) => acc + page.posts.length, 0);
             return totalItemsLoaded;
         },
     });

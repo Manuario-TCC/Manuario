@@ -43,11 +43,27 @@ export default function FeedPage() {
     );
 
     const posts = useMemo(() => {
-        return data?.pages.flatMap((page) => page) || [];
+        return data?.pages.flatMap((page) => page.posts) || [];
     }, [data]);
+
+    const isRecommendation = data?.pages[0]?.isRecommendation || false;
 
     return (
         <div className="max-w-2xl mx-auto py-8 px-4 w-full flex flex-col items-center">
+            {isRecommendation && !isLoading && (
+                <div className="w-full flex flex-col items-center justify-center p-8 mb-8 text-center">
+                    <div className="w-32 h-32 rounded-xl mb-4 flex items-center justify-center">
+                        <span className="text-sub-text text-sm font-medium">Imagem</span>
+                    </div>
+
+                    <h2 className="text-2xl font-bold text-text mb-2">Seu feed está vazio!</h2>
+                    <p className="text-sub-text mb-6">
+                        Comece a seguir outros usuários para ver as publicações deles aqui no seu
+                        feed.
+                    </p>
+                </div>
+            )}
+
             <div className="flex flex-col gap-4 w-full">
                 {posts.map((post, index) => {
                     const isLast = posts.length === index + 1;
@@ -82,7 +98,7 @@ export default function FeedPage() {
                 </div>
             )}
 
-            {!isLoading && !hasNextPage && posts.length > 0 && (
+            {!isLoading && !hasNextPage && posts.length > 0 && !isRecommendation && (
                 <div className="text-center text-sub-text py-10 text-sm">
                     Você chegou ao fim do feed.
                 </div>
