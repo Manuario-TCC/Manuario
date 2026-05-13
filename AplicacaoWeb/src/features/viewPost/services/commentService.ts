@@ -1,9 +1,13 @@
 export const commentService = {
-    getComments: async (postId: string, postType: string) => {
-        const res = await fetch(`/api/comments?postId=${postId}&postType=${postType}`);
-        if (!res.ok) {
-            throw new Error('Erro ao buscar comentários');
+    getComments: async (postId: string, postType: string, cursor?: string | null) => {
+        let url = `/api/comments?postId=${postId}&postType=${postType}`;
+
+        if (cursor) {
+            url += `&cursor=${cursor}`;
         }
+
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Erro ao buscar comentários');
 
         return res.json();
     },
@@ -13,6 +17,8 @@ export const commentService = {
         postId: string;
         postType: string;
         parentId?: string | null;
+        replyToCommentId?: string;
+        replyToUserId?: string;
     }) => {
         const res = await fetch('/api/comments', {
             method: 'POST',

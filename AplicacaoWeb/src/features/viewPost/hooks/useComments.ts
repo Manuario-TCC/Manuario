@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useMemo } from 'react';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { commentService } from '../services/commentService';
 import { socket } from '../../../services/socket';
 import { useSession } from '@/src/hooks/useSession';
@@ -7,17 +7,22 @@ import { useSession } from '@/src/hooks/useSession';
 export const useComments = (postId: string, postType: string) => {
     const queryClient = useQueryClient();
     const { user } = useSession();
-    const queryKey = ['comments', postType, postId];
 
-    const { data: comments = [], isLoading } = useQuery({
+    const queryKey = useMemo(() => ['comments', postType, postId], [postType, postId]);
+
+    const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
         queryKey,
-        queryFn: () => commentService.getComments(postId, postType),
+        queryFn: ({ pageParam = null }) =>
+            commentService.getComments(postId, postType, pageParam as string | null),
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+        initialPageParam: null,
         enabled: !!postId && !!postType,
     });
 
+    const allComments = data?.pages.flatMap((page) => page.comments || []) || [];
+
     useEffect(() => {
         if (!postId) return;
-
         socket.connect();
 
         const joinRoom = () => {
@@ -31,31 +36,56 @@ export const useComments = (postId: string, postType: string) => {
         }
 
         const handleReceiveComment = (newComment: any) => {
-            queryClient.setQueryData(queryKey, (oldData: any[]) => {
-                if (!oldData) return [newComment];
-                if (newComment.parentId) {
-                    return updateCommentTree(oldData, 'add', {
-                        parentId: newComment.parentId,
-                        newComment,
-                    });
-                }
-                return [newComment, ...oldData];
+            queryClient.setQueryData(queryKey, (oldData: any) => {
+                if (!oldData || !oldData.pages) return oldData;
+
+                const newPages = oldData.pages.map((page: any, index: number) => {
+                    if (newComment.parentId) {
+                        return {
+                            ...page,
+                            comments: updateCommentTree(page.comments || [], 'add', {
+                                parentId: newComment.parentId,
+                                newComment,
+                            }),
+                        };
+                    } else {
+                        if (index === 0) {
+                            const exists = page.comments?.some((c: any) => c.id === newComment.id);
+                            if (exists) return page;
+
+                            return {
+                                ...page,
+                                comments: [newComment, ...(page.comments || [])],
+                            };
+                        }
+                        return page;
+                    }
+                });
+
+                return { ...oldData, pages: newPages };
             });
         };
 
-        // Escuta acoes nos comentários
         const handleActionComment = (actionData: any) => {
-            queryClient.setQueryData(queryKey, (oldData: any[]) => {
-                if (!oldData) return oldData;
-
-                return updateCommentTree(oldData, actionData.type, actionData);
+            queryClient.setQueryData(queryKey, (oldData: any) => {
+                if (!oldData || !oldData.pages) return oldData;
+                return {
+                    ...oldData,
+                    pages: oldData.pages.map((page: any) => ({
+                        ...page,
+                        comments: updateCommentTree(
+                            page.comments || [],
+                            actionData.type,
+                            actionData,
+                        ),
+                    })),
+                };
             });
         };
 
         socket.on('receive_comment', handleReceiveComment);
         socket.on('action_comment', handleActionComment);
 
-        // Cleanup
         return () => {
             socket.emit('leave_post', postId);
             socket.off('connect', joinRoom);
@@ -65,12 +95,19 @@ export const useComments = (postId: string, postType: string) => {
     }, [postId, postType, queryClient]);
 
     const addCommentMutation = useMutation({
-        mutationFn: (data: { text: string; parentId: string | null }) =>
+        mutationFn: (data: {
+            text: string;
+            parentId: string | null;
+            replyToCommentId?: string;
+            replyToUserId?: string;
+        }) =>
             commentService.createComment({
                 text: data.text,
                 postId,
                 postType,
                 parentId: data.parentId,
+                replyToCommentId: data.replyToCommentId,
+                replyToUserId: data.replyToUserId,
             }),
         onSuccess: (apiResponse) => {
             const imgFilename = user?.img ? user.img.split('/').pop() : null;
@@ -86,16 +123,33 @@ export const useComments = (postId: string, postType: string) => {
                 replies: apiResponse.replies || [],
             };
 
-            queryClient.setQueryData(queryKey, (oldData: any[]) => {
-                if (!oldData) return [newComment];
+            queryClient.setQueryData(queryKey, (oldData: any) => {
+                if (!oldData || !oldData.pages) return oldData;
 
-                if (newComment.parentId) {
-                    return updateCommentTree(oldData, 'add', {
-                        parentId: newComment.parentId,
-                        newComment,
-                    });
-                }
-                return [newComment, ...oldData];
+                const newPages = oldData.pages.map((page: any, index: number) => {
+                    if (newComment.parentId) {
+                        return {
+                            ...page,
+                            comments: updateCommentTree(page.comments || [], 'add', {
+                                parentId: newComment.parentId,
+                                newComment,
+                            }),
+                        };
+                    } else {
+                        if (index === 0) {
+                            const exists = page.comments?.some((c: any) => c.id === newComment.id);
+                            if (exists) return page;
+
+                            return {
+                                ...page,
+                                comments: [newComment, ...(page.comments || [])],
+                            };
+                        }
+                        return page;
+                    }
+                });
+
+                return { ...oldData, pages: newPages };
             });
 
             socket.emit('send_comment', {
@@ -112,9 +166,19 @@ export const useComments = (postId: string, postType: string) => {
         },
     });
 
-    const addComment = async (text: string, parentId: string | null = null) => {
+    const addComment = async (
+        text: string,
+        parentId: string | null = null,
+        replyToCommentId?: string,
+        replyToUserId?: string,
+    ) => {
         try {
-            await addCommentMutation.mutateAsync({ text, parentId });
+            await addCommentMutation.mutateAsync({
+                text,
+                parentId,
+                replyToCommentId,
+                replyToUserId,
+            });
             return true;
         } catch (error) {
             return false;
@@ -137,8 +201,11 @@ export const useComments = (postId: string, postType: string) => {
     };
 
     return {
-        comments,
+        comments: allComments,
         loading: isLoading,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
         addComment,
         fetchComments,
         handleValidate,
@@ -146,13 +213,19 @@ export const useComments = (postId: string, postType: string) => {
 };
 
 const updateCommentTree = (comments: any[], action: string, payload: any): any[] => {
+    if (!comments) return [];
+
     if (action === 'add') {
         if (comments.some((c) => c.id === payload.parentId)) {
-            return comments.map((c) =>
-                c.id === payload.parentId
-                    ? { ...c, replies: [...(c.replies || []), payload.newComment] }
-                    : c,
-            );
+            return comments.map((c) => {
+                if (c.id === payload.parentId) {
+                    const exists = c.replies?.some((r: any) => r.id === payload.newComment.id);
+                    if (exists) return c;
+
+                    return { ...c, replies: [...(c.replies || []), payload.newComment] };
+                }
+                return c;
+            });
         }
 
         return comments.map((c) => ({
@@ -172,7 +245,10 @@ const updateCommentTree = (comments: any[], action: string, payload: any): any[]
 
     if (action === 'edit') {
         return comments.map((c) => {
-            if (c.id === payload.commentId) return { ...c, text: payload.newText, isEdited: true };
+            if (c.id === payload.commentId) {
+                return { ...c, text: payload.newText, isEdited: true };
+            }
+
             return {
                 ...c,
                 replies: c.replies ? updateCommentTree(c.replies, 'edit', payload) : [],
@@ -182,7 +258,9 @@ const updateCommentTree = (comments: any[], action: string, payload: any): any[]
 
     if (action === 'validate') {
         return comments.map((c) => {
-            if (c.id === payload.commentId) return { ...c, isValidated: payload.isValidated };
+            if (c.id === payload.commentId) {
+                return { ...c, isValidated: payload.isValidated };
+            }
             return {
                 ...c,
                 replies: c.replies ? updateCommentTree(c.replies, 'validate', payload) : [],

@@ -14,7 +14,8 @@ const CommentItemSkeleton = () => (
 );
 
 export default function CommentSection({ postId, postType }: any) {
-    const { comments, loading, addComment, fetchComments } = useComments(postId, postType);
+    const { comments, loading, addComment, fetchNextPage, hasNextPage, isFetchingNextPage } =
+        useComments(postId, postType);
 
     return (
         <div className="bg-card rounded-xl p-6 w-full shadow-sm border border-card-border/40">
@@ -26,22 +27,31 @@ export default function CommentSection({ postId, postType }: any) {
                         <div className="divide-y divide-card-border/10">
                             <CommentItemSkeleton />
                             <CommentItemSkeleton />
-                            <CommentItemSkeleton />
                         </div>
-                    ) : comments.length > 0 ? (
-                        comments.map((comment) => (
-                            <CommentItem
-                                key={comment.id}
-                                comment={comment}
-                                postId={postId}
-                                onAddReply={(t: string, p: string) => addComment(t, p)}
-                                onReplySuccess={fetchComments}
-                            />
-                        ))
                     ) : (
-                        <p className="text-muted-foreground text-sm text-center py-6">
-                            Nenhum comentário ainda. Seja o primeiro a comentar!
-                        </p>
+                        <>
+                            {comments.map((comment) => (
+                                <CommentItem
+                                    key={comment.id}
+                                    comment={comment}
+                                    postId={postId}
+                                    onAddReply={(t, p, rC, rU) => addComment(t, p, rC, rU)}
+                                    onReplySuccess={() => {}}
+                                />
+                            ))}
+
+                            {hasNextPage && (
+                                <button
+                                    onClick={() => fetchNextPage()}
+                                    disabled={isFetchingNextPage}
+                                    className="mt-4 py-2 text-sm font-bold text-primary hover:underline disabled:opacity-50 transition-all cursor-pointer"
+                                >
+                                    {isFetchingNextPage
+                                        ? 'Carregando mais...'
+                                        : 'Carregar mais comentários'}
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

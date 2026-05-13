@@ -47,6 +47,8 @@ model User {
     likedAIPostIds String[] @db.ObjectId
     likedAIPosts   AIPost[] @relation("AIPostLikes", fields: [likedAIPostIds], references: [id])
 
+    repliesReceived Comment[] @relation("RepliesReceived")
+
     bio   String?       @db.String
     links ProfileLink[]
 
@@ -201,15 +203,20 @@ model Comment {
     parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
     replies  Comment[] @relation("CommentReplies")
 
+    replyToCommentId String?   @db.ObjectId
+    replyToComment   Comment?  @relation("DirectReplies", fields: [replyToCommentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    directReplies    Comment[] @relation("DirectReplies")
+
+    replyToUserId String? @db.ObjectId
+    replyToUser   User?   @relation("RepliesReceived", fields: [replyToUserId], references: [id])
+
     likeCount  Int      @default(0)
     likedByIds String[] @db.ObjectId
     likedBy    User[]   @relation("CommentLikes", fields: [likedByIds], references: [id])
 
-    isEdited Boolean @default(false)
-
+    isEdited    Boolean @default(false)
     isValidated Boolean @default(false)
-
-    isDisabled Boolean @default(false)
+    isDisabled  Boolean @default(false)
 }
 
 model Follow {

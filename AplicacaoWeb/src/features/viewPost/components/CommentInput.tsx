@@ -16,6 +16,7 @@ export default function CommentInput({
     onSuccess,
     initialValue = '',
     isReply = false,
+    replyingToName,
 }: any) {
     const { user } = useSession();
 
@@ -65,6 +66,11 @@ export default function CommentInput({
 
             <div className="flex flex-1 items-center gap-2 sm:gap-3 min-w-0 relative">
                 <div className="flex-1 flex items-center min-w-0 bg-transparent border border-card-border rounded-lg focus-within:border-primary transition-colors pr-1 sm:pr-2">
+                    {replyingToName && (
+                        <span className="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-bold ml-2 shrink-0 select-none flex items-center gap-1">
+                            @{replyingToName}
+                        </span>
+                    )}
                     <input
                         type="text"
                         value={texto}

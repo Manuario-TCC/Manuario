@@ -38,19 +38,9 @@ export const useCommentItem = (comment: any, onSuccess: () => void, postId: stri
         setShowReplies(true);
     }, []);
 
-    const [replyingTo, setReplyingTo] = useState('');
-
-    const toggleReplyInput = useCallback(
-        (authorName?: string) => {
-            setShowReplyInput((prev) => !prev);
-            if (authorName && !showReplyInput) {
-                setReplyingTo(`@${authorName} `);
-            } else {
-                setReplyingTo('');
-            }
-        },
-        [showReplyInput],
-    );
+    const toggleReplyInput = useCallback(() => {
+        setShowReplyInput((prev) => !prev);
+    }, []);
 
     const isAuthor = useMemo(() => {
         if (!currentUser || !comment) return false;
@@ -222,7 +212,6 @@ export const useCommentItem = (comment: any, onSuccess: () => void, postId: stri
         startEditing,
         handleUpdate,
         handleDelete,
-        replyingTo,
         handleDisable,
         handleToggleLike,
         isEdited,
