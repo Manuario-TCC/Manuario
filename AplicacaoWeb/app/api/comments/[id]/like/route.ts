@@ -42,6 +42,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
             include: {
                 question: true,
                 parent: true,
+                replyToComment: {
+                    include: { author: true },
+                },
+                replyToUser: true,
             },
         });
 
@@ -83,8 +87,16 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
                                 text: updatedComment.text,
                                 authorId: updatedComment.authorId,
                                 likeCount: updatedComment.likeCount,
+
                                 parentText: updatedComment.parent
                                     ? updatedComment.parent.text
+                                    : null,
+
+                                replyToText: updatedComment.replyToComment
+                                    ? updatedComment.replyToComment.text
+                                    : null,
+                                replyToUserName: updatedComment.replyToUser
+                                    ? updatedComment.replyToUser.name
                                     : null,
                             },
                             post: {

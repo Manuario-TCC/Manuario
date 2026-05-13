@@ -11,15 +11,17 @@ export async function GET(req: Request) {
         const postId = searchParams.get('postId');
         const postType = searchParams.get('postType');
 
+        const cursor = searchParams.get('cursor');
+        const limit = parseInt(searchParams.get('limit') || '10');
+
         if (!postId) {
             return NextResponse.json({ error: 'PostId não fornecido' }, { status: 400 });
         }
 
-        if (postType !== 'rules' && postType !== 'questions' && postType !== 'ai') {
-            return NextResponse.json({ error: 'Tipo de post inválido' }, { status: 400 });
-        }
-
-        const where: any = { parentId: null };
+        const where: any = {
+            parentId: null,
+            isDisabled: false,
+        };
 
         if (postType === 'rules') {
             where.ruleId = postId;
@@ -31,6 +33,9 @@ export async function GET(req: Request) {
 
         const comments = await prisma.comment.findMany({
             where,
+            take: limit + 1,
+            cursor: cursor ? { id: cursor } : undefined,
+            skip: cursor ? 1 : 0,
             orderBy: { createdAt: 'desc' },
             include: {
                 author: {
@@ -43,7 +48,12 @@ export async function GET(req: Request) {
                         isSuperAdmin: true,
                     },
                 },
+                replyToUser: {
+                    select: { id: true, idPublic: true, name: true },
+                },
                 replies: {
+                    where: { isDisabled: false },
+                    take: 3,
                     include: {
                         author: {
                             select: {
@@ -55,7 +65,12 @@ export async function GET(req: Request) {
                                 isSuperAdmin: true,
                             },
                         },
+                        replyToUser: {
+                            select: { id: true, idPublic: true, name: true },
+                        },
                         replies: {
+                            where: { isDisabled: false },
+                            take: 3,
                             include: {
                                 author: {
                                     select: {
@@ -67,13 +82,24 @@ export async function GET(req: Request) {
                                         isSuperAdmin: true,
                                     },
                                 },
+                                replyToUser: {
+                                    select: { id: true, idPublic: true, name: true },
+                                },
                             },
+                            orderBy: { createdAt: 'asc' },
                         },
                     },
                     orderBy: { createdAt: 'asc' },
                 },
             },
         });
+
+        let nextCursor: string | null = null;
+
+        if (comments.length > limit) {
+            const nextItem = comments.pop();
+            nextCursor = nextItem!.id;
+        }
 
         const formatCommentsWithLikes = (commentList: any[]) => {
             return commentList.map((comment) => ({
@@ -88,7 +114,10 @@ export async function GET(req: Request) {
 
         const formattedComments = formatCommentsWithLikes(comments);
 
-        return NextResponse.json(formattedComments);
+        return NextResponse.json({
+            comments: formattedComments,
+            nextCursor,
+        });
     } catch (error) {
         console.error('Erro ao buscar comentários:', error);
         return NextResponse.json({ error: 'Erro ao buscar comentários' }, { status: 500 });
@@ -103,12 +132,15 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
         }
 
-        const { texto, text, postId, postType, parentId } = await req.json();
+        const { text, postId, postType, parentId, replyToCommentId, replyToUserId } =
+            await req.json();
 
         const data: any = {
-            text: text || texto,
+            text: text,
             authorId: session.user.id,
             parentId: parentId || null,
+            replyToCommentId: replyToCommentId || null,
+            replyToUserId: replyToUserId || null,
         };
 
         if (postType === 'rules') {
@@ -119,7 +151,14 @@ export async function POST(req: Request) {
             data.aiPostId = postId;
         }
 
-        const novoComentario = await prisma.comment.create({ data });
+        const novoComentario = await prisma.comment.create({
+            data,
+            include: {
+                replyToUser: {
+                    select: { idPublic: true, name: true },
+                },
+            },
+        });
 
         let newNotification = null;
 

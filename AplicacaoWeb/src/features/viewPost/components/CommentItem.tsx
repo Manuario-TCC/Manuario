@@ -18,7 +18,12 @@ import { ReasonModal } from '../../../components/ReasonModal';
 interface Props {
     comment: any;
     postId: string;
-    onAddReply: (text: string, parentId: string) => Promise<boolean>;
+    onAddReply: (
+        text: string,
+        parentId: string,
+        replyToCommentId?: string,
+        replyToUserId?: string,
+    ) => Promise<boolean>;
     onReplySuccess: () => void;
     mainCommentId?: string;
 }
@@ -56,7 +61,6 @@ export default function CommentItem({
         isLoadingLike,
         handleToggleLike,
         isEdited,
-        replyingTo,
         handleValidate,
     } = useCommentItem(comment, onReplySuccess, postId);
 
@@ -206,32 +210,28 @@ export default function CommentItem({
                         </div>
                     ) : (
                         <p className="text-text text-sm whitespace-pre-wrap leading-relaxed">
-                            {comment.text
-                                .split(
-                                    /(@[\w\u00C0-\u017F]+(?:\s+(?:[A-Z\u00C0-\u00DF][\w\u00C0-\u017F]*|de|da|do|dos|das))*\b|\[gif:.*?\])/g,
-                                )
-                                .map((part: string, i: number) => {
-                                    if (part.startsWith('@')) {
-                                        return (
-                                            <span key={i} className="text-tretiary font-medium">
-                                                {part}
-                                            </span>
-                                        );
-                                    }
+                            {comment.replyToUser && (
+                                <Link href={`/perfil/${comment.replyToUser.idPublic}`}>
+                                    <span className="text-tretiary font-medium mr-1 cursor-pointer hover:underline">
+                                        @{comment.replyToUser.name}
+                                    </span>
+                                </Link>
+                            )}
 
-                                    if (part.startsWith('[gif:') && part.endsWith(']')) {
-                                        const gifUrl = part.slice(5, -1);
-                                        return (
-                                            <img
-                                                key={i}
-                                                src={gifUrl}
-                                                alt="GIF"
-                                                className="max-w-[12.5rem] w-full rounded-xl mt-2 block border border-card-border/50"
-                                            />
-                                        );
-                                    }
-                                    return <span key={i}>{part}</span>;
-                                })}
+                            {comment.text.split(/(\[gif:.*?\])/g).map((part: string, i: number) => {
+                                if (part.startsWith('[gif:') && part.endsWith(']')) {
+                                    const gifUrl = part.slice(5, -1);
+                                    return (
+                                        <img
+                                            key={i}
+                                            src={gifUrl}
+                                            alt="GIF"
+                                            className="max-w-[12.5rem] w-full rounded-xl mt-2 block border border-card-border/50"
+                                        />
+                                    );
+                                }
+                                return <span key={i}>{part}</span>;
+                            })}
                         </p>
                     )}
                 </div>
@@ -253,7 +253,7 @@ export default function CommentItem({
                         </button>
 
                         <button
-                            onClick={() => toggleReplyInput(comment.author?.name)}
+                            onClick={toggleReplyInput}
                             className="flex items-center gap-1.5 select-none hover:text-secondary transition-all cursor-pointer"
                         >
                             <MessageCircle className="w-[0.9rem] h-[0.9rem]" /> Responder
@@ -275,13 +275,15 @@ export default function CommentItem({
                 {showReplyInput && (
                     <div className="mt-4">
                         <CommentInput
-                            initialValue={replyingTo}
-                            onSubmit={(t: string) => onAddReply(t, targetParentId)}
+                            onSubmit={(t: string) =>
+                                onAddReply(t, targetParentId, comment.id, comment.author?.id)
+                            }
                             onSuccess={() => {
                                 handleReplySuccess();
                                 onReplySuccess();
                             }}
                             isReply={true}
+                            replyingToName={comment.author?.name}
                         />
                     </div>
                 )}
