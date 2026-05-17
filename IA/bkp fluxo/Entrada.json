@@ -1,0 +1,1101 @@
+{
+  "name": "Entrada",
+  "nodes": [
+    {
+      "parameters": {
+        "text": "={{ $json.chatInput }}",
+        "guardrails": {
+          "nsfw": {
+            "value": {
+              "threshold": 0.7,
+              "customizePrompt": true
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        -736
+      ],
+      "id": "c6621546-6de7-41e9-92b6-1413c939079c",
+      "name": "Guardrails"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.precisa_de_quiz }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    },
+                    "id": "3c0146f4-072a-42bd-adbe-02cfef364eac"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "dafd34f9-f494-4a03-9ed1-e55184f68595",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1504,
+        -656
+      ],
+      "id": "aefa94cf-616e-43a3-a795-717c7940ff53",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=",
+        "options": {
+          "systemMessage": "You are a helpful assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        768,
+        -128
+      ],
+      "id": "f13ebeb7-12ec-4af7-a304-108bd3eb2924",
+      "name": "Manuario"
+    },
+    {
+      "parameters": {
+        "model": "deepseek-v4-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        768,
+        512
+      ],
+      "id": "2a7a0043-bdbf-4047-a8c5-2c1c16daaa83",
+      "name": "IA",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "AKio8sBDKoxTxO0b",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        864,
+        512
+      ],
+      "id": "b21555a0-a931-4dea-8707-fa90d972e1b2",
+      "name": "Banco",
+      "credentials": {
+        "postgres": {
+          "id": "I8Icve5gxx5smL6h",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e2ca4353-8c04-4187-bf9f-83457c840088",
+              "name": "Msg",
+              "value": "={{ $('When chat message received').item.json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "c6642f86-a765-4170-8662-5c56b69b5f0e",
+              "name": "IdUsuario",
+              "value": "={{ $('When chat message received').item.json.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "bbfab34e-0796-4547-bb92-4cd86d0f95b1",
+              "name": "idJogo",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        336,
+        -848
+      ],
+      "id": "729a7c2b-529e-4526-86e2-2e3b26266efa",
+      "name": "Dados"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "yWXR1lTdq9ueeNpb",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/yWXR1lTdq9ueeNpb",
+          "cachedResultName": "Fluxo construção do manual"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [
+            "chave"
+          ],
+          "schema": [
+            {
+              "id": "chave",
+              "displayName": "chave",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1600,
+        496
+      ],
+      "id": "31c915b2-145b-4b8d-8fc3-f14a6a2a4674",
+      "name": "CriarManual"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        496,
+        512
+      ],
+      "id": "e744b477-af9d-4e58-b5b6-9a0f282e4e95",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Agente do banco",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "You are a helpful assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [
+        1920,
+        -16
+      ],
+      "id": "d4dd2e64-8d26-486c-9e9f-5dad915930d3",
+      "name": "Agente do Banco"
+    },
+    {
+      "parameters": {
+        "model": "deepseek-v4-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        448
+      ],
+      "id": "a0f9dac3-1add-43cd-b905-ee141fc2165d",
+      "name": "IA1",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "AKio8sBDKoxTxO0b",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "011y5MF16ktSMDNk",
+          "mode": "list",
+          "cachedResultName": "My Sub-Workflow 1",
+          "cachedResultUrl": "/workflow/011y5MF16ktSMDNk"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1312,
+        496
+      ],
+      "id": "f83e7b0d-960f-4b0b-9b15-f50f3f10fa6c",
+      "name": "CriarQuiz"
+    },
+    {
+      "parameters": {
+        "content": "## Fluxo da Saida",
+        "height": 480,
+        "width": 1136,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1200,
+        -848
+      ],
+      "typeVersion": 1,
+      "id": "2eab61df-e48b-4c09-9eb2-5a8bf8132d46",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Fluxo de Controle",
+        "height": 880,
+        "width": 2288,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        304,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "30269312-085e-4d83-be88-c4a0834737c9",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "Manuario",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -656,
+        -736
+      ],
+      "id": "ae9ebb27-da21-420f-8def-59b12f1fd729",
+      "name": "Webhook",
+      "webhookId": "ed7187ed-f5c4-4c04-8fd2-d10ca5f9a0c7"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1984,
+        -672
+      ],
+      "id": "d0dc943d-5800-4ff8-b057-4c87adae7ee8",
+      "name": "Saida2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        -576
+      ],
+      "id": "6b7d10a2-984e-4ff8-a9f1-0516177edaa2",
+      "name": "Quiz"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        -768
+      ],
+      "id": "37252bde-b630-4cc1-af20-4ee4ff3ce5be",
+      "name": "Resposta"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        -656
+      ],
+      "id": "ce457465-0cf6-4acb-b94c-968e17101bfd",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Cria um array para armazenar os novos itens de saída\nconst newItems = [];\n\n// Percorre todos os itens que chegam no nó\nfor (const item of $input.all()) {\n  // Pega o valor da mensagem da IA da entrada\n  const mensagem = item.json.msgIA;\n\n  // Monta a nova estrutura JSON\n  newItems.push({\n    json: {\n      content: mensagem,\n      metadata: {\n        title: \"\",\n        gameName: \"\"\n      },\n      options: [\"\", \"\"]\n    }\n  });\n}\n\n// Retorna os itens formatados para o próximo nó\nreturn newItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        -624
+      ],
+      "id": "289bb016-3b80-4e35-9ae4-c4013dafd92b",
+      "name": "Preparar Json"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        336,
+        -624
+      ],
+      "id": "f7a24916-eb47-47f2-afe2-485b0741f8c0",
+      "name": "Saida3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f5fda9df-685a-4909-ba04-468cb810f5bb",
+              "name": "Erro",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        -624
+      ],
+      "id": "135e2afb-19a9-40c0-8611-d700e6c65276",
+      "name": "Erro"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "YFhYCP8vZANKDW6G",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/YFhYCP8vZANKDW6G",
+          "cachedResultName": "Fluxo buscar jogo API"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [
+            "chave"
+          ],
+          "schema": [
+            {
+              "id": "chave",
+              "displayName": "chave",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1168,
+        496
+      ],
+      "id": "8f528b9f-6c81-4058-8e99-a08b92709c09",
+      "name": "ProdcurarJogos"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "GzoQ4iXikbwwkrOD",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/GzoQ4iXikbwwkrOD",
+          "cachedResultName": "BuscarRAG"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Banco": "n8n_vectors_ia",
+            "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('query', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "idUsuario",
+              "displayName": "idUsuario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Jogo",
+              "displayName": "Jogo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Banco",
+              "displayName": "Banco",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        2384,
+        192
+      ],
+      "id": "96074b93-6c0b-40cb-a47b-af2554f68aa2",
+      "name": "RAGManualIA"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "GzoQ4iXikbwwkrOD",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/GzoQ4iXikbwwkrOD",
+          "cachedResultName": "BuscarRAG"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Banco": "n8n_vectors_original",
+            "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('query', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "idUsuario",
+              "displayName": "idUsuario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Jogo",
+              "displayName": "Jogo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "Banco",
+              "displayName": "Banco",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        2256,
+        352
+      ],
+      "id": "529c8eaf-ab42-4e7c-ac5c-d3910c2f44ff",
+      "name": "RAGManualInternet"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "GzoQ4iXikbwwkrOD",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/GzoQ4iXikbwwkrOD",
+          "cachedResultName": "BuscarRAG"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('query', ``, 'string') }}",
+            "Banco": "n8n_vectors_comunidade"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "idUsuario",
+              "displayName": "idUsuario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "Jogo",
+              "displayName": "Jogo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "Banco",
+              "displayName": "Banco",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        2064,
+        448
+      ],
+      "id": "fe29e6d5-916e-4075-97d9-ae5675e12c86",
+      "name": "RAGComunidade"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "y4om2fYILn7QGDwB",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/y4om2fYILn7QGDwB",
+          "cachedResultName": "Fluxo salvar manual internet"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [
+            "chave"
+          ],
+          "schema": [
+            {
+              "id": "chave",
+              "displayName": "chave",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1456,
+        496
+      ],
+      "id": "e24e4f5e-8518-4195-9af8-dbb6253bfdb9",
+      "name": "ProcurarInternet"
+    },
+    {
+      "parameters": {
+        "model": "deepseek-v4-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        -544
+      ],
+      "id": "2224df64-34de-4106-9f6c-ed3e61349ed2",
+      "name": "IA2",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "AKio8sBDKoxTxO0b",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "={{ $('Dados').item.json.sessionId }} + {{ $('Dados').item.json.Msg }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -848
+      ],
+      "id": "06fa0c6f-9599-444f-822f-b2bf5631723b",
+      "name": "LoadInfoJogo",
+      "credentials": {
+        "redis": {
+          "id": "3ezhy82uKrJOKjyl",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        -848
+      ],
+      "id": "393850c4-b035-49a7-b5f6-7862d0f38cbd",
+      "name": "PegarJogo"
+    },
+    {
+      "parameters": {
+        "content": "## Fluxo da Entrada",
+        "height": 576,
+        "width": 1328,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -752,
+        -944
+      ],
+      "typeVersion": 1,
+      "id": "2fc93f2e-70d0-44dc-b0ff-963ec8c69e16",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Guardrails": {
+      "main": [
+        [
+          {
+            "node": "LoadInfoJogo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IA": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Manuario",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Banco": {
+      "ai_memory": [
+        [
+          {
+            "node": "Manuario",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dados": {
+      "main": [
+        [
+          {
+            "node": "Manuario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CriarManual": {
+      "ai_tool": [
+        [
+          {
+            "node": "Manuario",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "Manuario",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente do Banco": {
+      "ai_tool": [
+        [
+          {
+            "node": "Manuario",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IA1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente do Banco",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manuario": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CriarQuiz": {
+      "ai_tool": [
+        [
+          {
+            "node": "Manuario",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Guardrails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Resposta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Quiz",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resposta": {
+      "main": [
+        [
+          {
+            "node": "Saida2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quiz": {
+      "main": [
+        [
+          {
+            "node": "Saida2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Json": {
+      "main": [
+        [
+          {
+            "node": "Saida3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Erro": {
+      "main": [
+        [
+          {
+            "node": "Preparar Json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ProdcurarJogos": {
+      "ai_tool": [
+        [
+          {
+            "node": "Manuario",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAGManualIA": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente do Banco",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAGManualInternet": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente do Banco",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAGComunidade": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente do Banco",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ProcurarInternet": {
+      "ai_tool": [
+        [
+          {
+            "node": "Manuario",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IA2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Guardrails",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LoadInfoJogo": {
+      "main": [
+        [
+          {
+            "node": "PegarJogo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PegarJogo": {
+      "main": [
+        [
+          {
+            "node": "Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "731d4a4f-30ca-4fe5-a6d6-5b69b5541e0a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dd6c29c4ad0d44ae0235d6cf3989401b36f118a352cb3a6bd38f6a546e5cfec0"
+  },
+  "id": "yDFTXITO5y5Z7V1Y",
+  "tags": []
+}

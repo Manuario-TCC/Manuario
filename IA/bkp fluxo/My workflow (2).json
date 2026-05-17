@@ -1,0 +1,507 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "32221267-0b78-473a-98f5-0372b0771b44",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -320,
+        -256
+      ],
+      "id": "6ee70e96-ceb4-48e3-b36b-4b40fdaf5131",
+      "name": "Webhook",
+      "webhookId": "32221267-0b78-473a-98f5-0372b0771b44"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -112,
+        -256
+      ],
+      "id": "03ac4875-b444-424f-89d8-b0f289a6a596",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        -256
+      ],
+      "id": "d2b7ca74-26c1-44ce-a78c-228b18deb30e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        -256
+      ],
+      "id": "57dc6296-f98e-4427-b19b-efa8828907ad",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        592,
+        -256
+      ],
+      "id": "8fbb083b-ac52-4e78-b5af-b9fc1f1a9606",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a7c576a4-302a-473f-bc90-b0884121c63e",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        784,
+        -256
+      ],
+      "id": "4ec251e7-ab94-4bbb-b7bc-cc23d2a837ee",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "7f61ff1d-c227-49d1-9531-8b9376d11b09"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        -64
+      ],
+      "id": "b14370cc-9f42-4330-b180-bf1434572df0",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -112,
+        -64
+      ],
+      "id": "91c1de5b-e70f-43b8-b3d0-3ca763a2ddf7",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        128
+      ],
+      "id": "f9adc480-a532-4faf-ad0a-044c276d715f",
+      "placeholder": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        128
+      ],
+      "id": "60304307-1595-47e7-b9cf-bfa326872339",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "3ezhy82uKrJOKjyl",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "guardrails": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 2,
+      "position": [
+        96,
+        128
+      ],
+      "id": "73ba8a97-f7e9-48a2-b000-11ae8bc45ffa",
+      "name": "Guardrails"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        320,
+        128
+      ],
+      "id": "3a2899ba-4509-4334-9504-0f40c8fd76f9",
+      "name": "Update rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "I8Icve5gxx5smL6h",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "=deepseek-chat",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        576,
+        128
+      ],
+      "id": "48942f2e-3b6b-47b4-931d-1bda816fb437",
+      "name": "DeepSeek Chat Model1",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "AKio8sBDKoxTxO0b",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        112,
+        -64
+      ],
+      "id": "dd382797-9369-4eca-a32e-ff9c9c33e1f6",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {},
+      "id": "8dad440a-01e6-4adc-bb8f-51d90d2fc19d",
+      "name": "Replace me with your logic",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        320,
+        -64
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chave"
+            },
+            {
+              "name": "jogo"
+            },
+            {
+              "name": "idUsuario"
+            },
+            {}
+          ]
+        }
+      },
+      "id": "d8552eb4-81b5-472e-8efa-61545fd188be",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        560,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "embed-multilingual-light-v3.0"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsCohere",
+      "typeVersion": 1,
+      "position": [
+        784,
+        -64
+      ],
+      "id": "b2a76d80-d415-4114-813d-c06e3102bd13",
+      "name": "Embeddings Cohere2",
+      "credentials": {
+        "cohereApi": {
+          "id": "7kDVD5X1NPN3hads",
+          "name": "CohereApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        768,
+        128
+      ],
+      "id": "f22a5e6b-320b-41f9-a9d8-1a3e957cedc5",
+      "name": "XML1"
+    },
+    {
+      "parameters": {
+        "q": "={{ $('dados').item.json.name }} manual regras filetype:pdf",
+        "additionalFields": {
+          "num": "5"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-serpapi.serpApi",
+      "typeVersion": 1,
+      "position": [
+        944,
+        -80
+      ],
+      "id": "bf84d20d-651a-4d79-bfb5-3a85db10bfb3",
+      "name": "Google search",
+      "credentials": {
+        "serpApi": {
+          "id": "Rzv77YsW4bdHuWsk",
+          "name": "SerpApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chunkSize": 1200,
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        976,
+        144
+      ],
+      "id": "83b8ad9c-e7a2-4623-97f3-5f0cd0ad4d7b",
+      "name": "Recursive Character Text Splitter1"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        -320,
+        320
+      ],
+      "id": "d10236c3-7ab1-462d-8064-d1ccbe2fdf8c",
+      "name": "Think"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -96,
+        320
+      ],
+      "id": "69b131f2-772a-4580-bedc-98102d3c8339",
+      "name": "Call n8n Workflow Tool"
+    },
+    {
+      "parameters": {
+        "mode": "load",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        304
+      ],
+      "id": "8e026bda-ce4c-4987-b566-8a15e010c461",
+      "name": "Postgres PGVector Store",
+      "credentials": {
+        "postgres": {
+          "id": "I8Icve5gxx5smL6h",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        448,
+        304
+      ],
+      "id": "ce522aff-71dd-40d3-a83f-a6122b0cd01e",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "Game",
+                "value": "=UNO"
+              },
+              {
+                "name": "=Description",
+                "value": "=Players race to empty their hands and catch opposing players with cards left in theirs, which score points. In turns, players attempt to play a card by matching its color, number, or word to the topmost card on the discard pile. If unable to play, players draw a card from the draw pile, and if still unable to play, they pass their turn. Wild and special cards spice things up a bit.\n\nUNO is a commercial version of Crazy Eights, a public domain card game played with a standard deck of playing cards.\n\nThis entry includes all themed versions of UNO that do not include new cards."
+              },
+              {
+                "name": "=Type",
+                "value": "=Card Game"
+              },
+              {
+                "name": "Minplayers",
+                "value": "=2"
+              },
+              {
+                "name": "=Maxplayers",
+                "value": "=10"
+              },
+              {
+                "name": "Yearpublished",
+                "value": "=1971"
+              },
+              {
+                "name": "Minage",
+                "value": "=6"
+              },
+              {
+                "name": "Playingtime",
+                "value": "=30"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        640,
+        320
+      ],
+      "id": "ef9548ba-8ad3-42be-984f-541796e2c78e",
+      "name": "Default Data Loader1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Loop Over Items": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        []
+      ]
+    },
+    "Guardrails": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "d6048597-d219-4702-aa05-6cbd8933e8bb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dd6c29c4ad0d44ae0235d6cf3989401b36f118a352cb3a6bd38f6a546e5cfec0"
+  },
+  "id": "A5qIb0mQ4Hwn1N7a",
+  "tags": []
+}

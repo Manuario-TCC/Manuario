@@ -1,0 +1,290 @@
+{
+  "name": "CriarQuiz",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chave"
+            },
+            {
+              "name": "jogo"
+            },
+            {
+              "name": "idUsuario"
+            }
+          ]
+        }
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        272,
+        368
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "b5942df6-0160-4ef7-965d-57583acdc8aa",
+      "name": "Replace me with your logic",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1728,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "={{ $json.idUsuario }} {{ $json.jogo }} Lista",
+        "keyType": "string",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        464,
+        368
+      ],
+      "id": "cce755a0-b363-4165-898b-30676f67be6c",
+      "name": "PegarLista",
+      "credentials": {
+        "redis": {
+          "id": "3ezhy82uKrJOKjyl",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "={{ $('When Executed by Another Workflow').item.json.idUsuario }} {{ $('When Executed by Another Workflow').item.json.jogo }} opcoes",
+        "keyType": "string",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        640,
+        368
+      ],
+      "id": "2aacc687-13d5-4479-9ab0-58a219a6b826",
+      "name": "PegarOpções",
+      "credentials": {
+        "redis": {
+          "id": "3ezhy82uKrJOKjyl",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ==========================================\n// 1. RECEBENDO AS VARIÁVEIS COM SEGURANÇA\n// ==========================================\nlet stringListaPequena, stringListaGigante, rawTargetName;\n\n// Testa o primeiro nó\ntry {\n  // ATENÇÃO: Dependendo da versão do n8n, o valor retornado pelo Redis \n  // pode estar em 'value' ou 'data' em vez de 'propertyName'.\n  stringListaPequena = $('PegarOpções').first().json.propertyName || $('PegarOpções').first().json.value;\n} catch (error) {\n  return [{ json: { erro: \"🔴 O nó 'PegarOpções' não foi encontrado ou não executou. Verifique o nome exato (letras maiúsculas, acentos e espaços)!\" } }];\n}\n\n// Testa o segundo nó\ntry {\n  stringListaGigante = $('PegarLista').first().json.propertyName || $('PegarLista').first().json.value;\n} catch (error) {\n  return [{ json: { erro: \"🔴 O nó 'PegarLista' não foi encontrado ou não executou. Verifique o nome exato!\" } }];\n}\n\n// Testa o terceiro nó\ntry {\n  rawTargetName = $('When Executed by Another Workflow').first().json.jogo\n} catch (error) {\n  return [{ json: { erro: \"🔴 O nó 'Dados' não foi encontrado ou não executou. Verifique se o nome está certo e se o campo se chama 'Msg' mesmo.\" } }];\n}\n\n// ==========================================\n// 2. CONVERSÃO DOS DADOS DO REDIS\n// ==========================================\nlet listaPequenaAntiga = [];\nlet listaGigante = [];\n\ntry {\n  listaPequenaAntiga = JSON.parse(stringListaPequena);\n} catch (e) {\n  return [{ json: { erro: \"A lista pequena do Redis está vazia ou não é um JSON válido.\" } }];\n}\n\ntry {\n  listaGigante = JSON.parse(stringListaGigante);\n} catch (e) {\n  return [{ json: { erro: \"A lista gigante do Redis está vazia ou não é um JSON válido.\" } }];\n}\n\nconst limiteItens = listaPequenaAntiga.length || 5; \n\n// ==========================================\n// FUNÇÃO DE NORMALIZAÇÃO\n// ==========================================\nfunction normalizarTexto(texto) {\n  if (!texto) return \"\";\n  return texto\n    .toString()\n    .normalize('NFD') \n    .replace(/[\\u0300-\\u036f]/g, \"\") \n    .toUpperCase() \n    .trim();\n}\n\nconst targetName = normalizarTexto(rawTargetName);\n\n// ==========================================\n// 3. SUBTRAÇÃO (Remover os já vistos da lista gigante)\n// ==========================================\nconst idsParaRemover = new Set(listaPequenaAntiga.map(jogo => jogo.id));\nlistaGigante = listaGigante.filter(jogo => !idsParaRemover.has(jogo.id));\n\n// ==========================================\n// 4. A BUSCA INTELIGENTE NOS JOGOS RESTANTES\n// ==========================================\nconst matchesExatos = [];\nconst matchesPrioritarios = []; \nconst matchesParciais = [];     \n\nfor (const game of listaGigante) {\n  if (game && game.name && game.name.value) {\n    const gameNameFromAPI = normalizarTexto(game.name.value);\n\n    if (gameNameFromAPI === targetName) {\n      matchesExatos.push(game);\n    } \n    else if (\n      gameNameFromAPI.includes(targetName + \" \") || \n      gameNameFromAPI.includes(targetName + \":\") ||\n      gameNameFromAPI.includes(targetName + \"-\")\n    ) {\n      matchesPrioritarios.push(game);\n    }\n    else if (gameNameFromAPI.includes(targetName)) {\n      matchesParciais.push(game);\n    }\n  }\n}\n\n// ==========================================\n// FUNÇÃO DE ORDENAÇÃO POR ANO\n// ==========================================\nfunction ordenarPorAnoDecrescente(lista) {\n  return lista.sort((a, b) => {\n    const anoA = parseInt(a.yearpublished?.value) || 0;\n    const anoB = parseInt(b.yearpublished?.value) || 0;\n    return anoB - anoA; \n  });\n}\n\nordenarPorAnoDecrescente(matchesExatos);\nordenarPorAnoDecrescente(matchesPrioritarios);\nordenarPorAnoDecrescente(matchesParciais);\n\n// ==========================================\n// 5. SELEÇÃO DA NOVA LISTA PEQUENA\n// ==========================================\nconst todosMatches = [...matchesExatos, ...matchesPrioritarios, ...matchesParciais];\nconst novaListaPequena = todosMatches.slice(0, limiteItens);\n\n// ==========================================\n// 6. RETORNO FINAL\n// ==========================================\nreturn [{ \n  json: { \n    quantidade_novos_jogos: novaListaPequena.length,\n    lista_pequena: novaListaPequena,\n    lista_gigante: listaGigante\n  } \n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        368
+      ],
+      "id": "0b87ebfb-fc54-4420-899d-e0e210301eec",
+      "name": "Filtro"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('When Executed by Another Workflow').item.json.idUsuario }} {{ $('When Executed by Another Workflow').item.json.jogo }} opcoes",
+        "value": "={{ JSON.stringify($('Filtro').item.json.lista_pequena) }}",
+        "keyType": "string"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        368
+      ],
+      "id": "dd6a9605-f6f3-4b6d-ae95-58cc65b7fd29",
+      "name": "SaveOpçoes",
+      "credentials": {
+        "redis": {
+          "id": "3ezhy82uKrJOKjyl",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('When Executed by Another Workflow').item.json.idUsuario }} {{ $('When Executed by Another Workflow').item.json.jogo }} Lista",
+        "value": "={{ JSON.stringify($json.lista_gigante) }}",
+        "keyType": "string"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        976,
+        368
+      ],
+      "id": "e7cad94d-9311-4f25-8ec3-ecb351503fe4",
+      "name": "SaveLista",
+      "credentials": {
+        "redis": {
+          "id": "3ezhy82uKrJOKjyl",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "55713b33-eef4-4dc6-b832-317cc5c4329b",
+              "name": "Opções",
+              "value": "={{ $json.prompt_jogos }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1536,
+        368
+      ],
+      "id": "16ff1533-dd63-4cef-b784-69408135cfb3",
+      "name": "Opcoes"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ==========================================\n// 1. ONDE ESTÁ A LISTA PEQUENA?\n// Substitua 'NomeDoSeuNo' pelo nome exato do nó onde a lista foi gerada ou lida do Redis\n// ==========================================\nlet listaPequena;\n\ntry {\n  // Se você está pegando direto do nó que gerou o JSON no passo anterior:\n  listaPequena = $('Filtro').first().json.lista_pequena\n\n  // IMPORTANTE: Se você estiver pegando a lista pequena de um nó GET do Redis, \n  // ela virá como texto. Nesse caso, apague a linha acima e use a linha abaixo:\n  // listaPequena = JSON.parse($('NomeDoSeuNo').first().json.propertyName);\n\n} catch (error) {\n  return [{ json: { erro: \"Nó não encontrado. Verifique o nome do nó no campo $('...').\" } }];\n}\n\n// Verifica se a lista realmente tem dados\nif (!listaPequena || !Array.isArray(listaPequena) || listaPequena.length === 0) {\n  return [{ json: { prompt_jogos: \"Nenhum jogo encontrado.\" } }];\n}\n\n// ==========================================\n// 2. FORMATANDO O TEXTO PARA A IA (LLM)\n// ==========================================\n// Cria o cabeçalho do texto\nlet textoParaIA = \"Novas Opções de jogos encontradas para jogo \" + $('When Executed by Another Workflow').first().json.jogo + \":\\n\";\n\n// Passa por cada jogo da lista e extrai só o nome e o ano\nlistaPequena.forEach((jogo, index) => {\n  // Pega o nome e o ano, com uma trava de segurança caso a API não tenha enviado o ano\n  const nomeJogo = jogo.name?.value || \"Nome não informado\";\n  const anoJogo = jogo.yearpublished?.value || \"Ano desconhecido\";\n  \n  // Monta a linha no formato: \"1. Nome do Jogo (Ano: 0000)\"\n  textoParaIA += `${index + 1}. ${nomeJogo} (Ano: ${anoJogo})\\n`;\n});\n\n// ==========================================\n// 3. RETORNO PARA O PRÓXIMO NÓ\n// ==========================================\nreturn [{ \n  json: { \n    // Retornamos o texto formatado limpo para jogar no Prompt do Agente\n    prompt_jogos: textoParaIA \n  } \n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        368
+      ],
+      "id": "c5094156-d5e2-4ff1-93af-ced6292168ba",
+      "name": "Filtro02"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "chave": null,
+          "jogo": "UNO",
+          "idUsuario": "5552"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "PegarLista",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PegarLista": {
+      "main": [
+        [
+          {
+            "node": "PegarOpções",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PegarOpções": {
+      "main": [
+        [
+          {
+            "node": "Filtro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtro": {
+      "main": [
+        [
+          {
+            "node": "SaveLista",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SaveLista": {
+      "main": [
+        [
+          {
+            "node": "SaveOpçoes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SaveOpçoes": {
+      "main": [
+        [
+          {
+            "node": "Filtro02",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Opcoes": {
+      "main": [
+        [
+          {
+            "node": "Replace me with your logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtro02": {
+      "main": [
+        [
+          {
+            "node": "Opcoes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "89260b9e-42c5-4493-9461-eeff02195222",
+  "meta": {
+    "instanceId": "dd6c29c4ad0d44ae0235d6cf3989401b36f118a352cb3a6bd38f6a546e5cfec0"
+  },
+  "id": "011y5MF16ktSMDNk",
+  "tags": []
+}

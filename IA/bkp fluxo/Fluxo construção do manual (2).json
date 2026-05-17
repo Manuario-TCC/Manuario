@@ -1,0 +1,887 @@
+{
+  "name": "Fluxo construção do manual",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "11640f77-e546-48d0-a913-f35b443a42d3",
+      "name": "Replace me with your logic",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        4208,
+        -288
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8263a526-9aa1-418c-a099-bc0097f03ae9",
+              "name": "Msg",
+              "value": "={{ $json.jogo }}",
+              "type": "string"
+            },
+            {
+              "id": "34780c5e-3807-4590-bec9-25c4128c381c",
+              "name": "Descricao",
+              "value": "={{ $json.descricao_jogo }}",
+              "type": "string"
+            },
+            {
+              "id": "012e49c7-e01a-4246-b230-bf3c85436e55",
+              "name": "idioma_manual",
+              "value": "={{ $json.idioma_manual }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1936,
+        208
+      ],
+      "id": "59cfa5fa-8ad7-4fc6-8027-53a373de95d4",
+      "name": "Dados"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Nome do Jogo\n{{ $json.Msg }}\n\n# Descrição / Premissa\n{{ $json.Descricao }}\n\n# Idioma\n{{ $json.idioma_manual }}\n\n",
+        "options": {
+          "systemMessage": "Você é um Arquiteto de Manuais de Jogos de Mesa e RPG. Sua função é atuar como o Agente Planejador de um sistema RAG. \nVocê receberá o Nome de um jogo, sua Descrição/Premissa e o Idioma original em que o manual está escrito.\n\nSua missão é gerar um Índice ESTRUTURAL e CONCISO do manual, juntamente com as \"queries\" de busca que outro agente usará para ler o banco de dados.\n\nDIRETRIZES ESTRITAS:\n1. IDIOMA DO TÍTULO: O nome do capítulo (titulo_capitulo) deve ser gerado EXCLUSIVAMENTE em Português do Brasil (PT-BR).\n2. IDIOMA DA QUERY: A instrução de busca (query_de_busca) DEVE ser escrita EXCLUSIVAMENTE no idioma original do manual (fornecido pelo usuário). Isso é vital para a busca vetorial funcionar.\n3. CONTEÚDO DA QUERY: A query não é uma pergunta simples. Deve conter palavras-chave, jargões, sinônimos e ações específicas que a regra abrange, baseando-se no que foi lido na Descrição.\n4. ESTRUTURA MACRO: Agrupe o jogo em tópicos essenciais (ex: Componentes, Setup, Turnos, Combate, Fim de Jogo). Não passe de 10 tópicos.\n5. ZERO EXPLICAÇÕES: Não tente explicar como a regra funciona. Foque apenas em criar o esqueleto de busca.\n\nREGRA CRÍTICA DE SAÍDA (JSON OBRIGATÓRIO):\nVocê DEVE responder ÚNICA e EXCLUSIVAMENTE com um array JSON válido. Não inclua blocos de código Markdown (como ```json), não use saudações, introduções ou notas de rodapé. Siga estritamente este modelo estrutural:\n\n[\n  {\n    \"titulo_capitulo\": \"1. Componentes e Preparação\",\n    \"query_de_busca\": \"game components, pieces, board setup, starting hand, initial preparation, starting equipment, how to set up the game\"\n  },\n  {\n    \"titulo_capitulo\": \"2. Estrutura do Turno\",\n    \"query_de_busca\": \"turn structure, player phases, what a player can do on their turn, action points, passing the turn\"\n  }\n]",
+          "maxIterations": 5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2112,
+        208
+      ],
+      "id": "f1653bce-ac35-4375-9fb7-a12ac6f12e3e",
+      "name": "CriarCapitulos"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# O Nome do Jogo\n{{ $('Dados').first().json.Msg }}\n\n# A Descrição do Jogo\n{{ $('Dados').first().json.Descricao }}\n\n# O Sumário Completo (para contexto espacial)\n{{ $('Regras').all().map(item => item.json.titulo_capitulo).join('\\n') }}\n\n# A Regra Específica a ser detalhada\n{{ $('Regras').all()[$runIndex].json.titulo_capitulo }}\n\n# Query da regra para busca no n8n\n{{ $('Regras').all()[$runIndex].json.query_de_busca }}",
+        "options": {
+          "systemMessage": "Você é um Master Game Designer e Redator Sênior de Manuais de Jogos de Mesa e RPG. Sua especialidade é redigir regras com precisão cirúrgica, clareza absoluta e o rigor técnico de um livro de regras oficial.\n\nO usuário fornecerá:\n1. O Nome do Jogo.\n2. A Descrição do Jogo.\n3. O Sumário Completo (para contexto espacial).\n4. O Título do Capítulo (A Regra Específica a ser detalhada).\n5. A Query de Busca (A instrução de pesquisa exata para o banco de dados).\n\nSUA MISSÃO E FLUXO DE TRABALHO OBRIGATÓRIO:\n\nPASSO 1: CONSULTA ÚNICA AO RAG (OBRIGATÓRIO E EXATO)\nVocê DEVE utilizar sua ferramenta de busca/RAG para recuperar as instruções oficiais. \nREGRA CRÍTICA DE DESEMPENHO: Faça APENAS UMA (1) consulta, utilizando EXATAMENTE o texto fornecido pelo usuário na variável \"Query de Busca\". Você está estritamente PROIBIDO de realizar pesquisas adicionais ou inventar novos termos de busca. Se a ferramenta não retornar algo específico, trabalhe exclusivamente com o que foi retornado na primeira tentativa.\n\nPASSO 2: REDAÇÃO E FIDELIDADE EXTREMA\nEscreva a explicação definitiva e didática APENAS para \"O Título do Capítulo\", utilizando exclusivamente o contexto recuperado no Passo 1.\n\nDIRETRIZES ESTRITAS DE CONTEÚDO (Siga obrigatoriamente):\n1. ISOLAMENTO DE CONTEXTO: O \"Sumário Completo\" serve APENAS para você saber a sua posição no manual. Sob nenhuma hipótese explique regras que pertencem aos capítulos anteriores ou posteriores. Foco 100% no tema atual.\n2. IDIOMA OBRIGATÓRIO: Redija o texto final EXCLUSIVAMENTE em Português do Brasil. Os dados do RAG estarão no idioma original do jogo; atue como um tradutor especialista, adaptando o vocabulário para o jargão correto de jogos de mesa no Brasil (ex: deck = baralho, draw = comprar, discard = descartar).\n3. ANCORAGEM DE FATOS (ZERO ALUCINAÇÃO): Sua resposta deve ser baseada EXCLUSIVAMENTE nos dados retornados pela busca. Nunca invente componentes, valores, exceções ou mecânicas baseando-se no seu conhecimento prévio.\n4. PROFUNDIDADE E EXEMPLO: Descreva os gatilhos e exceções da regra (se retornados na busca). Sempre termine com um subtítulo \"### Exemplo de Resolução\" detalhando a regra em uma situação prática de jogo, garantindo que a matemática e a mecânica do exemplo sejam 100% fiéis às regras do RAG.\n\nDIRETRIZES ESTRITAS DE FORMATAÇÃO E ESTRUTURA:\n1. SEM TÍTULO PRINCIPAL: Não escreva o título da regra no início da sua resposta. Comece escrevendo diretamente a explicação (o nó do sistema já adicionará o título depois).\n2. SUBTÍTULOS PADRONIZADOS: Utilize apenas \"### \" para criar subtítulos. Nunca numere os subtítulos.\n3. LISTAS SEM NÚMEROS: Nunca utilize numeração (1., 2., 3.) para listar itens, passos ou componentes. Utilize exclusivamente asteriscos (\"* \") ou traços (\"- \") para criar tópicos em bullet points.\n4. CONTROLE DE ESPAÇAMENTO:\n   - Entre um subtítulo e o parágrafo abaixo dele, deve haver exatamente uma linha em branco (equivalente a duas quebras de linha: \\n\\n).\n   - Entre os itens de uma lista com marcadores (bullet points), NÃO pule linhas em branco. Deixe-os juntos (equivalente a apenas uma quebra de linha: \\n).\n5. DESTAQUES: Utilize **negrito** para destacar termos cruciais do jogo e nomes de componentes.\n\nREGRA DE SAÍDA:\nRetorne APENAS o texto da regra formatado em Markdown estrito. Zero introduções conversacionais (Ex: \"Aqui está a regra...\", \"Consultando o banco...\", \"De acordo com o manual...\")."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        3104,
+        224
+      ],
+      "id": "feac1cc6-fcfb-4fcf-be6f-327fbee54ee5",
+      "name": "DetalharCapitulo"
+    },
+    {
+      "parameters": {
+        "batchSize": "=1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2672,
+        208
+      ],
+      "id": "edb1c37c-8bd5-4e08-8381-fe91aff2366a",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "regras_jogos",
+          "mode": "list",
+          "cachedResultName": "regras_jogos"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "nome_jogo": "={{ $('Dados').item.json.Msg }}",
+            "titulo_regra": "={{ $('Regras').all()[$runIndex].json.titulo_capitulo }}",
+            "conteudo_regra": "={{ $('DetalharCapitulo').item.json.output }}",
+            "criado_em": "2026-04-25T22:53:18"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nome_jogo",
+              "displayName": "nome_jogo",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "titulo_regra",
+              "displayName": "titulo_regra",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "conteudo_regra",
+              "displayName": "conteudo_regra",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "vetor_id",
+              "displayName": "vetor_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        3600,
+        560
+      ],
+      "id": "ced47880-bb68-4e5e-addd-1dc4e03fdd58",
+      "name": "PopularTabela",
+      "credentials": {
+        "postgres": {
+          "id": "I8Icve5gxx5smL6h",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS regras_jogos (\n    id SERIAL PRIMARY KEY,\n    nome_jogo VARCHAR(100) NOT NULL,\n    titulo_regra VARCHAR(255) NOT NULL,\n    conteudo_regra TEXT,\n    vetor_id VARCHAR(100), \n    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        3600,
+        224
+      ],
+      "id": "f4f01baf-38b3-470b-8fc3-7789ae1b0f5a",
+      "name": "CriarTabela",
+      "credentials": {
+        "postgres": {
+          "id": "I8Icve5gxx5smL6h",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "regras_jogos",
+          "mode": "list",
+          "cachedResultName": "regras_jogos"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "nome_jogo",
+              "value": "={{ $json.jogo }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        3120,
+        -288
+      ],
+      "id": "b44a6d0c-b308-43e7-ac44-889965f85d9f",
+      "name": "TrazerTabela",
+      "credentials": {
+        "postgres": {
+          "id": "I8Icve5gxx5smL6h",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        2896,
+        224
+      ],
+      "id": "102704e1-59f4-4c9d-9c68-f97c2af360e8",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Pega todos os itens que chegaram no nó\nconst items = $input.all();\n\n// Prevenção de erro: se a lista estiver vazia, encerra elegantemente\nif (items.length === 0) {\n  return [{ json: { manual_completo: \"Nenhuma regra encontrada.\" } }];\n}\n\n// 2. Extrai o nome do jogo (usamos o primeiro item da lista como referência)\nconst nomeJogo = items[0].json.nome_jogo;\n\n// 3. Monta o Sumário iterando sobre os títulos\nlet sumario = `## Sumário\\n\\n`;\nfor (const item of items) {\n  sumario += `* ${item.json.titulo_regra}\\n`;\n}\n\n// 4. Monta o Corpo do Manual com as descrições\nlet corpoRegras = `## Regras do Jogo\\n\\n`;\nfor (const item of items) {\n  // Adiciona o título da regra como cabeçalho (##)\n  corpoRegras += `## ${item.json.titulo_regra}\\n\\n`;\n  \n  // Adiciona o conteúdo detalhado gerado pela IA\n  corpoRegras += `${item.json.conteudo_regra}\\n\\n`;\n  \n  // Adiciona uma linha divisória do Markdown (---) para separar visualmente as regras\n  corpoRegras += `---\\n\\n`; \n}\n\n// 5. Junta todas as partes em uma única string de Markdown\nconst textoFinal = `# Manual de Regras: ${nomeJogo}\\n\\n${sumario}\\n${corpoRegras}`;\n\n// 6. Retorna um ÚNICO item contendo o manual completo consolidado\nreturn [{\n  json: {\n    nome_jogo: nomeJogo,\n    manual_completo: textoFinal\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3808,
+        -288
+      ],
+      "id": "0d9809ac-084f-4661-a928-b56b6f86ddb3",
+      "name": "MontarManual"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "RAG - Use esta ferramenta para buscar regras oficiais",
+        "includeDocumentMetadata": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        3216,
+        416
+      ],
+      "id": "bacecedc-dbca-4aed-89a0-b576080b7890",
+      "name": "RAG",
+      "credentials": {
+        "postgres": {
+          "id": "I8Icve5gxx5smL6h",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "embed-multilingual-light-v3.0"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsCohere",
+      "typeVersion": 1,
+      "position": [
+        3216,
+        576
+      ],
+      "id": "9e28890a-325d-4a54-be72-767403178b84",
+      "name": "Embeddings Cohere2",
+      "credentials": {
+        "cohereApi": {
+          "id": "7kDVD5X1NPN3hads",
+          "name": "CohereApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "=deepseek-chat",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        2112,
+        432
+      ],
+      "id": "fffb29e9-79d2-4220-9f6b-dba56fb706c9",
+      "name": "DeepSeek Chat Model",
+      "retryOnFail": false,
+      "executeOnce": false,
+      "alwaysOutputData": false,
+      "notesInFlow": false,
+      "credentials": {
+        "deepSeekApi": {
+          "id": "AKio8sBDKoxTxO0b",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        2944,
+        -288
+      ],
+      "id": "0cbc5cf8-c8bc-4e17-aa3b-8d0e5fb94714",
+      "name": "Limit2"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "manual_jogos",
+          "mode": "list",
+          "cachedResultName": "manual_jogos"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "nome_jogo",
+              "value": "={{ $('When chat message received').first().json.chatInput }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1760,
+        208
+      ],
+      "id": "e8d29cf6-7bb5-45d9-9c31-586acf4f3873",
+      "name": "TrazerManaual2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "I8Icve5gxx5smL6h",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  // 1. Pega a string bruta que a IA gerou (dentro do campo 'output')\n  const textoDaIA = $input.first().json.output;\n\n  // 2. Transforma a string de texto em um Array JSON real\n  const capitulos = JSON.parse(textoDaIA);\n\n  // 3. Mapeia a lista para o formato nativo do n8n (múltiplos itens)\n  // Cada capítulo vai se tornar um \"pacote\" que o seu nó de Loop vai processar um por vez\n  return capitulos.map(capitulo => {\n    return {\n      json: {\n        titulo_capitulo: capitulo.titulo_capitulo,\n        query_de_busca: capitulo.query_de_busca\n      }\n    };\n  });\n\n} catch (error) {\n  // BLINDAGEM: Se a IA gaguejar e não retornar um JSON perfeito, avisa o erro\n  // sem quebrar o fluxo inteiro de forma fatal.\n  return [\n    {\n      json: {\n        titulo_capitulo: \"ERRO DE PARSE\",\n        query_de_busca: \"A IA não retornou um JSON válido.\",\n        detalhe_tecnico: error.message\n      }\n    }\n  ];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2432,
+        208
+      ],
+      "id": "cfab0348-9997-48d0-b782-e503977fdb76",
+      "name": "Regras"
+    },
+    {
+      "parameters": {
+        "model": "=deepseek-chat",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        3104,
+        416
+      ],
+      "id": "0bf512b7-63f4-4a4c-ae11-228abd6be114",
+      "name": "DeepSeek Chat Model1",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "AKio8sBDKoxTxO0b",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "chave"
+            },
+            {
+              "name": "jogo"
+            },
+            {
+              "name": "idUsuario"
+            },
+            {}
+          ]
+        }
+      },
+      "id": "3b9e6982-84d1-4e8c-ba51-7b0d43808152",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        1536,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "Game",
+                "value": "=UNO"
+              },
+              {
+                "name": "=Description",
+                "value": "=Players race to empty their hands and catch opposing players with cards left in theirs, which score points. In turns, players attempt to play a card by matching its color, number, or word to the topmost card on the discard pile. If unable to play, players draw a card from the draw pile, and if still unable to play, they pass their turn. Wild and special cards spice things up a bit.\n\nUNO is a commercial version of Crazy Eights, a public domain card game played with a standard deck of playing cards.\n\nThis entry includes all themed versions of UNO that do not include new cards."
+              },
+              {
+                "name": "=Type",
+                "value": "=Card Game"
+              },
+              {
+                "name": "Minplayers",
+                "value": "=2"
+              },
+              {
+                "name": "=Maxplayers",
+                "value": "=10"
+              },
+              {
+                "name": "Yearpublished",
+                "value": "=1971"
+              },
+              {
+                "name": "Minage",
+                "value": "=6"
+              },
+              {
+                "name": "Playingtime",
+                "value": "=30"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        3616,
+        -96
+      ],
+      "id": "b8cbdcb3-e8e4-4b4f-8c02-eab39925faa9",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "modelName": "embed-multilingual-light-v3.0"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsCohere",
+      "typeVersion": 1,
+      "position": [
+        3472,
+        -96
+      ],
+      "id": "5c7b98d7-2c64-4023-ab74-828c05308eb3",
+      "name": "Embeddings Cohere3",
+      "credentials": {
+        "cohereApi": {
+          "id": "7kDVD5X1NPN3hads",
+          "name": "CohereApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chunkSize": 1200,
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        3616,
+        48
+      ],
+      "id": "03da7e2d-ab17-46fd-bdfc-de5dad192551",
+      "name": "Recursive Character Text Splitter1"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": "n8n_vectors_ia",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        3472,
+        -288
+      ],
+      "id": "dcbdf9a9-d26c-4ca2-a2cd-d900c6a647e2",
+      "name": "Colocar RAG",
+      "credentials": {
+        "postgres": {
+          "id": "I8Icve5gxx5smL6h",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = [];\n\nfor (const item of items) {\n  const titulo = item.json.titulo_regra;\n  const conteudo = item.json.conteudo_regra;\n\n  // Monta a string contendo apenas o nome da regra e a descrição\n  const textoCombinado = `Regra: ${titulo}\\n\\n${conteudo}`;\n\n  results.push({\n    json: {\n      texto_rag: textoCombinado // Apenas este campo será retornado\n    }\n  });\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3296,
+        -288
+      ],
+      "id": "36fe628e-4bd9-4bbc-941d-13cfcff44a1b",
+      "name": "prepararRag"
+    },
+    {
+      "parameters": {
+        "url": "hoo",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        4000,
+        -288
+      ],
+      "id": "37c1f982-6306-4c10-8e80-9291ffba0d43",
+      "name": "EnviarManual"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "chave": null,
+          "jogo": "UNO",
+          "idUsuario": "55500"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Dados": {
+      "main": [
+        [
+          {
+            "node": "CriarCapitulos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CriarCapitulos": {
+      "main": [
+        [
+          {
+            "node": "Regras",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DetalharCapitulo": {
+      "main": [
+        [
+          {
+            "node": "CriarTabela",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Limit2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PopularTabela": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CriarTabela": {
+      "main": [
+        [
+          {
+            "node": "PopularTabela",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "DetalharCapitulo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TrazerTabela": {
+      "main": [
+        [
+          {
+            "node": "prepararRag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MontarManual": {
+      "main": [
+        [
+          {
+            "node": "EnviarManual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAG": {
+      "ai_tool": [
+        [
+          {
+            "node": "DetalharCapitulo",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Cohere2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "RAG",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "CriarCapitulos",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit2": {
+      "main": [
+        [
+          {
+            "node": "TrazerTabela",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TrazerManaual2": {
+      "main": [
+        [
+          {
+            "node": "Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Regras": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "DetalharCapitulo",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "TrazerManaual2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Colocar RAG",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Cohere3": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Colocar RAG",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter1": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace me with your logic": {
+      "main": [
+        []
+      ]
+    },
+    "Colocar RAG": {
+      "main": [
+        [
+          {
+            "node": "MontarManual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepararRag": {
+      "main": [
+        [
+          {
+            "node": "Colocar RAG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EnviarManual": {
+      "main": [
+        [
+          {
+            "node": "Replace me with your logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0c0425ef-58d5-4e5a-8d49-9f3a7d5b0fd0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dd6c29c4ad0d44ae0235d6cf3989401b36f118a352cb3a6bd38f6a546e5cfec0"
+  },
+  "id": "yWXR1lTdq9ueeNpb",
+  "tags": []
+}

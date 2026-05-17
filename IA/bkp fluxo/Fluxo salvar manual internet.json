@@ -1,0 +1,1359 @@
+{
+  "name": "Fluxo salvar manual internet",
+  "nodes": [
+    {
+      "parameters": {
+        "q": "={{ $('dados').item.json.name }} manual regras filetype:pdf",
+        "additionalFields": {
+          "num": "5"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-serpapi.serpApi",
+      "typeVersion": 1,
+      "position": [
+        -4000,
+        480
+      ],
+      "id": "b3635650-00f0-49db-99b1-95c3040a5889",
+      "name": "Google search",
+      "credentials": {
+        "serpApi": {
+          "id": "Rzv77YsW4bdHuWsk",
+          "name": "SerpApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url_download }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -2976,
+        512
+      ],
+      "id": "b92726be-50bb-43eb-9783-8b398d819b7f",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Pega o JSON do nó anterior (Search Google / SerpApi)\nconst inputData = $input.all()[0].json;\n\n// 2. Acessa a lista de resultados da pesquisa\nconst organicResults = inputData.organic_results || [];\n\n// 3. Cria uma lista vazia para armazenar os links válidos\nconst pdfLinks = [];\n\n// 4. Varre todos os resultados procurando PDFs\nfor (const result of organicResults) {\n  if (result.link) {\n    // Converte o link para minúsculo para facilitar a verificação\n    const linkMinusculo = result.link.toLowerCase();\n    \n    // Usamos .includes('.pdf') em vez de .endsWith('.pdf') para garantir que\n    // links com parâmetros no final (ex: .pdf?id=123) não sejam descartados\n    if (linkMinusculo.includes('.pdf')) {\n      pdfLinks.push({\n        titulo: result.title || \"Documento sem título\",\n        url_download: result.link,\n        posicao_google: result.position\n      });\n    }\n  }\n}\n\n// 5. Tratamento de Falha (Se não achar nenhum PDF)\nif (pdfLinks.length === 0) {\n  return [{ json: { erro: \"Nenhum link de PDF encontrado na busca.\" } }];\n}\n\n// 6. Retorna a lista no formato padrão do n8n para o nó Loop\n// Cada link vira um \"Item\" separado no fluxo\nreturn pdfLinks.map(item => ({ json: item }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3808,
+        480
+      ],
+      "id": "2559242c-f3e0-43f0-89dd-8593ae3c665a",
+      "name": "Filtro Link"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -3216,
+        496
+      ],
+      "id": "88bd9922-e37a-46a1-8d33-9f5d7fe30bb8",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -2736,
+        512
+      ],
+      "id": "dfbe4043-5f11-46bd-b8e7-b7d529bea564",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "model": "deepseek-v4-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        -2704,
+        1104
+      ],
+      "id": "1a439e0c-b264-4b69-9b33-7ffb2aadd74a",
+      "name": "DeepSeek Chat Model2",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "AKio8sBDKoxTxO0b",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f45bb194-9b64-47d0-a72d-33428bc4f635",
+              "leftValue": "={{ $json.values().first() }}",
+              "rightValue": "SIM",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -3408,
+        480
+      ],
+      "id": "45bd104b-addc-4486-91d1-36ee53102b02",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Arraste a variável com o texto do PDF selecionando o texto \"ARRASTE_SEU_TEXTO_AQUI\"\nlet textoCompleto = $input.first().json.text; \n\n// Exemplo de como vai ficar depois que você arrastar:\n// let textoCompleto = $json[\"text\"]; ou $node[\"Extract from File\"].json[\"text\"];\n\n// 2. Define o limite de caracteres (4000 caracteres = aprox. 1000 tokens)\nconst MAX_CARACTERES = 1000;\n\n// 3. Prevenção de falhas (se o PDF for apenas imagem e vier vazio)\nif (!textoCompleto || typeof textoCompleto !== 'string' || textoCompleto.trim() === \"\") {\n  return {\n    json: {\n      texto_amostra: \"[ERRO] PDF vazio ou baseado em imagens (sem texto detectável).\"\n    }\n  };\n}\n\n// 4. Fatiamento: Pega do caractere 0 até o limite\nlet textoCortado = textoCompleto.substring(0, MAX_CARACTERES);\n\n// 5. Limpeza: Remove os buracos em branco enormes para economizar mais tokens\ntextoCortado = textoCortado.replace(/\\n{3,}/g, '\\n\\n').trim();\n\n// Se o manual for muito grande, adiciona o aviso no final\nif (textoCompleto.length > MAX_CARACTERES) {\n   textoCortado += \"\\n\\n[... TEXTO CORTADO PELO SISTEMA PARA ECONOMIA DE TOKENS ...]\";\n}\n\n// 6. Retorna o texto fatiado pronto para a IA ler\nreturn {\n  json: {\n    texto_amostra: textoCortado\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2512,
+        672
+      ],
+      "id": "48136003-2411-401b-9ed2-4cfc36496756",
+      "name": "Filtro Texto"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b62184c4-8812-4288-8296-52799ef2c586",
+              "name": "erro",
+              "value": "={{ $json.values().first() }}",
+              "type": "string"
+            },
+            {
+              "id": "62940309-27a5-4226-be98-1bc675641515",
+              "name": "text",
+              "value": "={{ $('Extract from File1').item.json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2320,
+        1200
+      ],
+      "id": "55bfef7d-c612-4ddc-bbcf-3f836b1cf56c",
+      "name": "resposta"
+    },
+    {
+      "parameters": {
+        "maxItems": 5
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -3616,
+        480
+      ],
+      "id": "51ae6e29-2428-4fc1-95ed-9c1d19023bab",
+      "name": "Pegar 5"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Trecho inicial extraído do PDF baixado da internet para a sua avaliação:\n\n{{ $json.texto_amostra }}",
+        "options": {
+          "systemMessage": "=Você é um Árbitro Validador de Documentos de jogos de tabuleiro. Sua missão exclusiva é analisar um trecho extraído de um arquivo PDF e confirmar se ele pertence ao manual de regras oficial do jogo especificado, além de detectar seu idioma.\n\nDADOS DO JOGO ALVO QUE VOCÊ ESTÁ BUSCANDO:\n- Nome do Jogo: {{ $('dados').item.json.name }}\n- Descrição da Premissa: {{ $('dados').item.json.description }}\n\nREGRAS DE AVALIAÇÃO RIGOROSA:\n1. O texto deve pertencer ao jogo exato listado acima. Use a \"Descrição da Premissa\" para diferenciar o jogo base de possíveis expansões ou jogos com nomes parecidos.\n2. O texto deve ser característico de um manual (conter lista de componentes, setup, como jogar, etc.).\n\nREGRA DE SAÍDA (FORMATO OBRIGATÓRIO):\nVocê deve responder ÚNICA e EXCLUSIVAMENTE com um objeto JSON válido. Não inclua formatação markdown (como ```json), não adicione texto antes ou depois, não dê justificativas.\n\n- Se o trecho for o manual correto e legível, retorne exatamente:\n{\n  \"status\": \"SIM\",\n  \"idioma\": \"[Nome do idioma detectado, ex: Inglês, Português, Espanhol]\"\n}\n\n- Se for uma expansão, um jogo diferente, um arquivo corrompido ou uma ficha de pontuação, retorne exatamente:\n{\n  \"status\": \"NAO\",\n  \"idioma\": \"N/A\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -2704,
+        928
+      ],
+      "id": "7e109f71-6f4f-48c4-950a-0a1774301a2e",
+      "name": "Árbitro"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a107ae56-23fc-4fa3-826a-6b8c730a109d",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "2a38d295-2ddf-44df-a4ad-d911ec8a3048",
+              "name": "description",
+              "value": "={{ $json.description }}",
+              "type": "string"
+            },
+            {
+              "id": "5c850c2d-63f6-4856-ab31-47e420342d4f",
+              "name": "Type",
+              "value": "={{ $json.Type }}",
+              "type": "string"
+            },
+            {
+              "id": "771dd302-ff7f-46eb-9e4a-0f79b77ff4e9",
+              "name": "minplayers",
+              "value": "={{ $json.minplayers }}",
+              "type": "string"
+            },
+            {
+              "id": "6b7e1c5a-760a-4971-bfc8-1676d2bce888",
+              "name": "maxplayers",
+              "value": "={{ $json.maxplayers }}",
+              "type": "string"
+            },
+            {
+              "id": "0c27a1f7-32cb-4b8b-808c-94929c921015",
+              "name": "yearpublished",
+              "value": "={{ $json.yearpublished }}",
+              "type": "string"
+            },
+            {
+              "id": "28c81350-afa2-4188-98b9-dee93e7e2921",
+              "name": "Minage",
+              "value": "={{ $json.Minage }}",
+              "type": "string"
+            },
+            {
+              "id": "f7413b73-db9f-402a-b621-37ab48798018",
+              "name": "Playingtime",
+              "value": "={{ $json.Playingtime }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4752,
+        464
+      ],
+      "id": "0261b92f-a687-4bf9-8945-bcb4d4789f12",
+      "name": "dados"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5739a6cb-d537-495e-b70b-07f9f26f6ef6",
+              "leftValue": "={{ $json.values().first() }}",
+              "rightValue": "[ERRO] PDF vazio ou baseado em imagens (sem texto detectável).",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2928,
+        1184
+      ],
+      "id": "caf938bb-df37-4b89-98f7-e57d33dfa081",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "manual_jogos",
+          "mode": "list",
+          "cachedResultName": "manual_jogos"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "nome_jogo",
+              "value": "={{ $('dados').item.json.name }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -4400,
+        464
+      ],
+      "id": "f87df993-c9c3-48f4-86b1-03ab441235a2",
+      "name": "TrazerManaual",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "I8Icve5gxx5smL6h",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5891cea1-0ef5-4f5b-a7a5-6c2f4853de06",
+              "leftValue": "={{ $json.values().length }}",
+              "rightValue": "=0",
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -4224,
+        464
+      ],
+      "id": "aaeec4fa-5585-4f17-9db7-745378fed6f7",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e83a6172-cd53-4534-a7c6-09ca36503b6c",
+              "name": "aviso",
+              "value": "Manual não Encontrado",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2976,
+        304
+      ],
+      "id": "0e020444-f60a-4159-8528-b262f7db0274",
+      "name": "Saida"
+    },
+    {
+      "parameters": {},
+      "id": "dfe935ac-3af0-4d36-806d-35cf30d547e8",
+      "name": "Saida1",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        -3808,
+        304
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "id": "0a123927-69d8-4831-990b-bc9b79ca51aa",
+      "name": "Saida2",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        -2736,
+        304
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "id": "585f0a4a-cb2c-464b-836e-94348e9ac211",
+      "name": "Saida3",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        -1376,
+        96
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS manual_jogos (\n    id SERIAL PRIMARY KEY,\n    nome_jogo VARCHAR(100) NOT NULL,\n    descricao_jogo TEXT,\n    tipo VARCHAR(100),\n    ninJogadores VARCHAR(100),\n    maxJogadores VARCHAR(100),\n    anoPublicado VARCHAR(100),\n    minimoIdade VARCHAR(100),\n    tempoJogo VARCHAR(100),\n    manual_jogo TEXT,\n    idioma_manual VARCHAR(100) NOT NULL,\n    vetor_id VARCHAR(100),\n    ano VARCHAR(100),\n    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -4576,
+        464
+      ],
+      "id": "840f5ecf-6ee4-41fb-9ca7-9e4f038be498",
+      "name": "CriarTabelaManual",
+      "credentials": {
+        "postgres": {
+          "id": "I8Icve5gxx5smL6h",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "915b2176-ff9e-46d4-adb1-6549b631c0d8",
+              "name": "aviso",
+              "value": "=Existe no banco",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4000,
+        304
+      ],
+      "id": "07383305-be0f-4a13-9030-6717c34e99e4",
+      "name": "Saida4"
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "Jogo",
+                "value": "={{ $('dados').first().json.name }}"
+              },
+              {
+                "name": "=Type",
+                "value": "={{ $('dados').first().json.Type }}"
+              },
+              {
+                "name": "Minplayers",
+                "value": "={{ $('dados').first().json.minplayers }}"
+              },
+              {
+                "name": "=Maxplayers",
+                "value": "={{ $('dados').first().json.maxplayers }}"
+              },
+              {
+                "name": "Yearpublished",
+                "value": "={{ $('dados').first().json.yearpublished }}"
+              },
+              {
+                "name": "Minage",
+                "value": "={{ $('dados').first().json.Minage }}"
+              },
+              {
+                "name": "Playingtime",
+                "value": "={{ $('dados').first().json.Playingtime }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        -1744,
+        320
+      ],
+      "id": "97ec2e2a-2b25-4e0d-bf10-aea2ec9e4102",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "modelName": "embed-multilingual-light-v3.0"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsCohere",
+      "typeVersion": 1,
+      "position": [
+        -1920,
+        320
+      ],
+      "id": "cac0ba66-7ad9-4158-aeb7-1e7ee3b5ab2a",
+      "name": "Embeddings Cohere3",
+      "credentials": {
+        "cohereApi": {
+          "id": "7kDVD5X1NPN3hads",
+          "name": "CohereApi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -1568,
+        96
+      ],
+      "id": "8ae0bb08-87ce-4d62-9ea9-a61f31bd0e24",
+      "name": "Limit3"
+    },
+    {
+      "parameters": {
+        "chunkSize": 1200,
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        -1744,
+        512
+      ],
+      "id": "b3f53fc5-22ff-4d50-83a7-5d358aad6271",
+      "name": "Recursive Character Text Splitter1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1f4b703c-076f-474b-9f4f-bee52c67c6a1",
+              "name": "Conteúdo da Regra",
+              "value": "={{ $json.values().last() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2976,
+        96
+      ],
+      "id": "8b84f5f3-d3d4-44a8-b755-eab315792ef8",
+      "name": "pegarManual"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "manual_jogos",
+          "mode": "list",
+          "cachedResultName": "manual_jogos"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "nome_jogo": "={{ $('dados').item.json.name }}",
+            "descricao_jogo": "={{ $('dados').item.json.description }}",
+            "criado_em": "2026-04-25T22:52:51",
+            "manual_jogo": "={{ $json.values().first() }}",
+            "idioma_manual": "={{ $('Converte em json').item.json.idioma }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "nome_jogo",
+              "displayName": "nome_jogo",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "descricao_jogo",
+              "displayName": "descricao_jogo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "manual_jogo",
+              "displayName": "manual_jogo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "idioma_manual",
+              "displayName": "idioma_manual",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "vetor_id",
+              "displayName": "vetor_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ano",
+              "displayName": "ano",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2736,
+        96
+      ],
+      "id": "10ba1a43-6b3f-4892-894e-f63ecd229ed3",
+      "name": "SalvarManual",
+      "credentials": {
+        "postgres": {
+          "id": "I8Icve5gxx5smL6h",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. RECEBER O TEXTO DO MANUAL\nconst rawText = $input.first().json.manual_jogo || \"\";\n\nlet gameName = \"Jogo Desconhecido\";\ntry {\n  gameName = $('When chat message received').first().json.chatInput;\n} catch (error) {\n  gameName = \"Jogo Desconhecido\";\n}\n\n// 2. CONFIGURAÇÃO DE LIMITES\nconst MAX_CARACTERES = 1200; // Tamanho ideal por bloco\nconst MIN_CARACTERES_FINAL = 400; // Se a sobra final for menor que isso, anexa ao anterior\n\nconst tableData = [];\nconst lines = rawText.split('\\n');\n\nlet currentChunk = \"\";\nlet chunkIndex = 1;\n\n// 3. PROCESSAMENTO E FATIAMENTO\nfor (let i = 0; i < lines.length; i++) {\n  let line = lines[i].trim();\n  \n  if (!line) continue;\n  if (line.length <= 2 && !line.match(/[0-9]/)) continue;\n  if (line === \"TM\" || line === \"®\") continue;\n\n  if ((currentChunk.length + line.length) > MAX_CARACTERES) {\n    if (currentChunk.trim().length > 0) {\n      tableData.push({\n        \"Nome do Jogo\": gameName,\n        \"Nome da Regra\": `Fragmento ${chunkIndex}`,\n        \"Conteúdo da Regra\": currentChunk.trim(),\n        \"Palavras_Chave\": gameName\n      });\n      chunkIndex++;\n      currentChunk = \"\"; \n    }\n  }\n\n  currentChunk += line + \"\\n\";\n}\n\n// 4. TRATAMENTO INTELIGENTE DA SOBRA (O que resolve o seu problema)\nlet sobraFinal = currentChunk.trim();\n\nif (sobraFinal.length > 0) {\n  // Se a sobra for pequena E já existir um bloco anterior, costura no último bloco\n  if (sobraFinal.length < MIN_CARACTERES_FINAL && tableData.length > 0) {\n    let ultimoIndice = tableData.length - 1;\n    tableData[ultimoIndice][\"Conteúdo da Regra\"] += \"\\n\" + sobraFinal;\n  } else {\n    // Se a sobra for grande (ou se for o único texto do manual), cria o último bloco normalmente\n    tableData.push({\n      \"Nome do Jogo\": gameName,\n      \"Nome da Regra\": `Fragmento ${chunkIndex}`,\n      \"Conteúdo da Regra\": sobraFinal,\n      \"Palavras_Chave\": gameName\n    });\n  }\n}\n\n// Retorna os dados fragmentados para o n8n\nreturn tableData.map(row => ({ json: row }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2336,
+        96
+      ],
+      "id": "338c558b-6ef2-4e2c-bb0e-4bc0633eb88e",
+      "name": "DividirTexto"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1f4b703c-076f-474b-9f4f-bee52c67c6a1",
+              "name": "Conteúdo da Regra",
+              "value": "={{ $json['Conteúdo da Regra'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2128,
+        96
+      ],
+      "id": "9aad3a80-4483-42b2-b74b-57eeb0971cac",
+      "name": "pegarTexto"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "manual_jogos",
+          "mode": "list",
+          "cachedResultName": "manual_jogos"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "nome_jogo",
+              "value": "={{ $('When chat message received').first().json.chatInput }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -2544,
+        96
+      ],
+      "id": "ed4234ac-93c5-4f9e-8451-a50c66fbb297",
+      "name": "TrazerManaual1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "I8Icve5gxx5smL6h",
+          "name": "Postgres account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Percorre todos os itens que chegaram do nó anterior\nfor (const item of $input.all()) {\n  try {\n    // 1. Pega a string gerada pela IA (verifica se está em 'erro' ou 'output')\n    const textoDaIA = item.json.erro || item.json.output || \"\";\n\n    // 2. Transforma a string da IA em um objeto JSON real\n    const dadosConvertidos = JSON.parse(textoDaIA);\n\n    // 3. Cria as variáveis limpas na raiz do item\n    item.json.status = dadosConvertidos.status;\n    item.json.idioma = dadosConvertidos.idioma;\n    \n    // 4. Renomeia a variável do manual para ficar mais clara no resto do fluxo\n    item.json.manual_texto = item.json.text || \"\";\n\n    // 5. Limpeza de Segurança: Apaga os campos antigos para o JSON ficar leve e limpo\n    delete item.json.erro;\n    delete item.json.output;\n    delete item.json.text;\n\n  } catch (error) {\n    // BLINDAGEM: Se a IA falhar em gerar o JSON, o fluxo não quebra e mantém o manual salvo\n    item.json.status = \"ERRO\";\n    item.json.idioma = \"N/A\";\n    item.json.manual_texto = item.json.text || \"\";\n    item.json.erro_parse = \"A IA não retornou um JSON válido.\";\n  }\n}\n\n// Retorna os dados perfeitamente estruturados\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3664,
+        704
+      ],
+      "id": "534f1f07-61f9-4c1c-969c-034e31135762",
+      "name": "Converte em json"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4968dce1-b4be-440a-9d93-62970e59ccb8",
+              "leftValue": "={{ $json.values().first().includes(\"SIM\")}}",
+              "rightValue": 3,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "4ac72144-20c3-41e3-8489-97daefec470f",
+              "leftValue": "={{ $json.values().first().length }}",
+              "rightValue": 50,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -3904,
+        944
+      ],
+      "id": "755e4e97-a07f-4682-831f-0b9866ae99cf",
+      "name": "If3"
+    },
+    {
+      "parameters": {},
+      "id": "a914d651-4ca5-4a24-a0e8-57e3defe4800",
+      "name": "repassa",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        -3520,
+        960
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "Jogo"
+            },
+            {
+              "name": "IdUsuario"
+            }
+          ]
+        }
+      },
+      "id": "9e586d84-aa85-4272-83b5-ba30c423a2e9",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -5136,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "={{ $json.IdUsuario }} {{ $json.Jogo }} info",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -4944,
+        464
+      ],
+      "id": "553e2bcf-fa49-4e24-89a7-0e27007b069d",
+      "name": "SaveInfoJogo",
+      "credentials": {
+        "redis": {
+          "id": "3ezhy82uKrJOKjyl",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": "n8n_vectors_original",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        -1920,
+        96
+      ],
+      "id": "18d7c433-04aa-465c-b73c-0472489224e9",
+      "name": "Colocar RAG",
+      "credentials": {
+        "postgres": {
+          "id": "I8Icve5gxx5smL6h",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google search": {
+      "main": [
+        [
+          {
+            "node": "Filtro Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Saida",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtro Link": {
+      "main": [
+        [
+          {
+            "node": "Pegar 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Filtro Texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Árbitro",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "pegarManual",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtro Texto": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "resposta": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pegar 5": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Árbitro": {
+      "main": [
+        [
+          {
+            "node": "resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "dados": {
+      "main": [
+        [
+          {
+            "node": "CriarTabelaManual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Árbitro",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TrazerManaual": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Saida4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Saida": {
+      "main": [
+        [
+          {
+            "node": "Saida2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Saida3": {
+      "main": [
+        []
+      ]
+    },
+    "CriarTabelaManual": {
+      "main": [
+        [
+          {
+            "node": "TrazerManaual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Saida4": {
+      "main": [
+        [
+          {
+            "node": "Saida1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Colocar RAG",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Cohere3": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Colocar RAG",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter1": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit3": {
+      "main": [
+        [
+          {
+            "node": "Saida3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pegarManual": {
+      "main": [
+        [
+          {
+            "node": "SalvarManual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SalvarManual": {
+      "main": [
+        [
+          {
+            "node": "TrazerManaual1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DividirTexto": {
+      "main": [
+        [
+          {
+            "node": "pegarTexto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pegarTexto": {
+      "main": [
+        [
+          {
+            "node": "Colocar RAG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TrazerManaual1": {
+      "main": [
+        [
+          {
+            "node": "DividirTexto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converte em json": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Converte em json",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "repassa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "repassa": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "SaveInfoJogo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SaveInfoJogo": {
+      "main": [
+        [
+          {
+            "node": "dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Colocar RAG": {
+      "main": [
+        [
+          {
+            "node": "Limit3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "eb4985d2-2acd-4001-8289-784d705cb8f1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dd6c29c4ad0d44ae0235d6cf3989401b36f118a352cb3a6bd38f6a546e5cfec0"
+  },
+  "id": "y4om2fYILn7QGDwB",
+  "tags": []
+}

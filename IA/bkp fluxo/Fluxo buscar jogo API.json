@@ -1,0 +1,611 @@
+{
+  "name": "Fluxo buscar jogo API",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        0
+      ],
+      "id": "01e6268e-2b4f-4cf4-a2b0-0fc6085b49cf",
+      "name": "XML"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        240
+      ],
+      "id": "69b1f1e8-ae77-403f-8d6f-7ddbdf608068",
+      "name": "XML1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9926f8f7-64b2-41e3-8b11-8c7e7e0b4a91",
+              "name": "name",
+              "value": "={{ $json.items.item.name[0].value }}",
+              "type": "string"
+            },
+            {
+              "id": "7ecbf6d8-9185-4150-b44c-e7ea26252181",
+              "name": "Type",
+              "value": "={{ $json.items.item.type }}",
+              "type": "string"
+            },
+            {
+              "id": "4e6b3686-9644-4ef0-9352-f62023176954",
+              "name": "description",
+              "value": "={{ $json.items.item.description }}",
+              "type": "string"
+            },
+            {
+              "id": "8fe048c2-5bac-44ad-b90d-d1a916091275",
+              "name": "minplayers",
+              "value": "={{ $json.items.item.minplayers.value }}",
+              "type": "string"
+            },
+            {
+              "id": "2ac3cdb1-f957-48ab-8f43-f0db4f3c2996",
+              "name": "maxplayers",
+              "value": "={{ $json.items.item.maxplayers.value }}",
+              "type": "string"
+            },
+            {
+              "id": "9e9906dc-aee5-4659-a175-b77549078e29",
+              "name": "yearpublished",
+              "value": "={{ $json.items.item.yearpublished.value }}",
+              "type": "string"
+            },
+            {
+              "id": "93da7ba9-800e-44e1-b300-c81a5153658d",
+              "name": "Minage",
+              "value": "={{ $json.items.item.minage.value }}",
+              "type": "string"
+            },
+            {
+              "id": "67592b71-3b0d-435f-bf25-278ac5235a8a",
+              "name": "Playingtime",
+              "value": "={{ $json.items.item.playingtime.value }}",
+              "type": "string"
+            },
+            {
+              "id": "12b1f7c9-45a4-479e-9ab3-1f4f7fc70866",
+              "name": "icone",
+              "value": "={{ $json.items.item.image }}",
+              "type": "string"
+            },
+            {
+              "id": "c94f5ed9-14f3-4e5b-9ddc-a96b38f9a44c",
+              "name": "thumbnail",
+              "value": "={{ $json.items.item.thumbnail }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -272,
+        240
+      ],
+      "id": "b597124e-9ea0-45f6-b4f0-99a9875c44c7",
+      "name": "data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f081bc2c-9b52-4af9-b07b-ed63166dfb0a",
+              "name": "Msg",
+              "value": "={{ $json.jogo }}",
+              "type": "string"
+            },
+            {
+              "id": "79446eb6-62b9-4404-8967-53ac94b65742",
+              "name": "sessionId",
+              "value": "={{ $json.idUsuario }}",
+              "type": "string"
+            },
+            {
+              "id": "64700dc9-2321-4747-8a4e-a3140816483d",
+              "name": "idJogo",
+              "value": "={{ $json.chave }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1088,
+        16
+      ],
+      "id": "1b831250-1527-43d0-9f3d-e426c02efdf1",
+      "name": "Dados"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Pega o JSON do nó XML (ou API)\nconst inputData = $input.all()[0].json;\n\n// ==========================================\n// CONFIGURAÇÕES GERAIS\n// ==========================================\nconst limiteItens = 5; // Define a quantidade máxima de jogos que serão retornados\n\n// ==========================================\n// FUNÇÃO DE NORMALIZAÇÃO\n// Remove acentos e deixa TUDO MAIÚSCULO\n// ==========================================\nfunction normalizarTexto(texto) {\n  if (!texto) return \"\";\n  return texto\n    .toString()\n    .normalize('NFD') // Separa os caracteres dos acentos\n    .replace(/[\\u0300-\\u036f]/g, \"\") // Remove os acentos\n    .toUpperCase() // Deixa tudo maiúsculo\n    .trim();\n}\n\n// 2. Define o nome do jogo buscado pelo usuário\n// (Ajuste a referência do nó conforme seu fluxo)\nconst rawTargetName = $('Dados').first().json.Msg;\nconst targetName = normalizarTexto(rawTargetName);\n\n// 3. Garante que a lista de itens é um Array \nlet gamesList = inputData.items?.item;\n\nif (!gamesList) {\n  return [{ json: { erro: \"Nenhum jogo retornado pela API na busca.\" } }];\n}\nif (!Array.isArray(gamesList)) {\n  gamesList = [gamesList];\n}\n\n// 4. Listas para separar os níveis de correspondência\nconst matchesExatos = [];\nconst matchesPrioritarios = []; // Com espaço, ':' ou '-' (Ex: UNO FLIP, ORCS MUST DIE)\nconst matchesParciais = [];     // Letras no meio de outra palavra (Ex: UNORIGINAL, SORCERERS)\n\n// ==========================================\n// A BUSCA INTELIGENTE (COM FILTRO)\n// ==========================================\nfor (const game of gamesList) {\n  if (game && game.name && game.name.value) {\n    const gameNameFromAPI = normalizarTexto(game.name.value);\n\n    // PASSO A: Correspondência EXATA (\"UNO\" ou \"ORCS\")\n    if (gameNameFromAPI === targetName) {\n      matchesExatos.push(game);\n    } \n    // PASSO B: Correspondência com Espaço ou Pontuação logo após o termo\n    // Evita pegar \"Unoriginal\" quando a busca é \"UNO\"\n    else if (\n      gameNameFromAPI.includes(targetName + \" \") || \n      gameNameFromAPI.includes(targetName + \":\") ||\n      gameNameFromAPI.includes(targetName + \"-\")\n    ) {\n      matchesPrioritarios.push(game);\n    }\n    // PASSO C: Correspondência PARCIAL (O que sobrar)\n    else if (gameNameFromAPI.includes(targetName)) {\n      matchesParciais.push(game);\n    }\n  }\n}\n\n// ==========================================\n// FUNÇÃO DE ORDENAÇÃO POR ANO (Mais novo para o mais antigo)\n// ==========================================\nfunction ordenarPorAnoDecrescente(lista) {\n  return lista.sort((a, b) => {\n    // Pega o ano. Se não existir na API (undefined), assume 0 para ir pro final da lista\n    const anoA = parseInt(a.yearpublished?.value) || 0;\n    const anoB = parseInt(b.yearpublished?.value) || 0;\n    \n    return anoB - anoA; // A subtração invertida força a ordem do maior para o menor\n  });\n}\n\n// Ordena cada grupo de match individualmente para não quebrar o nível de prioridade\nordenarPorAnoDecrescente(matchesExatos);\nordenarPorAnoDecrescente(matchesPrioritarios);\nordenarPorAnoDecrescente(matchesParciais);\n\n// ==========================================\n// RETORNO FINAL (UM ÚNICO OBJETO JSON)\n// ==========================================\n\n// Junta as 3 listas, garantindo que os exatos venham primeiro, depois os com espaço/dois-pontos\nconst todosMatches = [...matchesExatos, ...matchesPrioritarios, ...matchesParciais];\n\n// Corta a lista de acordo com o limite configurado lá em cima\nconst topJogos = todosMatches.slice(0, limiteItens);\n\nif (topJogos.length > 0) {\n  // Retorna apenas 1 \"Item\" no n8n, contendo o array de jogos dentro dele\n  return [{ \n    json: { \n      termo_buscado: rawTargetName,\n      quantidade_retornada: topJogos.length,\n      jogos: topJogos \n    } \n  }];\n} else {\n  return [{ json: { erro: `Nenhum jogo encontrado contendo o nome: ${rawTargetName}` } }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        0
+      ],
+      "id": "f5d860e2-d995-4e73-af4c-1fa0e70a3d4d",
+      "name": "Filtro"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "86b4ee0c-454c-4724-8d2b-06f6bf4d3a95",
+              "leftValue": "={{ $json.idJogo }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -896,
+        16
+      ],
+      "id": "5d8f251e-3f81-4205-8e56-bf9f272e4ef0",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "url": "https://boardgamegeek.com/xmlapi2/thing",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $('Dados').item.json.idJogo }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 0a35afad-eaa7-4f8d-bef7-112acafebe9a"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -656,
+        240
+      ],
+      "id": "236c3b2f-c5ef-49ea-8ddf-1a5223542683",
+      "name": "Pegar jogo"
+    },
+    {
+      "parameters": {},
+      "id": "a6dddc5b-4e88-4e75-be55-4d76f3e12245",
+      "name": "Saida",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        704,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "id": "33d03e53-1cfa-44fc-9e86-122ed2100088",
+      "name": "Saida02",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        304,
+        240
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('Dados').item.json.sessionId }} {{ $('Dados').item.json.Msg }} opcoes",
+        "value": "={{ JSON.stringify($json.jogos) }}",
+        "keyType": "string"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        96,
+        0
+      ],
+      "id": "7eba2504-d27c-4423-b4c7-553ecf7814c7",
+      "name": "SaveOpçoes",
+      "credentials": {
+        "redis": {
+          "id": "3ezhy82uKrJOKjyl",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('Dados').item.json.sessionId }} {{ $('Dados').item.json.Msg }} info",
+        "value": "={{ $json.valor_para_salvar }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        112,
+        240
+      ],
+      "id": "6d007253-b323-4e57-a42d-3df02a1bcc25",
+      "name": "SaveInfoJogo",
+      "credentials": {
+        "redis": {
+          "id": "3ezhy82uKrJOKjyl",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "idJogo"
+            },
+            {
+              "name": "jogo"
+            },
+            {
+              "name": "idUsuario"
+            }
+          ]
+        }
+      },
+      "id": "059485e2-cb24-4f9e-be40-92c83332528d",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -1280,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "={{ $('Dados').item.json.sessionId }} {{ $('Dados').item.json.Msg }} Lista",
+        "value": "={{ JSON.stringify($json.items.item) }}",
+        "keyType": "string"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        0
+      ],
+      "id": "6c389228-681e-4bf1-843c-141de5e898aa",
+      "name": "SaveLista",
+      "credentials": {
+        "redis": {
+          "id": "3ezhy82uKrJOKjyl",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://boardgamegeek.com/xmlapi2/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $('Dados').item.json.Msg }}"
+            },
+            {
+              "name": "type",
+              "value": "boardgame"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 0a35afad-eaa7-4f8d-bef7-112acafebe9a"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -656,
+        0
+      ],
+      "id": "19143484-0c1e-4916-b27e-44edfa61708c",
+      "name": "BGG"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ==========================================\n// 1. PEGA OS DADOS DIRETAMENTE DO NÓ ANTERIOR\n// ==========================================\nconst inputData = $input.first().json;\nconst listaJogos = inputData.jogos;\n\n// Verifica se a lista realmente tem dados\nif (!listaJogos || !Array.isArray(listaJogos) || listaJogos.length === 0) {\n  return [{ json: { prompt_jogos: \"Nenhum jogo encontrado.\" } }];\n}\n\n// ==========================================\n// 2. FORMATANDO O TEXTO PARA A IA (LLM)\n// ==========================================\n// Cria o cabeçalho do texto aproveitando o termo buscado\nlet textoParaIA = `Opções de jogos encontradas para \"${inputData.termo_buscado}\":\\n`;\n\n// Passa por cada jogo da lista e extrai só o nome e o ano\nlistaJogos.forEach((jogo, index) => {\n  // Pega o nome e o ano, com uma trava de segurança caso a API não tenha enviado o ano\n  const nomeJogo = jogo.name?.value || \"Nome não informado\";\n  const anoJogo = jogo.yearpublished?.value || \"Ano desconhecido\";\n  \n  // Monta a linha no formato: \"1. Nome do Jogo (Ano: 0000)\"\n  textoParaIA += `${index + 1}. ${nomeJogo} (Ano: ${anoJogo})\\n`;\n});\n\n// ==========================================\n// 3. RETORNO PARA O PRÓXIMO NÓ\n// ==========================================\nreturn [{ \n  json: { \n    // Retornamos o texto formatado limpo para jogar no Prompt do Agente\n    prompt_jogos: textoParaIA \n  } \n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        0
+      ],
+      "id": "f1c355b3-2cb2-4edb-9ea3-be673f5c974e",
+      "name": "Filtro02"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e9f97b06-0ea0-4554-8cd3-6a7d7fc10838",
+              "name": "Opções",
+              "value": "={{ $json.prompt_jogos }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        0
+      ],
+      "id": "ab264dc9-09a8-4647-9e0f-148103b5cf79",
+      "name": "Reposta"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ==========================================\n// EMPACOTAR PARA O REDIS (JSON -> TEXTO)\n// ==========================================\n\n// 1. Pega todo o JSON que chegou do nó anterior (os dados do jogo)\nconst dadosDoJogo = $input.first().json;\n\n// 2. Converte o objeto inteiro em uma única linha de texto puro\nconst textoParaRedis = JSON.stringify(dadosDoJogo);\n\n// 3. Retorna a string pronta para você usar no campo 'Value' do nó Redis\nreturn [{\n  json: {\n    valor_para_salvar: textoParaRedis\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        240
+      ],
+      "id": "bbf98e2a-d852-4450-a86b-b06b8c1b8e12",
+      "name": "Compactar"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "SaveLista",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML1": {
+      "main": [
+        [
+          {
+            "node": "data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data": {
+      "main": [
+        [
+          {
+            "node": "Compactar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dados": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtro": {
+      "main": [
+        [
+          {
+            "node": "SaveOpçoes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "BGG",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pegar jogo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pegar jogo": {
+      "main": [
+        [
+          {
+            "node": "XML1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Saida02": {
+      "main": [
+        []
+      ]
+    },
+    "SaveOpçoes": {
+      "main": [
+        [
+          {
+            "node": "Filtro02",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SaveInfoJogo": {
+      "main": [
+        [
+          {
+            "node": "Saida02",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SaveLista": {
+      "main": [
+        [
+          {
+            "node": "Filtro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BGG": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtro02": {
+      "main": [
+        [
+          {
+            "node": "Reposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reposta": {
+      "main": [
+        [
+          {
+            "node": "Saida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compactar": {
+      "main": [
+        [
+          {
+            "node": "SaveInfoJogo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "06809bb5-4cc7-4e40-a1db-12465aa74805",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dd6c29c4ad0d44ae0235d6cf3989401b36f118a352cb3a6bd38f6a546e5cfec0"
+  },
+  "id": "YFhYCP8vZANKDW6G",
+  "tags": []
+}
